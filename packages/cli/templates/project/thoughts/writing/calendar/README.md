@@ -43,5 +43,5 @@ thoughts/writing/calendar/
 ## See also
 
 - User guide: `thoughts/writing/README.md`
-- Engineering reference: `.claude/skills/writing/README.md`
+- Engineering reference: scribetronic `docs/contracts.md` and `docs/skills.md`
 - Brainstorming pool (ideas backlog): `thoughts/writing/ideas/`

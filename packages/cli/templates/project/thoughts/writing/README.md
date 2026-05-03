@@ -2,7 +2,7 @@
 
 A set of Claude Code skills for drafting, editing, and publishing weekly newsletters plus their daily social derivatives. Output language: English (customize as needed). Platforms: blog, X, LinkedIn, Threads.
 
-> Looking for HOW the skills work internally — contracts, pipelines, extension recipes? Read [`.claude/skills/writing/README.md`](../../.claude/skills/writing/README.md). This file is the user guide.
+> Looking for HOW the skills work internally — contracts, pipelines, extension recipes? Read the scribetronic engineering docs (`docs/contracts.md` and `docs/skills.md` in the scribetronic repo). This file is the user guide.
 
 ---
 
@@ -182,7 +182,7 @@ thoughts/writing/
 
 For the per-week directory layout (rules, plan rows, derivatives), see [`thoughts/writing/calendar/README.md`](calendar/README.md).
 
-For the engineering view (contracts, extension recipes, anti-patterns), see [`.claude/skills/writing/README.md`](../../.claude/skills/writing/README.md).
+For the engineering view (contracts, extension recipes, anti-patterns), see the scribetronic engineering docs (`docs/contracts.md` and `docs/skills.md` in the scribetronic repo).
 
 ---
 
@@ -226,7 +226,7 @@ The system is designed to be edited by hand. Every file is markdown or YAML; no 
 
 ## For contributors / engineering
 
-> If you're extending this system (new content type, new publish target, new platform), see the engineering reference at [`.claude/skills/writing/README.md`](../../.claude/skills/writing/README.md).
+> If you're extending this system (new content type, new publish target, new platform), see the engineering reference at the scribetronic engineering docs (`docs/contracts.md` and `docs/skills.md` in the scribetronic repo).
 
 ---
 
