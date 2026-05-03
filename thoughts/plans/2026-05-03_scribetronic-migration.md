@@ -16,7 +16,7 @@ After migration, `rbart-astro` consumes scribetronic via `npx scribetronic init`
 - [ ] Repo `24.scribetronic/` matches devtronic's top-level layout (root files, `packages/cli/`, `templates/`, `docs/`, `thoughts/`, `.claude/`, `.github/`).
 - [ ] CLI built with TypeScript + tsup, distributed as npm package `scribetronic` with `bin: scribetronic`.
 - [ ] All current writing skills converted from flat `<name>.md` to devtronic's `<name>/SKILL.md` folder format.
-- [ ] `/agenda`, `/write`, `/write-publish` and all 14 type-skills functional after migration (parity with current rbart-astro behaviour).
+- [ ] `/agenda`, `/write`, `/write-publish` and all 14 type-skills (6 long-form + 8 short-form, post-`weekly-bip`-removal) functional after migration (parity with current rbart-astro behaviour). 21 total skills counting 3 orchestrators + 4 shared.
 - [ ] `scribetronic init <project-root>` scaffolds `thoughts/writing/calendar/` and `thoughts/writing/ideas/` from templates.
 - [ ] OSS files present: `LICENSE` (MIT), `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `AGENTS.md`, `RECOMMENDED-SKILLS.md`, `CLAUDE.md`.
 - [ ] `docs/` populated: `ARCHITECTURE.md`, `philosophy.md`, `cli-reference.md`, `customization.md`, `skills.md`, `tutorials/` (≥3).
@@ -177,7 +177,7 @@ templates/project/thoughts/writing/
 │   └── archive/.gitkeep
 └── ideas/
     ├── README.md
-    └── <14 type files>.md
+    └── <13 type files>.md
 ```
 
 `scribetronic init` MUST refuse to overwrite existing files (idempotent, safe to re-run).
@@ -302,7 +302,7 @@ Build: `tsup src/index.ts --format esm --dts --clean`. Test: `vitest run`. Lint:
 | `rbart-astro/CLAUDE.md` | Modify | Point to scribetronic plugin |
 | `rbart-astro/thoughts/writing/README.md` | Modify | Add "powered by" note |
 
-Total new files: **~92** (21 skill folders × 1 SKILL.md + 14 ideas + 5 calendar + 3 root project + ~22 CLI src/test + 12 docs + 12 root OSS + 6 self-dogfood). The `+2` in CLI vs prior estimate accounts for the new `style.ts` command + its test.
+Total new files: **~92** (21 skill folders × 1 SKILL.md + 13 ideas + 5 calendar + 3 root project + ~22 CLI src/test + 12 docs + 12 root OSS + 6 self-dogfood). The `+2` in CLI vs prior estimate accounts for the new `style.ts` command + its test.
 
 ---
 
@@ -446,7 +446,7 @@ Move (not copy) the existing `rbart-astro/thoughts/writing/calendar/{rules.yaml,
 `README.md` and `index.md`: copy verbatim, they're already user-guide content.
 
 #### Task 4.2: Ideas pool template (15 files)
-**Files**: `templates/project/thoughts/writing/ideas/{README,<14 type files>}.md`
+**Files**: `templates/project/thoughts/writing/ideas/{README,<13 type files>}.md`
 
 Move the structure from `rbart-astro/thoughts/writing/ideas/`, but each `<type>.md` template starts empty (only sections `## Active`, `## Used`, `## Cold / parked` with no bullets). Roberto's actual ideas stay in rbart-astro.
 
@@ -576,7 +576,7 @@ dependencies:
   - `templateCopier.test.ts`: walks dirs, preserves structure, handles `.gitkeep`.
   - `skills.test.ts`: registry has 22 entries, every entry has valid frontmatter, every `name:` matches folder.
 - **Integration** (manual, Phase 5.2):
-  - Fresh `/tmp` dir + `scribetronic init` → verify 22 skills + project scaffold.
+  - Fresh `/tmp` dir + `scribetronic init` → verify 21 skills + project scaffold.
 - **Migration validation** (Phase 5.3):
   - rbart-astro post-init: skill folder count matches, no leftover `writing/` infix, `npm run build` passes.
   - Smoke `/agenda today` runs without error.
@@ -608,7 +608,7 @@ dependencies:
 - [ ] Every `inherits:` value resolves to an existing file when interpreted relative to the SKILL.md location.
 
 ### Phase 4: Project templates
-- [ ] `find packages/cli/templates/project/thoughts/writing -type f | wc -l` returns at least 21 (1 README + 5 calendar + 15 ideas).
+- [ ] `find packages/cli/templates/project/thoughts/writing -type f | wc -l` returns at least 21 (1 README + 1 publish-config + 5 calendar + 14 ideas including its README).
 - [ ] `templates/project/thoughts/writing/calendar/rules.example.yaml` and `publish-config.example.yaml` exist; the non-example versions do NOT exist in templates.
 - [ ] `templates/project/thoughts/writing/calendar/history.md` is clean (header only, no entries).
 
