@@ -1,0 +1,97 @@
+# Cadence rules. Customize freely. See https://github.com/r-bart/scribetronic/blob/main/docs/customization.md
+#
+# publish-config.yaml
+#
+# Source of truth for /write-publish. The skill MUST read its config from this
+# file — no hardcoded paths, no hardcoded key names. If you find a hardcoded
+# value in /write-publish, that's a bug.
+#
+# Top-level keys:
+#   content_types         — map: writing post type → publish target
+#   targets               — map: target name → { path, format, frontmatter, filename }
+#   social_archive        — { base, layout } for archived social derivatives
+#   strict_slop_check     — bool. If true, HIGH ai-slop-check issues block publish.
+#   require_ready_status  — bool. If true, only `status: ready` drafts can be published.
+#
+# To extend with a newsletter collection later: add a new key under `targets`
+# (e.g. `newsletter:` with its own path/format/frontmatter), then point the
+# relevant `content_types` entries at it (e.g. `long-form-monthly-devlog: { target: newsletter }`).
+# No skill code change required.
+
+# -----------------------------------------------------------------------------
+# content_types — which long-form types map to which target
+# -----------------------------------------------------------------------------
+# Short-form types (x-vs-y, listicle, observation, motivational, present-vs-future,
+# thread, carousel) are derivatives of long-form posts and are handled via
+# `social_archive` below — they don't need a content_types entry.
+content_types:
+  long-form-weekly-newsletter: { target: blog }   # weekly newsletter — Sunday cadence, parent of weekly derivatives
+  long-form-monthly-devlog:    { target: blog }   # monthly recap / devlog
+  long-form-hot-take:          { target: blog }   # opinion / hot-take essay
+  long-form-how-to:            { target: blog }   # tutorial / how-to guide
+  long-form-launch-retro:      { target: blog }   # post-launch retrospective
+  long-form-manifesto:         { target: blog }   # long-form manifesto / position piece
+
+# -----------------------------------------------------------------------------
+# targets — destination collections
+# -----------------------------------------------------------------------------
+# Each target describes WHERE files go, in WHAT format, and HOW to derive their
+# frontmatter from the draft.
+#
+# `frontmatter` mapping rules (per field):
+#   { from: draft.<field> }        → read from draft frontmatter
+#   { from: draft.title }          → first H1 of the draft body
+#   { from: prompt }               → ask the user interactively (fail in --auto)
+#   { from: prompt, fallback: X }  → ask, but pre-fill from X if available
+#   { from: <key>, default: <v> }  → use <key>; if missing, fall back to <v>
+#   { value: "<literal>" }         → hard-coded literal
+targets:
+  blog:
+    # Customize `path`, `format`, `frontmatter`, and `filename` for your blog
+    # collection. The example below is for an Astro content collection with a
+    # Zod schema like:
+    #   title:       z.string()
+    #   description: z.string()
+    #   date:        z.coerce.date()
+    #   tags:        z.array(z.string()).default([])
+    #   type:        z.literal("blog").default("blog")
+    path: src/content/blog                                              # customize for your project
+    format: mdx
+    frontmatter:
+      title:       { from: draft.title }                                # H1 of the draft body
+      description: { from: prompt, fallback: draft.description }        # draft frontmatter `description` if present, else asked
+      date:        { from: published_date, default: today }             # --date <D> overrides; else today
+      tags:        { from: draft.tags, default: [] }                    # draft frontmatter `tags`; if missing, []
+      type:        { value: "blog" }                                    # required by the example Astro schema
+    # Mustache-style template. {{date}} is YYYY-MM-DD; {{slug}} is the draft slug.
+    filename: "{{date}}-{{slug}}.mdx"
+
+# -----------------------------------------------------------------------------
+# social_archive — local archive of social derivatives
+# -----------------------------------------------------------------------------
+# /write-publish does NOT push to platforms in v1. The user copies these into
+# Buffer / Hypefury / native composers manually.
+#
+# Each platform gets its own subdirectory; filenames within a subdirectory do
+# NOT carry a platform suffix (the directory already identifies the channel).
+social_archive:
+  base: thoughts/writing/published/social
+  layout:
+    # Each entry: <platform>: <relative-path-template>
+    # Available variables: {{date}}, {{slug}}.
+    # The skill creates these subdirectories on first publish if missing.
+    x:        "x/{{date}}-{{slug}}.md"
+    linkedin: "linkedin/{{date}}-{{slug}}.md"
+    threads:  "threads/{{date}}-{{slug}}.md"
+    carousel: "carousel/{{date}}-{{slug}}.md"
+
+# -----------------------------------------------------------------------------
+# Publish gates
+# -----------------------------------------------------------------------------
+# If true, /write-publish refuses to publish when ai-slop-check returns any
+# HIGH severity issue. Override per-invocation with --force.
+strict_slop_check: true
+
+# If true, /write-publish refuses to publish unless the draft frontmatter
+# `status` is exactly `ready`. Forces the writer to pass the review gate first.
+require_ready_status: true

@@ -1,0 +1,68 @@
+# Cadence rules. Customize freely. See https://github.com/r-bart/scribetronic/blob/main/docs/customization.md
+#
+# Recurring slots for the writing agenda.
+#
+# CANONICAL SCHEMA — this file is the source of truth. /agenda and /write must
+# match this shape exactly. Do not introduce `id`, `priority`, `schedule`, or
+# `cron` fields — they are not supported.
+#
+# Schema:
+#   rules:
+#     - name: <unique-string>           # rule identifier; used by `overrides`
+#       when:                           # exactly one selector key:
+#         weekday: <full-word>          #   sunday | monday | tuesday | ... | saturday
+#         # OR
+#         monthday: <int>               #   1..31, or negative to count from end (-1 = last day)
+#         # OR
+#         nth_weekday_of_month: "<ord> <weekday>"
+#                                       #   ord ∈ {first, second, third, fourth, last}
+#                                       #   weekday ∈ {sunday..saturday}
+#                                       #   e.g. "first sunday", "last friday"
+#       type: <long-form-weekly-newsletter|long-form-monthly-devlog|long-form-hot-take|long-form-how-to|long-form-launch-retro|long-form-manifesto>
+#       seed_template: <string>         # optional. Variables expanded by the resolver:
+#                                       #   {{date}}        ISO date of the slot (YYYY-MM-DD)
+#                                       #   {{weekday}}     full weekday name, lowercase
+#                                       #   {{week_start}}  Monday of the slot's ISO week
+#                                       #   {{week_end}}    Sunday of the slot's ISO week
+#                                       #   {{month_name}}  full English month name
+#                                       #   {{month_num}}   2-digit month
+#                                       #   {{year}}        4-digit year
+#                                       # Unknown variables are left literal and a warning is printed.
+#       active_from: <YYYY-MM-DD>       # optional. Rule only matches on/after this date.
+#       active_until: <YYYY-MM-DD>      # optional. Rule only matches on/before this date.
+#       overrides: [<name>, ...]        # optional. List of OTHER rule `name` values that this
+#                                       #   rule beats when both match the same date.
+#                                       #   Reference rules by `name`, never by id (no ids exist).
+#
+# Resolution algorithm for a given date D:
+#   1. Drop rules whose active window excludes D.
+#   2. Collect all rules whose `when` matches D.
+#   3. For each pair (A, B) in the survivors, if A's `overrides` contains B's name, drop B.
+#   4. If multiple still survive, the one defined LATER in this file wins.
+#   5. Expand the `seed_template` variables and return the rule.
+#
+# Date math: ISO weekdays. "first sunday" = the first calendar occurrence of Sunday in the month.
+
+rules:
+  - name: weekly-newsletter
+    when: { weekday: sunday }
+    type: long-form-weekly-newsletter
+    seed_template: "Week of {{week_start}} — {{week_end}}"
+
+  - name: monthly-devlog
+    when: { nth_weekday_of_month: "first sunday" }
+    type: long-form-monthly-devlog
+    seed_template: "{{month_name}} {{year}} recap"
+    overrides: [weekly-newsletter]   # if both match, monthly wins
+
+  - name: midweek-how-to
+    when: { weekday: wednesday }
+    type: long-form-how-to
+    seed_template: "How to — {{date}}"
+    active_from: 2026-06-01
+
+  - name: quarterly-manifesto
+    when: { nth_weekday_of_month: "first monday" }
+    type: long-form-manifesto
+    seed_template: "Manifesto — {{month_name}} {{year}}"
+    active_from: 2026-01-01
