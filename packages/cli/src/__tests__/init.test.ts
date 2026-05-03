@@ -79,4 +79,38 @@ describe('initCommand', () => {
 
     expect(readFileSync(target, 'utf-8')).toBe('user-config: true');
   });
+
+  it('exits 1 when the target path does not exist', async () => {
+    const exitSpy = vi.spyOn(process, 'exit').mockImplementation(((_code?: number) => {
+      throw new Error('process.exit called');
+    }) as never);
+
+    await expect(initCommand({ path: join(project, 'nope') })).rejects.toThrow(
+      'process.exit called'
+    );
+
+    exitSpy.mockRestore();
+  });
+
+  it('warns and returns gracefully when bundled templates are missing', async () => {
+    rmSync(fakeTemplatesRoot, { recursive: true, force: true });
+    // Recreate an empty dir so getTemplatesDir() points at a valid but empty location
+    fakeTemplatesRoot = mkdtempSync(join(tmpdir(), 'scribe-init-tpl-empty-'));
+
+    // Should NOT throw — it returns after warning
+    await expect(initCommand({ path: project })).resolves.toBeUndefined();
+
+    // Nothing was scaffolded
+    expect(existsSync(join(project, '.claude'))).toBe(false);
+    expect(existsSync(join(project, 'scribetronic'))).toBe(false);
+  });
+
+  it('detects an existing scribetronic install and continues idempotently', async () => {
+    // Seed a previous install
+    await initCommand({ path: project });
+    expect(existsSync(join(project, 'scribetronic/calendar/README.md'))).toBe(true);
+
+    // Re-run — should not throw, all files skipped
+    await expect(initCommand({ path: project })).resolves.toBeUndefined();
+  });
 });

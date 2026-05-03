@@ -78,6 +78,22 @@ describe('styleCommand', () => {
     Object.defineProperty(process.stdin, 'isTTY', { value: origIsTTY, configurable: true });
   });
 
+  it('exits 1 when the bundled seed is missing', async () => {
+    // Wipe the seed
+    rmSync(fakeTemplatesRoot, { recursive: true, force: true });
+    fakeTemplatesRoot = mkdtempSync(join(tmpdir(), 'scribe-style-tpl-empty-'));
+
+    const exitSpy = vi.spyOn(process, 'exit').mockImplementation(((_code?: number) => {
+      throw new Error('process.exit called');
+    }) as never);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    await expect(styleCommand({})).rejects.toThrow('process.exit called');
+
+    exitSpy.mockRestore();
+    errSpy.mockRestore();
+  });
+
   it('--reset on non-TTY exits with an error before touching the file', async () => {
     const target = join(project, '.claude/skills/writing-style/SKILL.md');
     mkdirSync(join(project, '.claude/skills/writing-style'), { recursive: true });
