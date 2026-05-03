@@ -57,7 +57,7 @@ npm install --save-dev github:r-bart/scribetronic#release/v0.1.x
 
 The CLI will:
 
-1. Scaffold the editorial calendar templates into `thoughts/writing/`
+1. Scaffold the editorial calendar templates into `scribetronic/`
 2. Install the 21 skills under `.claude/skills/`
 3. Create the folder structure for drafts, published pieces, and notes
 

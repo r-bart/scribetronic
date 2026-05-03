@@ -12,17 +12,17 @@ See also [contracts.md §7](contracts.md) for the formal source-of-truth rule.
 
 | Concern | File | Owner |
 |---|---|---|
-| Cadence (recurring slots) | `thoughts/writing/calendar/rules.yaml` | You |
-| Publish targets and frontmatter mappings | `thoughts/writing/publish-config.yaml` | You |
+| Cadence (recurring slots) | `scribetronic/calendar/rules.yaml` | You |
+| Publish targets and frontmatter mappings | `scribetronic/publish-config.yaml` | You |
 | Voice | `.claude/skills/writing-style/SKILL.md` | You (via `scribetronic style`) |
-| Ideas backlog | `thoughts/writing/ideas/<type>.md` | You |
-| Per-week plan | `thoughts/writing/calendar/<YYYY-WNN>/plan.md` | You + `/agenda` |
+| Ideas backlog | `scribetronic/ideas/<type>.md` | You |
+| Per-week plan | `scribetronic/calendar/<YYYY-WNN>/plan.md` | You + `/agenda` |
 
 What you **should not** edit:
 
 - Any other `SKILL.md` under `.claude/skills/` (excepting `writing-style`). These are scribetronic-owned and refresh on `scribetronic init` after upgrades.
-- `thoughts/writing/calendar/history.md` (append-only, written by skills).
-- Files inside `thoughts/writing/calendar/<week>/` other than `plan.md` (the week directory is the skills' working set).
+- `scribetronic/calendar/history.md` (append-only, written by skills).
+- Files inside `scribetronic/calendar/<week>/` other than `plan.md` (the week directory is the skills' working set).
 
 ---
 
@@ -33,7 +33,7 @@ What you **should not** edit:
 ### Example — default scribetronic rules
 
 ```yaml
-# thoughts/writing/calendar/rules.yaml
+# scribetronic/calendar/rules.yaml
 #
 # Schema (closed — do NOT add fields):
 #   - name: <unique-string>
@@ -106,7 +106,7 @@ For a given date `D`:
 ### Example — Astro blog target
 
 ```yaml
-# thoughts/writing/publish-config.yaml
+# scribetronic/publish-config.yaml
 
 content_types:
   weekly-newsletter:    { target: blog }
@@ -128,7 +128,7 @@ targets:
     filename: "{{date}}-{{slug}}.mdx"
 
 social_archive:
-  base: thoughts/writing/social_archive
+  base: scribetronic/social_archive
   layout:
     x:        "x/{{date}}-{{slug}}.md"
     linkedin: "linkedin/{{date}}-{{slug}}.md"
@@ -225,7 +225,7 @@ Two reasons:
 
 ## Adding ideas to the backlog
 
-`thoughts/writing/ideas/` is a writer-owned brainstorming area. One file per content type. No skill writes to these files; they're a notebook you grep.
+`scribetronic/ideas/` is a writer-owned brainstorming area. One file per content type. No skill writes to these files; they're a notebook you grep.
 
 ### Schema (per [contracts.md §8](contracts.md))
 
@@ -297,11 +297,11 @@ This is your upgrade path: bump the scribetronic version (`cd ~/scribetronic/pac
 
 ### What `init` will NOT touch
 
-- `thoughts/writing/calendar/<YYYY-WNN>/` — your active and past weeks.
-- `thoughts/writing/calendar/history.md` — your published archive.
-- `thoughts/writing/ideas/<type>.md` if it already has content — only seeded the first time.
+- `scribetronic/calendar/<YYYY-WNN>/` — your active and past weeks.
+- `scribetronic/calendar/history.md` — your published archive.
+- `scribetronic/ideas/<type>.md` if it already has content — only seeded the first time.
 - `.claude/skills/writing-style/SKILL.md` — managed by `scribetronic style`, not `init`.
-- Any file in your project outside `.claude/` and `thoughts/writing/`.
+- Any file in your project outside `.claude/` and `scribetronic/`.
 
 If you're worried, run `git status` after `init` to see exactly what changed.
 
@@ -321,4 +321,4 @@ rm -rf .claude/skills/short-form-*
 npm uninstall -g scribetronic
 ```
 
-Your `thoughts/writing/` directory is unaffected. The content, calendar, ideas, and history all stay — they're yours.
+Your `scribetronic/` directory is unaffected. The content, calendar, ideas, and history all stay — they're yours.

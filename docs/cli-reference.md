@@ -17,7 +17,7 @@ All commands exit with code `0` on success, non-zero on failure. Exit codes docu
 
 ## `scribetronic init [path]`
 
-Scaffold scribetronic into a project. Copies the bundled templates into the target project's `.claude/` and `thoughts/writing/` directories.
+Scaffold scribetronic into a project. Copies the bundled templates into the target project's `.claude/` and `scribetronic/` directories.
 
 ### Synopsis
 
@@ -32,7 +32,7 @@ scribetronic init /abs/path        # absolute path also works
 1. Resolves the target path (default: `process.cwd()`).
 2. Verifies the target is a directory and writable.
 3. Walks `templates/claude-code/` and copies into `<target>/.claude/`.
-4. Walks `templates/project/` and copies into `<target>/thoughts/writing/`.
+4. Walks `templates/project/` and copies into `<target>/scribetronic/`.
 5. During copy, files matching `*.example.yaml` are renamed to `*.yaml` at the destination.
 6. Existing files are **never overwritten** — each is logged with a yellow `exists` line and skipped.
 7. Prints a summary: count copied, count skipped, count renamed.
@@ -53,19 +53,18 @@ Running `scribetronic init` multiple times in the same directory is safe. The se
 │       ├── write/SKILL.md
 │       ├── write-publish/SKILL.md
 │       └── ... (18 more)
-└── thoughts/
-    └── writing/
+└── scribetronic/
+    ├── README.md
+    ├── publish-config.yaml                  # renamed from .example.yaml
+    ├── calendar/
+    │   ├── README.md
+    │   ├── index.md
+    │   ├── rules.yaml                       # renamed from .example.yaml
+    │   ├── history.md
+    │   └── archive/.gitkeep
+    └── ideas/
         ├── README.md
-        ├── publish-config.yaml                  # renamed from .example.yaml
-        ├── calendar/
-        │   ├── README.md
-        │   ├── index.md
-        │   ├── rules.yaml                       # renamed from .example.yaml
-        │   ├── history.md
-        │   └── archive/.gitkeep
-        └── ideas/
-            ├── README.md
-            └── <14 type files>.md
+        └── <14 type files>.md
 ```
 
 ### What gets NOT created
@@ -87,8 +86,8 @@ $ scribetronic init
 created  .claude/skills/agenda/SKILL.md
 created  .claude/skills/write/SKILL.md
 ...
-created  thoughts/writing/calendar/rules.yaml         (from rules.example.yaml)
-created  thoughts/writing/calendar/publish-config.yaml (from publish-config.example.yaml)
+created  scribetronic/calendar/rules.yaml         (from rules.example.yaml)
+created  scribetronic/calendar/publish-config.yaml (from publish-config.example.yaml)
 ✓ scribetronic installed. Run `scribetronic style` next.
 
 # Re-running is safe

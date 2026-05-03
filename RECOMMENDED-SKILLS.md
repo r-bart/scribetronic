@@ -6,7 +6,7 @@ Scribetronic ships 21 writing-pipeline skills. These pair well with it for a ful
 
 [`r-bart/devtronic`](https://github.com/r-bart/devtronic) provides the engineering counterpart: spec, plan, execute, review. Scribetronic borrows its repo shape and conventions.
 
-If you also do code, install both. The two plugins do not overlap: scribetronic owns `thoughts/writing/`, devtronic owns `thoughts/{plans,specs,notes}/` and engineering skills (`/create-plan`, `/execute-plan`, `/post-review`, `/spec`, etc.).
+If you also do code, install both. The two plugins do not overlap: scribetronic owns `scribetronic/`, devtronic owns `thoughts/{plans,specs,notes}/` and engineering skills (`/create-plan`, `/execute-plan`, `/post-review`, `/spec`, etc.).
 
 ## Claude Code built-ins
 

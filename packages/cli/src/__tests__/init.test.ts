@@ -37,7 +37,7 @@ beforeEach(() => {
   mkdirSync(cc, { recursive: true });
   writeFileSync(join(cc, 'SKILL.md'), '---\nname: agenda\n---\nbody');
 
-  const proj = join(fakeTemplatesRoot, 'project', 'thoughts', 'writing', 'calendar');
+  const proj = join(fakeTemplatesRoot, 'project', 'scribetronic', 'calendar');
   mkdirSync(proj, { recursive: true });
   writeFileSync(join(proj, 'rules.example.yaml'), 'sample: true');
   writeFileSync(join(proj, 'README.md'), 'guide');
@@ -54,15 +54,15 @@ describe('initCommand', () => {
     await initCommand({ path: project });
 
     expect(existsSync(join(project, '.claude/skills/agenda/SKILL.md'))).toBe(true);
-    expect(existsSync(join(project, 'thoughts/writing/calendar/README.md'))).toBe(true);
-    expect(existsSync(join(project, 'thoughts/writing/calendar/rules.yaml'))).toBe(true);
-    expect(existsSync(join(project, 'thoughts/writing/calendar/rules.example.yaml'))).toBe(false);
+    expect(existsSync(join(project, 'scribetronic/calendar/README.md'))).toBe(true);
+    expect(existsSync(join(project, 'scribetronic/calendar/rules.yaml'))).toBe(true);
+    expect(existsSync(join(project, 'scribetronic/calendar/rules.example.yaml'))).toBe(false);
   });
 
   it('is idempotent — re-running does not overwrite existing files', async () => {
     await initCommand({ path: project });
 
-    const target = join(project, 'thoughts/writing/calendar/README.md');
+    const target = join(project, 'scribetronic/calendar/README.md');
     writeFileSync(target, 'user-edited');
 
     await initCommand({ path: project });
@@ -71,8 +71,8 @@ describe('initCommand', () => {
   });
 
   it('does not overwrite an existing rules.yaml when source is rules.example.yaml', async () => {
-    const target = join(project, 'thoughts/writing/calendar/rules.yaml');
-    mkdirSync(join(project, 'thoughts/writing/calendar'), { recursive: true });
+    const target = join(project, 'scribetronic/calendar/rules.yaml');
+    mkdirSync(join(project, 'scribetronic/calendar'), { recursive: true });
     writeFileSync(target, 'user-config: true');
 
     await initCommand({ path: project });

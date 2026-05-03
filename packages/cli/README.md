@@ -31,7 +31,7 @@ Scaffolds skills and project templates into the target directory (default: cwd).
 Behaviour:
 
 - Copies `templates/claude-code/.claude/skills/*` → `.claude/skills/*`
-- Copies `templates/project/thoughts/writing/*` → `thoughts/writing/*`
+- Copies `templates/project/scribetronic/*` → `scribetronic/*`
 - Renames `*.example.yaml` → `*.yaml` at the destination
 - Skips any file that already exists (printed in yellow)
 

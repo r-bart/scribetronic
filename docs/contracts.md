@@ -24,7 +24,7 @@ These contracts are preserved verbatim from the source-of-truth in the original 
 ## Contract 2: Week directory layout
 
 ```
-thoughts/writing/calendar/<YYYY-WNN>/
+scribetronic/calendar/<YYYY-WNN>/
 ├── plan.md                          # required — the week's table (see Contract 3)
 ├── newsletter.md                    # optional — present once /write drafts the newsletter
 └── derivatives/                     # optional — present once any derivative is drafted
@@ -198,7 +198,7 @@ When a config and a consumer skill split responsibilities, the **config wins**. 
 
 ## Contract 8: Ideas pool
 
-Pure brainstorming backlog. Lives at `thoughts/writing/ideas/`, ONE file per content type. **Not** consumed automatically by any skill — it's a writer's notebook the user grep/skims when they need a seed.
+Pure brainstorming backlog. Lives at `scribetronic/ideas/`, ONE file per content type. **Not** consumed automatically by any skill — it's a writer's notebook the user grep/skims when they need a seed.
 
 **File schema** (every `<type>.md`):
 

@@ -66,12 +66,12 @@ A consumer project that adopts scribetronic ends up with two trees:
 ```
 <project>/
 ├── .claude/skills/         ← installed by scribetronic; rarely edited
-└── thoughts/writing/       ← project-owned; the writer's working set
+└── scribetronic/       ← project-owned; the writer's working set
 ```
 
 The split is intentional:
 
-- **Skills are reusable.** They contain no project-specific paths, no hardcoded blog targets, no individual voice. They read from config files in `thoughts/writing/`.
+- **Skills are reusable.** They contain no project-specific paths, no hardcoded blog targets, no individual voice. They read from config files in `scribetronic/`.
 - **Thoughts are personal.** Your ideas, your calendar, your published archive — none of that belongs in a plugin. It's yours.
 
 Updating scribetronic (e.g. `scribetronic init` after a new release) refreshes the skills without touching your content. Conversely, editing your `rules.yaml` or `publish-config.yaml` doesn't fork the plugin.

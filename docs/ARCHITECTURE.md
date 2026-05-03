@@ -110,20 +110,19 @@ packages/cli/
     │           ├── short-form-thread-from-longform/SKILL.md
     │           ├── short-form-carousel-li/SKILL.md
     │           └── short-form-voice-adjustments/SKILL.md
-    └── project/             # mirrors a consumer's thoughts/writing/ scaffold
-        └── thoughts/
-            └── writing/
+    └── project/             # mirrors a consumer's scribetronic/ scaffold
+        └── scribetronic/
+            ├── README.md
+            ├── publish-config.example.yaml
+            ├── calendar/
+            │   ├── README.md
+            │   ├── index.md
+            │   ├── rules.example.yaml
+            │   ├── history.md
+            │   └── archive/.gitkeep
+            └── ideas/
                 ├── README.md
-                ├── publish-config.example.yaml
-                ├── calendar/
-                │   ├── README.md
-                │   ├── index.md
-                │   ├── rules.example.yaml
-                │   ├── history.md
-                │   └── archive/.gitkeep
-                └── ideas/
-                    ├── README.md
-                    └── <14 type files>.md
+                └── <14 type files>.md
 ```
 
 ### Source organisation rules
@@ -146,7 +145,7 @@ Mirrors the structure of a Claude Code workspace. The CLI copies this tree into 
 
 ### `templates/project/`
 
-Mirrors the structure of `thoughts/writing/` inside a consumer project. The CLI copies this tree into `<project>/thoughts/writing/` on `init`. Files ending in `.example.yaml` are renamed to `.yaml` during the copy so user edits never collide with template updates.
+Mirrors the structure of `scribetronic/` inside a consumer project. The CLI copies this tree into `<project>/scribetronic/` on `init`. Files ending in `.example.yaml` are renamed to `.yaml` during the copy so user edits never collide with template updates.
 
 See [contracts.md](contracts.md) for the file schemas these templates produce.
 

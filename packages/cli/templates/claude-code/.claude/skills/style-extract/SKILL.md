@@ -1,6 +1,6 @@
 ---
 name: style-extract
-description: Destila una guía de estilo de escritura desde 3-5 muestras de referencia y 1-2 textos propios. Genera `thoughts/writing/style/writing-style.md` con las 8 secciones (voice, structure, sentence-level, signature moves, anti-patterns, ejemplos +, ejemplos -, revision checklist). Usar cuando el usuario quiera crear o refrescar la guía de estilo de su blog/newsletter.
+description: Destila una guía de estilo de escritura desde 3-5 muestras de referencia y 1-2 textos propios. Genera `scribetronic/style/writing-style.md` con las 8 secciones (voice, structure, sentence-level, signature moves, anti-patterns, ejemplos +, ejemplos -, revision checklist). Usar cuando el usuario quiera crear o refrescar la guía de estilo de su blog/newsletter.
 ---
 
 # style-extract
@@ -57,7 +57,7 @@ NO pedir al usuario que se autodescriba. En su lugar, presentar **pares "genéri
 
 ### Fase 4 — Síntesis
 
-Generar `thoughts/writing/style/writing-style.md` con la plantilla de 8 secciones (ver más abajo). Cada regla acompañada de **al menos un ejemplo textual real** extraído de las muestras. Para anti-patterns, incluir un fragmento real (puede ser AI-generated de muestra) con su corrección.
+Generar `scribetronic/style/writing-style.md` con la plantilla de 8 secciones (ver más abajo). Cada regla acompañada de **al menos un ejemplo textual real** extraído de las muestras. Para anti-patterns, incluir un fragmento real (puede ser AI-generated de muestra) con su corrección.
 
 ### Fase 5 — Validación
 
@@ -128,8 +128,8 @@ Cita (real o sintética) + qué falla + reescritura aceptable.
 
 ## Output
 
-- Crear `thoughts/writing/style/writing-style.md` con `status: draft`.
-- Mover muestras pegadas a `thoughts/writing/samples/` (una por archivo, prefijo `ref-` o `mine-` o `anti-`).
+- Crear `scribetronic/style/writing-style.md` con `status: draft`.
+- Mover muestras pegadas a `scribetronic/samples/` (una por archivo, prefijo `ref-` o `mine-` o `anti-`).
 - Cuando el usuario valide, cambiar a `status: validated`.
 
 ## Qué NO hacer

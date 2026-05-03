@@ -75,7 +75,7 @@ targets:
 # Each platform gets its own subdirectory; filenames within a subdirectory do
 # NOT carry a platform suffix (the directory already identifies the channel).
 social_archive:
-  base: thoughts/writing/published/social
+  base: scribetronic/published/social
   layout:
     # Each entry: <platform>: <relative-path-template>
     # Available variables: {{date}}, {{slug}}.

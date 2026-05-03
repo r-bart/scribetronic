@@ -24,8 +24,8 @@ You're winding down, but tomorrow is Monday. You want to know what to ship each 
 What you'll see:
 
 ```
-✓ created thoughts/writing/calendar/2026-W18/
-✓ created thoughts/writing/calendar/2026-W18/plan.md
+✓ created scribetronic/calendar/2026-W18/
+✓ created scribetronic/calendar/2026-W18/plan.md
   scaffolded with default rotation. 6 rows queued.
 
   Mon  observation        x          queued
@@ -80,7 +80,7 @@ newsletter_seed: "What I learned shipping product #2"
 Save. Commit:
 
 ```bash
-$ git add thoughts/writing/calendar/2026-W18/
+$ git add scribetronic/calendar/2026-W18/
 $ git commit -m "plan: 2026-W18"
 ```
 
@@ -118,7 +118,7 @@ For the rest of this tutorial, assume you wrote a newsletter LAST Sunday (`2026-
 Monday's row says `observation` on `x` with slug `mw18-launch-tooling`. The derivative file should already exist from last week's `/write --repurpose`:
 
 ```bash
-$ ls thoughts/writing/calendar/2026-W18/derivatives/
+$ ls scribetronic/calendar/2026-W18/derivatives/
 mon-observation-mw18-launch-tooling.md
 tue-x-vs-y-mw18-shipping-vs-launching.md
 wed-listicle-mw18-five-ship-mistakes.md
@@ -129,7 +129,7 @@ fri-observation-mw18-friday-shipping.md
 Read Monday's file, do a final pass:
 
 ```bash
-$ cat thoughts/writing/calendar/2026-W18/derivatives/mon-observation-mw18-launch-tooling.md
+$ cat scribetronic/calendar/2026-W18/derivatives/mon-observation-mw18-launch-tooling.md
 ---
 type: observation
 status: ready
@@ -157,7 +157,7 @@ What scribetronic does:
 ```
 ✓ resolved derivative: 2026-W18/derivatives/mon-observation-mw18-launch-tooling.md
 ✓ pre-flight: status=ready, slop=clean
-✓ archived to: thoughts/writing/social_archive/x/2026-04-27-mw18-launch-tooling.md
+✓ archived to: scribetronic/social_archive/x/2026-04-27-mw18-launch-tooling.md
 ✓ updated draft frontmatter: status → published, published_date: 2026-04-27
 ✓ updated 2026-W18/plan.md: row 1 → published
 ✓ appended to history.md
@@ -212,7 +212,7 @@ Confirm. Phase 1 (seed) loads `writing-style/SKILL.md` and the `long-form-weekly
 4. What's the one-line takeaway?
 ```
 
-Answer each. Phase 2 (draft) generates the newsletter and saves to `thoughts/writing/calendar/2026-W18/newsletter.md`:
+Answer each. Phase 2 (draft) generates the newsletter and saves to `scribetronic/calendar/2026-W18/newsletter.md`:
 
 ```yaml
 ---
@@ -336,7 +336,7 @@ You're ready for next week.
 After every row in `2026-W18/plan.md` is `published` or `skipped`, you can archive the week:
 
 ```bash
-$ mv thoughts/writing/calendar/2026-W18 thoughts/writing/calendar/archive/
+$ mv scribetronic/calendar/2026-W18 scribetronic/calendar/archive/
 ```
 
 Or set `archive_completed_weeks: true` in `publish-config.yaml` and `/write-publish` will prompt to archive on the last publish.

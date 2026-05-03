@@ -1,13 +1,13 @@
 ---
 name: write-publish
-description: Publishes a `status: ready` draft from the weekly calendar to its configured target (Astro blog collection) and archives social derivatives. Reads thoughts/writing/publish-config.yaml. Updates calendar history and per-week plan. Optionally archives completed weeks. Does NOT push to social platforms (out of scope v1).
+description: Publishes a `status: ready` draft from the weekly calendar to its configured target (Astro blog collection) and archives social derivatives. Reads scribetronic/publish-config.yaml. Updates calendar history and per-week plan. Optionally archives completed weeks. Does NOT push to social platforms (out of scope v1).
 ---
 
 # /write-publish
 
-Moves a `status: ready` draft from `thoughts/writing/calendar/<week>/` into the Astro blog at `src/content/blog/`, generating frontmatter that matches the collection schema. Archives social derivatives — sourced from `<week>/derivatives/` — to `thoughts/writing/published/social/<channel>/`. Updates `thoughts/writing/calendar/history.md` and the matching row in `<week>/plan.md`. After publishing, optionally archives the entire week if every row in its plan is `published` or `skipped`. Does NOT auto-push to X, LinkedIn, or Threads — that is out of scope for v1.
+Moves a `status: ready` draft from `scribetronic/calendar/<week>/` into the Astro blog at `src/content/blog/`, generating frontmatter that matches the collection schema. Archives social derivatives — sourced from `<week>/derivatives/` — to `scribetronic/published/social/<channel>/`. Updates `scribetronic/calendar/history.md` and the matching row in `<week>/plan.md`. After publishing, optionally archives the entire week if every row in its plan is `published` or `skipped`. Does NOT auto-push to X, LinkedIn, or Threads — that is out of scope for v1.
 
-All paths and frontmatter shapes come from `thoughts/writing/publish-config.yaml`. This skill never hardcodes them.
+All paths and frontmatter shapes come from `scribetronic/publish-config.yaml`. This skill never hardcodes them.
 
 ## Invocation
 
@@ -26,7 +26,7 @@ All paths and frontmatter shapes come from `thoughts/writing/publish-config.yaml
 | Flag | Effect |
 |---|---|
 | (none) | Interactive. Lists ready drafts, prompts for selection, confirms each step. |
-| `<slug>` | Resolve the draft by slug. Newsletters: match against `<week>/plan.md` Slug column where Type=`long-form-weekly-newsletter`. Derivatives: glob `thoughts/writing/calendar/*/derivatives/*-<slug>.md`. |
+| `<slug>` | Resolve the draft by slug. Newsletters: match against `<week>/plan.md` Slug column where Type=`long-form-weekly-newsletter`. Derivatives: glob `scribetronic/calendar/*/derivatives/*-<slug>.md`. |
 | `--dry-run` | Render frontmatter + target paths, show what would be written, write nothing. |
 | `--social-only` | Skip the blog publish; only archive derivatives + update history + plan.md. |
 | `--date <YYYY-MM-DD>` | Use this as the `date` frontmatter. Does NOT delay the file write. |
@@ -39,14 +39,14 @@ All paths and frontmatter shapes come from `thoughts/writing/publish-config.yaml
 
 ### 1. Load config
 
-Read `thoughts/writing/publish-config.yaml`. If missing or malformed, block with the parse error. Do not auto-create.
+Read `scribetronic/publish-config.yaml`. If missing or malformed, block with the parse error. Do not auto-create.
 
 ### 2. Resolve target draft
 
 Drafts now live under the weekly calendar layout:
 
 ```
-thoughts/writing/calendar/<YYYY-WNN>/
+scribetronic/calendar/<YYYY-WNN>/
 ├── plan.md
 ├── newsletter.md
 └── derivatives/
@@ -55,9 +55,9 @@ thoughts/writing/calendar/<YYYY-WNN>/
 
 Resolution rules:
 
-- **Newsletter slug resolution:** newsletters are always named `newsletter.md` (no slug in the filename — only one per week). To find the newsletter for a given `<slug>`: scan each `thoughts/writing/calendar/*/plan.md`. If any row has `Type=long-form-weekly-newsletter` AND `Slug=<slug>`, the newsletter is at the same week's `calendar/<week>/newsletter.md`.
-- **Derivative slug resolution:** glob `thoughts/writing/calendar/*/derivatives/*-<slug>.md`. The slug is the LAST `-`-separated segment of the filename pattern `<weekday>-<type>-<slug>.md` (before `.md`).
-- **Listing ready drafts (no `<slug>` arg, interactive):** scan ALL of `thoughts/writing/calendar/*/newsletter.md` and `thoughts/writing/calendar/*/derivatives/*.md`. Filter to those whose frontmatter has `status: ready`. Display with their week, type, slug, and platform. Prompt for selection. In `--auto`, fail.
+- **Newsletter slug resolution:** newsletters are always named `newsletter.md` (no slug in the filename — only one per week). To find the newsletter for a given `<slug>`: scan each `scribetronic/calendar/*/plan.md`. If any row has `Type=long-form-weekly-newsletter` AND `Slug=<slug>`, the newsletter is at the same week's `calendar/<week>/newsletter.md`.
+- **Derivative slug resolution:** glob `scribetronic/calendar/*/derivatives/*-<slug>.md`. The slug is the LAST `-`-separated segment of the filename pattern `<weekday>-<type>-<slug>.md` (before `.md`).
+- **Listing ready drafts (no `<slug>` arg, interactive):** scan ALL of `scribetronic/calendar/*/newsletter.md` and `scribetronic/calendar/*/derivatives/*.md`. Filter to those whose frontmatter has `status: ready`. Display with their week, type, slug, and platform. Prompt for selection. In `--auto`, fail.
 - **`--social-only`:** skip newsletter resolution; jump to step 8 with the resolved week (the directory containing the matched draft).
 
 If multiple newsletters or multiple derivatives match the same slug: list them and stop. The plan/calendar layout should make collisions impossible — surfacing one means something is wrong upstream.
@@ -137,16 +137,16 @@ For each derivative file to archive:
 1. Read its frontmatter `platform` field. **REQUIRED** — if missing, block with the file path. Do not infer platform from the filename.
 2. Validate: `platform` must be a key in `social_archive.layout`. If not, block.
 3. Source: the derivative's path under `<week>/derivatives/`.
-4. Target: `social_archive.base` + `social_archive.layout.<platform>` (with `{{date}}` = `published_date` and `{{slug}}` = the derivative's slug — the LAST `-`-separated segment of the filename before `.md`). Currently resolves to `thoughts/writing/published/social/<platform>/{{date}}-{{slug}}.md`.
+4. Target: `social_archive.base` + `social_archive.layout.<platform>` (with `{{date}}` = `published_date` and `{{slug}}` = the derivative's slug — the LAST `-`-separated segment of the filename before `.md`). Currently resolves to `scribetronic/published/social/<platform>/{{date}}-{{slug}}.md`.
 5. Idempotency: same content → no-op. Different content → confirm overwrite (interactive) or fail (`--auto`).
 
 **Archived filenames have NO platform suffix** — the subdirectory IS the channel. Under the new layout the SOURCE filename also has no platform suffix; platform information lives only in frontmatter (source) and directory (target).
 
-This skill DOES create the platform subdirectories under `social_archive.base` if missing — they live entirely under `thoughts/`, the user has full control of that tree.
+This skill DOES create the platform subdirectories under `social_archive.base` if missing — they live entirely under `scribetronic/`, the user has full control of that tree.
 
 ### 9. Update calendar history
 
-Append a row to `thoughts/writing/calendar/history.md` (markdown table — same format as the file's documented schema):
+Append a row to `scribetronic/calendar/history.md` (markdown table — same format as the file's documented schema):
 
 ```
 | {published_date} | {type} | {slug} | published | /write-publish |
@@ -170,13 +170,13 @@ Print:
 
 ```
 ✓ Published: src/content/blog/2026-05-04-niches-are-dead.mdx
-✓ Draft updated: thoughts/writing/calendar/2026-W19/newsletter.md (status → published)
-✓ History appended: thoughts/writing/calendar/history.md
-✓ Plan row updated: thoughts/writing/calendar/2026-W19/plan.md (Status → published)
+✓ Draft updated: scribetronic/calendar/2026-W19/newsletter.md (status → published)
+✓ History appended: scribetronic/calendar/history.md
+✓ Plan row updated: scribetronic/calendar/2026-W19/plan.md (Status → published)
 ✓ Derivatives archived:
-  - thoughts/writing/published/social/x/2026-05-04-niches-are-dead.md
-  - thoughts/writing/published/social/linkedin/2026-05-04-niches-are-dead.md
-  - thoughts/writing/published/social/threads/2026-05-04-niches-are-dead.md
+  - scribetronic/published/social/x/2026-05-04-niches-are-dead.md
+  - scribetronic/published/social/linkedin/2026-05-04-niches-are-dead.md
+  - scribetronic/published/social/threads/2026-05-04-niches-are-dead.md
 
 Next:
   [ ] Read the published file once in dev (`npm run dev`)
@@ -193,13 +193,13 @@ Compute the published piece's week from its file path (the `<week>` directory it
   - **`--auto`:** rename only if `archive_completed_weeks: true` in `publish-config.yaml`. Otherwise no-op silently.
 - If any row is still `queued` or `drafted`: skip archival. The week stays active.
 
-The move is a directory rename (`thoughts/writing/calendar/<week>/` → `thoughts/writing/calendar/archive/<week>/`). No content changes. The skill creates `thoughts/writing/calendar/archive/` if missing.
+The move is a directory rename (`scribetronic/calendar/<week>/` → `scribetronic/calendar/archive/<week>/`). No content changes. The skill creates `scribetronic/calendar/archive/` if missing.
 
 If `<week>/plan.md` is missing: skip archival entirely (the skill refuses to guess what "completed" means without a plan).
 
 ## Configuration contract
 
-`thoughts/writing/publish-config.yaml` is the source of truth. The skill must read these keys:
+`scribetronic/publish-config.yaml` is the source of truth. The skill must read these keys:
 
 - `content_types.<post-type>.target` — which target to use for a given post type.
 - `targets.<name>.path` — destination directory.
@@ -247,11 +247,11 @@ A second run only acts if `--force` is passed AND the user confirms the diff at 
 - **Astro schema mismatch (rendered frontmatter would fail Zod parse):** block. Print the offending field, expected type, produced value. Do not write the file.
 - **`publish-config.yaml` missing or malformed:** block. Print path + parse error. Do not auto-create.
 - **`src/content/blog/` missing:** block. This is the Astro project's directory — not this skill's to create.
-- **Social archive subdir missing:** auto-create under `thoughts/writing/published/social/<platform>/`.
+- **Social archive subdir missing:** auto-create under `scribetronic/published/social/<platform>/`.
 - **Unfinished derivative (newsletter publish, derivative not `ready`/`published`):** warn (interactive) or block (`--auto`). List the offending files.
 - **Derivative frontmatter missing `platform`:** block. Print the file path. Do not infer platform from the filename.
 - **Derivative `platform` not in `social_archive.layout`:** block. Print the unknown value and the valid keys.
-- **No week directory found for the slug:** block. Print the slug and the search root (`thoughts/writing/calendar/`).
+- **No week directory found for the slug:** block. Print the slug and the search root (`scribetronic/calendar/`).
 - **Plan.md missing for the published piece's week:** warn loudly. Skip step 9b (cannot find the row to update) and skip step 11 (cannot determine completion). Publish itself succeeded.
 - **Week dir contains files but no plan.md:** treat as above — publish succeeds, plan.md updates and week archival are skipped, the user is told.
 - **`calendar/archive/<week>/` already exists when step 11 tries to move:** block the rename. Interactive prompt or `--auto` failure. Do not merge.
@@ -262,7 +262,7 @@ A second run only acts if `--force` is passed AND the user confirms the diff at 
 - Defer a publish to a future date. `--date` only sets the `date` frontmatter; the file is written immediately.
 - Send a newsletter email or trigger any external delivery hook.
 - Mutate the draft body. Only the draft's frontmatter is updated (status + published_date).
-- Create `src/content/blog/` (Astro's territory). DOES create `thoughts/writing/published/social/<platform>/` and `thoughts/writing/calendar/archive/` (its own territory).
+- Create `src/content/blog/` (Astro's territory). DOES create `scribetronic/published/social/<platform>/` and `scribetronic/calendar/archive/` (its own territory).
 - Resolve agenda slots or pick what to write. That's `/agenda` and `/write` Phase 0.
 - Create week directories. `/write` owns that. `/write-publish` only consumes them and (optionally) archives them.
 - Auto-archive a week that has no `plan.md` (refusing to guess what "completed" means without the plan).
@@ -271,7 +271,7 @@ A second run only acts if `--force` is passed AND the user confirms the diff at 
 ## Anti-patterns
 
 - Don't bypass pre-flight checks unless `--force` is explicitly passed. Silent overrides defeat the gate.
-- Don't write to `thoughts/writing/calendar/history.md` from anywhere except this skill (for `published` rows). `/agenda` reads only; `/write` writes only to plan.md.
+- Don't write to `scribetronic/calendar/history.md` from anywhere except this skill (for `published` rows). `/agenda` reads only; `/write` writes only to plan.md.
 - Don't mutate the draft body during publish. The MDX in `src/content/blog/` is a copy with new frontmatter; the original draft body stays exactly as-is.
 - Don't hardcode paths or key names. Read everything from `publish-config.yaml`.
 - Don't infer `tags` or `description` from the body when the draft frontmatter has them. Frontmatter wins; only fall back to prompt when the field is absent.

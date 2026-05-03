@@ -24,7 +24,7 @@ Check whether you have any of the paths scribetronic will populate:
 
 ```bash
 $ ls .claude/skills/ 2>/dev/null
-$ ls thoughts/writing/ 2>/dev/null
+$ ls scribetronic/ 2>/dev/null
 ```
 
 Three possible scenarios:
@@ -33,11 +33,11 @@ Three possible scenarios:
 
 You're effectively in the same position as a new project. Follow [tutorial 01](01-new-project.md) and skip the rest of this document.
 
-### Scenario B — `.claude/` exists with other skills, no `thoughts/writing/`
+### Scenario B — `.claude/` exists with other skills, no `scribetronic/`
 
 Scribetronic will add new skills under `.claude/skills/<name>/` without touching your existing skills. `init` is idempotent.
 
-### Scenario C — A previous editorial system exists at `thoughts/writing/`
+### Scenario C — A previous editorial system exists at `scribetronic/`
 
 You'll need to decide whether to migrate or coexist. See **Migrating from a previous system** below.
 
@@ -55,8 +55,8 @@ The output shows three categories of action:
 created  .claude/skills/agenda/SKILL.md             # new file
 created  .claude/skills/write/SKILL.md              # new file
 exists   .claude/skills/my-existing-skill/SKILL.md  # untouched
-exists   thoughts/writing/calendar/2026-W17/        # untouched (your old week)
-created  thoughts/writing/calendar/rules.yaml       # new (from rules.example.yaml)
+exists   scribetronic/calendar/2026-W17/        # untouched (your old week)
+created  scribetronic/calendar/rules.yaml       # new (from rules.example.yaml)
 ...
 ✓ scribetronic installed. 18 created, 4 skipped.
 ```
@@ -76,13 +76,13 @@ Untracked files:
         .claude/skills/ai-slop-check/
         .claude/skills/editing-pass/
         ... (18 more skill directories)
-        thoughts/writing/README.md
-        thoughts/writing/calendar/README.md
-        thoughts/writing/calendar/history.md
-        thoughts/writing/calendar/index.md
-        thoughts/writing/calendar/rules.yaml
-        thoughts/writing/ideas/
-        thoughts/writing/publish-config.yaml
+        scribetronic/README.md
+        scribetronic/calendar/README.md
+        scribetronic/calendar/history.md
+        scribetronic/calendar/index.md
+        scribetronic/calendar/rules.yaml
+        scribetronic/ideas/
+        scribetronic/publish-config.yaml
 ```
 
 Review what changed. If anything looks wrong, you can `rm -rf` the new files and re-run `init`.
@@ -114,7 +114,7 @@ If your existing project already has a writing style file under a different name
 `scribetronic init` ships a default `publish-config.yaml` that targets `src/content/blog/` (Astro convention). Edit it to match your project's structure:
 
 ```bash
-$ cat thoughts/writing/publish-config.yaml
+$ cat scribetronic/publish-config.yaml
 ```
 
 Common adjustments:
@@ -137,13 +137,13 @@ See [customization.md](../customization.md#editing-publish-configyaml) for the f
 ### Created (new files)
 
 - `.claude/skills/<name>/` — 20 skill folders (the 21st, `writing-style`, is created by `scribetronic style`).
-- `thoughts/writing/README.md`
-- `thoughts/writing/publish-config.yaml`
-- `thoughts/writing/calendar/{README,index,history}.md`
-- `thoughts/writing/calendar/rules.yaml`
-- `thoughts/writing/calendar/archive/.gitkeep`
-- `thoughts/writing/ideas/<14 type files>.md`
-- `thoughts/writing/ideas/README.md`
+- `scribetronic/README.md`
+- `scribetronic/publish-config.yaml`
+- `scribetronic/calendar/{README,index,history}.md`
+- `scribetronic/calendar/rules.yaml`
+- `scribetronic/calendar/archive/.gitkeep`
+- `scribetronic/ideas/<14 type files>.md`
+- `scribetronic/ideas/README.md`
 
 ### Left alone
 
@@ -192,8 +192,8 @@ Leave your old content where it is. Use scribetronic only for new content. Old p
 
 For each old newsletter:
 
-1. Create the corresponding week directory: `thoughts/writing/calendar/<YYYY-WNN>/`.
-2. Move the newsletter file into `thoughts/writing/calendar/<YYYY-WNN>/newsletter.md`.
+1. Create the corresponding week directory: `scribetronic/calendar/<YYYY-WNN>/`.
+2. Move the newsletter file into `scribetronic/calendar/<YYYY-WNN>/newsletter.md`.
 3. Add the frontmatter from [contracts.md §6](../contracts.md). Set `status: published` and add a `published_date`.
 4. Create a minimal `plan.md` with one row at status `published`.
 5. Append a row to `calendar/history.md`.
@@ -218,7 +218,7 @@ $ find .claude/skills -name SKILL.md | wc -l
 21
 
 # Config files exist
-$ ls thoughts/writing/calendar/rules.yaml thoughts/writing/publish-config.yaml
+$ ls scribetronic/calendar/rules.yaml scribetronic/publish-config.yaml
 
 # Idempotent re-run produces no changes
 $ scribetronic init
@@ -246,7 +246,7 @@ Re-run `scribetronic init`. It's idempotent — it'll fill in anything missing a
 Open Claude Code in the project and try `/agenda show today`. If Claude routes to your skill instead of scribetronic's, you have a name collision — see "Coexisting with other Claude Code skills" above.
 
 **Old editorial content references paths scribetronic doesn't recognise.**
-That's fine. Scribetronic only reads files it expects under `thoughts/writing/calendar/<YYYY-WNN>/`. Anything else is invisible to it.
+That's fine. Scribetronic only reads files it expects under `scribetronic/calendar/<YYYY-WNN>/`. Anything else is invisible to it.
 
 **My `publish-config.yaml` doesn't fit my stack.**
 Edit it. The skill `/write-publish` reads paths and key names from this file — there's no hardcoding to fight against. See [customization.md](../customization.md#editing-publish-configyaml).

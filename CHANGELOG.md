@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed (BREAKING)
+
+- **Editorial root renamed from `thoughts/writing/` to `scribetronic/`.** The scaffolded directory tree is now top-level under your project root, decoupled from the devtronic `thoughts/` convention (which is reserved for internal dev notes/plans/design). Migration for existing v0.1.0 installs:
+
+  ```bash
+  mv thoughts/writing scribetronic
+  rmdir thoughts 2>/dev/null  # only if empty
+  ```
+
+  All bundled skills (`/agenda`, `/write`, `/write-publish`, `/style-extract`) and `publish-config.yaml` examples have been updated to reference the new path. No content or schema changes — only the directory location.
+
 ### Planned
 
 - Calendar export (ICS, Notion, Google Calendar)
