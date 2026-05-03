@@ -74,7 +74,7 @@ The split is intentional:
 - **Skills are reusable.** They contain no project-specific paths, no hardcoded blog targets, no individual voice. They read from config files in `thoughts/writing/`.
 - **Thoughts are personal.** Your ideas, your calendar, your published archive — none of that belongs in a plugin. It's yours.
 
-Updating scribetronic (e.g. `npx scribetronic init` after a new release) refreshes the skills without touching your content. Conversely, editing your `rules.yaml` or `publish-config.yaml` doesn't fork the plugin.
+Updating scribetronic (e.g. `scribetronic init` after a new release) refreshes the skills without touching your content. Conversely, editing your `rules.yaml` or `publish-config.yaml` doesn't fork the plugin.
 
 This is the same pattern that lets editors update Vim plugins without losing their `init.vim`, or `npm install` a new linter without losing the project's source code. Tooling and content live in different layers.
 

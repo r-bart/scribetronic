@@ -46,7 +46,7 @@ You'll need to decide whether to migrate or coexist. See **Migrating from a prev
 ## Step 2 — Run `scribetronic init`
 
 ```bash
-$ npx scribetronic init
+$ scribetronic init
 ```
 
 The output shows three categories of action:

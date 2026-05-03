@@ -29,7 +29,7 @@ This step is optional — you can also run scribetronic via `npx` without ever i
 ## Step 2 — Run `scribetronic init`
 
 ```bash
-$ npx scribetronic init
+$ scribetronic init
 ```
 
 You'll see something like:
@@ -211,7 +211,7 @@ Now that the scaffold is in place:
 ## Troubleshooting
 
 **`scribetronic: command not found` after install.**
-You probably installed locally without `npx`. Either run `npx scribetronic ...`, or install globally with `npm i -g scribetronic`, or add `./node_modules/.bin/` to your `$PATH`.
+You haven't run `npm link` yet, or your shell can't find the linked binary. Either: (a) `cd scribetronic/packages/cli && npm link` to register the bin globally, (b) add an alias to your shell rc pointing at `node /path/to/scribetronic/packages/cli/dist/index.js`, or (c) call the binary by absolute path. See the [root README install section](../../README.md#install).
 
 **`/agenda plan-week today` produces no output.**
 Open the file `thoughts/writing/calendar/<current-week>/plan.md` directly. The skill writes to disk silently; the chat output is a summary. If the file isn't there, check that `thoughts/writing/calendar/` exists and is writable.

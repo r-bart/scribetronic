@@ -41,7 +41,7 @@ $ which claude     # or however you invoke Claude Code on your platform
 Bootstrapping from zero:
 
 1. Create a project directory.
-2. `npx scribetronic init`.
+2. `scribetronic init`.
 3. `scribetronic style` to seed your voice.
 4. `/agenda plan-week today` to scaffold the current week.
 5. Verify the resulting tree.

@@ -1,6 +1,5 @@
-[![npm version](https://img.shields.io/npm/v/scribetronic)](https://www.npmjs.com/package/scribetronic)
-[![npm downloads](https://img.shields.io/npm/dm/scribetronic)](https://www.npmjs.com/package/scribetronic)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Status: pre-1.0](https://img.shields.io/badge/status-pre--1.0-orange)](#roadmap)
 
 # scribetronic
 
@@ -20,29 +19,60 @@ Works with **Claude Code** today. The skills are portable; the CLI installs them
 
 ### Install
 
-```bash
-# Run inside your writing project (or create a new one)
-npx scribetronic init
+scribetronic is not on npm yet (planned for v1.0). Pick the path that fits you:
 
-# Or specify a target directory
-npx scribetronic init ./my-newsletter
+**A. Install from GitHub (recommended for cross-machine use):**
+
+```bash
+# Clone, build, link globally
+git clone https://github.com/r-bart/scribetronic.git
+cd scribetronic/packages/cli
+npm install && npm run build && npm link
+
+# Now usable from any project:
+cd ~/your-writing-project
+scribetronic init
+```
+
+**B. Run direct without linking (single machine, no PATH changes):**
+
+```bash
+git clone https://github.com/r-bart/scribetronic.git ~/scribetronic
+cd ~/scribetronic/packages/cli && npm install && npm run build
+
+# Add to your shell rc:
+alias scribetronic="node $HOME/scribetronic/packages/cli/dist/index.js"
+
+# Use:
+cd ~/your-writing-project
+scribetronic init
+```
+
+**C. Install as a project dev-dependency (when v0.2 ships a release branch):**
+
+```bash
+# Coming soon — see Roadmap.
+npm install --save-dev github:r-bart/scribetronic#release/v0.1.x
 ```
 
 The CLI will:
 
-1. Scaffold the editorial calendar templates
+1. Scaffold the editorial calendar templates into `thoughts/writing/`
 2. Install the 21 skills under `.claude/skills/`
-3. Seed a `writing-style` skill with your voice baseline
-4. Create the folder structure for drafts, published pieces, and notes
+3. Create the folder structure for drafts, published pieces, and notes
+
+It does **not** automatically seed your voice — you do that explicitly with `scribetronic style` (next step).
 
 ### Seed your voice
 
 ```bash
-npx scribetronic style          # Interactive interview
-npx scribetronic style --reset  # Start over
+scribetronic style          # Seeds writing-style/SKILL.md from the template, then opens it in $EDITOR
+scribetronic style --reset  # Overwrite with the template (asks for confirmation)
 ```
 
-This generates a `/writing-style` skill calibrated to *you* — phrasing, rhythm, taboos, signature moves. Every other skill reads from it.
+The first run copies a starter `writing-style/SKILL.md` into your project. After that, edits open it in `$EDITOR` (falls back to `$VISUAL`, then `vi`). On a non-TTY (CI, automation), it just prints the path.
+
+Every long-form and short-form skill reads from this file before generating anything — that's how the pipeline stays in *your* voice instead of generic AI tone.
 
 ### Plan and write
 
@@ -75,12 +105,13 @@ No accounts. No SaaS. Plain markdown files in your repo.
 
 | Document | Description |
 |----------|-------------|
-| [Architecture](./docs/ARCHITECTURE.md) | Folder structure and skill organization |
+| [Architecture](./docs/ARCHITECTURE.md) | Repo layout and skill organization |
+| [Philosophy](./docs/philosophy.md) | Why scribetronic exists and what it bets on |
 | [Skills Reference](./docs/skills.md) | Detailed docs for all 21 skills |
 | [CLI Reference](./docs/cli-reference.md) | Full command documentation |
-| [Workflow Guide](./docs/workflow.md) | Weekly cadence and pipeline overview |
-| [Voice & Style](./docs/voice.md) | How `/writing-style` works |
-| [Templates](./docs/templates.md) | What `init` scaffolds |
+| [Customization](./docs/customization.md) | Editing `rules.yaml`, `publish-config.yaml`, voice |
+| [Contracts](./docs/contracts.md) | Pipeline data contracts (week IDs, plan schema, etc.) |
+| [Tutorials](./docs/tutorials/) | Step-by-step walkthroughs |
 
 ---
 
@@ -184,11 +215,12 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full contributor guide.
 
 ## Roadmap
 
-- v0.1 — Core skills + CLI (`init`, `style`, `list`, `info`)
-- v0.2 — Calendar export (ICS, Notion, Google Calendar)
-- v0.3 — Multi-author voice profiles
-- v0.4 — Plugin marketplace integration for Claude Code
-- v0.5 — Analytics hooks (read-time, engagement) feeding back into `/agenda`
+- **v0.1** — Core skills + CLI (`init`, `style`, `list`, `info`). **Current.**
+- **v0.2** — `release/v0.1.x` branch with `package.json` at root for direct GitHub install (`npm i github:r-bart/scribetronic#release/v0.1.x`); harder `style` test cases; `update --skills-only` command.
+- **v0.3** — Multi-author voice profiles; `list --tree` showing the inheritance graph.
+- **v0.4** — Plugin marketplace integration for Claude Code (`/plugin add scribetronic`).
+- **v0.5** — Calendar export (ICS, Notion, Google Calendar) and analytics hooks feeding back into `/agenda`.
+- **v1.0** — Public npm release.
 
 Feedback and ideas: [open an issue](https://github.com/r-bart/scribetronic/issues).
 

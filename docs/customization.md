@@ -20,7 +20,7 @@ See also [contracts.md §7](contracts.md) for the formal source-of-truth rule.
 
 What you **should not** edit:
 
-- Any other `SKILL.md` under `.claude/skills/` (excepting `writing-style`). These are scribetronic-owned and refresh on `npx scribetronic init` after upgrades.
+- Any other `SKILL.md` under `.claude/skills/` (excepting `writing-style`). These are scribetronic-owned and refresh on `scribetronic init` after upgrades.
 - `thoughts/writing/calendar/history.md` (append-only, written by skills).
 - Files inside `thoughts/writing/calendar/<week>/` other than `plan.md` (the week directory is the skills' working set).
 
@@ -293,7 +293,7 @@ This means upgrades are safe: updating scribetronic refreshes skills, but your c
 - `.example.yaml` files are renamed to `.yaml` only on first creation; if `<file>.yaml` already exists, the rename is skipped.
 - New templates added in a future scribetronic release will land on a re-run; pre-existing files won't be touched.
 
-This is your upgrade path: bump the scribetronic version (`npm i -g scribetronic@latest`), re-run `scribetronic init` in your project, and any new skills land while your config and content stay intact.
+This is your upgrade path: bump the scribetronic version (`cd ~/scribetronic/packages/cli && git pull && npm run build`), re-run `scribetronic init` in your project, and any new skills land while your config and content stay intact.
 
 ### What `init` will NOT touch
 

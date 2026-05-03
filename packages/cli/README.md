@@ -6,11 +6,21 @@ Scaffolds a writing system into your project: a curated set of skills (orchestra
 
 ## Install
 
+scribetronic is not on npm yet (planned for v1.0). Three options today:
+
 ```bash
-npm install -g scribetronic
-# or one-shot via npx
-npx scribetronic init
+# A. From GitHub source + npm link
+git clone https://github.com/r-bart/scribetronic.git
+cd scribetronic/packages/cli && npm install && npm run build && npm link
+
+# B. Run direct without linking
+node /path/to/scribetronic/packages/cli/dist/index.js init
+
+# C. As a project dev-dependency (v0.2+, when release branch lands)
+npm install --save-dev github:r-bart/scribetronic#release/v0.1.x
 ```
+
+See the [repo root README](../../README.md#install) for full Quick Start.
 
 ## Usage
 
