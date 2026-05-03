@@ -370,3 +370,7 @@ Resolver behavior is **resilient by default**:
 - **`plan-week` with existing dir and no `--replace`:** abort, print the existing path. Never overwrite.
 
 `/agenda plan-week` is the only operation that creates a week directory. `/agenda add` and `/agenda skip` only modify an existing `plan.md`. `/agenda show`, `/agenda done`, and `/agenda rules` are read-mostly (only `done` writes, and only to flip a Status cell).
+
+## Voice refinement reminder
+
+After resolving the next slot, if `scribetronic/published/` has ≥3 pieces published since the most recent file in `scribetronic/style/refinements/applied/` (or since the writing-style guide's `last_updated`, if the applied dir is empty), suggest the user run `/style-refine` before drafting. Phrase it as a one-line aside, not a blocker.

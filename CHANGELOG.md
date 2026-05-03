@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `/style-refine` skill — proposes evidence-backed deltas to `writing-style/SKILL.md` from the user's `(draft → published)` edit history. Requires ≥2 supporting pairs per delta. Manual review only; never auto-rewrites the voice guide. Cross-referenced from `/agenda` and `/write-publish` as a periodic maintenance nudge after 3+ pieces published.
+
 ### Changed (BREAKING)
 
 - **Editorial root renamed from `thoughts/writing/` to `scribetronic/`.** The scaffolded directory tree is now top-level under your project root, decoupled from the devtronic `thoughts/` convention (which is reserved for internal dev notes/plans/design). Migration for existing v0.1.0 installs:

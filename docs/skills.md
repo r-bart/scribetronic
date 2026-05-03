@@ -1,9 +1,9 @@
 # Skills Catalog
 
-Scribetronic ships 21 skills, organised into four groups:
+Scribetronic ships 22 skills, organised into four groups:
 
 - **3 orchestrators** — user-invokable entry points.
-- **4 shared** — voice, editing, slop-detection, style extraction.
+- **5 shared** — voice, editing, slop-detection, style extraction, style refinement.
 - **6 long-form types** — newsletters, devlogs, retros, manifestos, etc.
 - **8 short-form types** — derivatives produced from long-form.
 
@@ -77,7 +77,7 @@ Publishing to blog target + social archive. Eleven steps.
 
 ---
 
-## Shared (4)
+## Shared (5)
 
 These are loaded by orchestrators, not invoked directly. Listed here for reference.
 
@@ -127,6 +127,18 @@ Utility skill that reads a corpus and produces a `writing-style/SKILL.md` candid
 **Inputs:** a directory of markdown files representing your published work.
 
 **Outputs:** a draft `writing-style/SKILL.md` with extracted voice characteristics.
+
+---
+
+### `/style-refine`
+
+Closes the feedback loop between drafted and published copy. Diffs each `(draft, published)` pair, surfaces edits the user makes consistently, and proposes deltas to `writing-style/SKILL.md`. Never auto-rewrites — produces a review document the user merges by hand.
+
+**When to use:** every 3–5 published pieces, or when the voice guide feels stale. Orchestrators (`agenda`, `write-publish`) print a one-line nudge when this threshold is crossed.
+
+**Inputs:** the existing `writing-style/SKILL.md` plus ≥3 `(draft, published)` pairs from `scribetronic/calendar/<W>/` and `scribetronic/published/`. Aborts if fewer than 3 pairs exist or if drafts are byte-identical to published versions.
+
+**Outputs:** `scribetronic/style/refinements/YYYY-MM-DD.md` with proposed deltas, each backed by ≥2 textual diffs. The user reviews, copies the deltas they accept into `writing-style/SKILL.md`, then archives the proposal under `applied/`.
 
 ---
 
@@ -298,5 +310,6 @@ Voice deltas applied on top of `writing-style/` for short-form. Captures what ch
 | Generate this week's derivatives | `/write --repurpose` |
 | Publish a finished draft | `/write-publish <slug>` |
 | Edit your voice | `scribetronic style` (in your shell) |
+| Refresh your voice guide from real edits | `/style-refine` |
 
 For the data contracts these skills depend on, see [contracts.md](contracts.md).

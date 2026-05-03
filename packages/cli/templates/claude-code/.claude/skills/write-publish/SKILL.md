@@ -279,3 +279,7 @@ A second run only acts if `--force` is passed AND the user confirms the diff at 
 - Don't infer platform from the derivative's filename. Read it from frontmatter — that is the contract.
 - Don't archive a derivative whose `platform` is missing or unknown. Block, surface the file, let the user fix the frontmatter.
 - Don't move a week to `calendar/archive/` while any plan row is still `queued` or `drafted`. The plan is the gate.
+
+## Voice refinement reminder
+
+After a successful publish, count entries in `scribetronic/published/`. If ≥3 pieces have been published since the most recent file in `scribetronic/style/refinements/applied/` (or since the writing-style guide's `last_updated`, if the applied dir is empty), print a one-line suggestion: "_3+ pieces published since the last voice refinement — consider running `/style-refine` to surface drift patterns._" Don't block the publish.

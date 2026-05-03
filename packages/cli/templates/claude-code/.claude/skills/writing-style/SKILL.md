@@ -109,3 +109,7 @@ Run before publishing any post:
 - [ ] If "I" appears in a feeling-claim, it's earned by a fact next to it.
 
 If any check fails, revise. If 3+ fail, the draft isn't ready.
+
+## Refining this guide
+
+This file should evolve as your published voice diverges from what's written here. Don't rewrite it from memory — run the `style-refine` skill, which proposes concrete deltas based on your real (draft → published) edit history. You review, accept the deltas you agree with, and apply them by hand. No auto-rewrites.
