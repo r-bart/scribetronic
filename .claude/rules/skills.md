@@ -52,23 +52,18 @@ Allowed in non-`writing-style` skills:
 Before committing any skill change:
 
 ```bash
-# 1. Verify frontmatter compliance
+# 1. Verify frontmatter compliance (idempotent — touches only files with non-spec keys)
 node scripts/normalize-skill-frontmatter.mjs
 
-# 2. Sync to plugin repo before tagging
+# 2. Sync to plugin repo before tagging a release
 bash scripts/sync-plugin-repo.sh /path/to/scribetronic-plugin
-
-# 3. Regression scan: detect names previously leaked into skill bodies
-#    (this list grows over time as new contamination is caught and removed —
-#    it is NOT a prescriptive whitelist of "the only forbidden names". Any
-#    name-shaped reference is forbidden. The list catches reintroductions.)
-NAMES_REGRESSION_LIST="$(cat .claude/rules/.skills-regression-names 2>/dev/null)"
-if [ -n "$NAMES_REGRESSION_LIST" ]; then
-  grep -nEi "$NAMES_REGRESSION_LIST" \
-    packages/cli/templates/claude-code/.claude/skills/*/SKILL.md \
-    && { echo "✗ regression: a previously-removed name reappeared"; exit 1; } \
-    || echo "✓ no regression names found"
-fi
 ```
 
-The regression list lives in `.claude/rules/.skills-regression-names` (one alternation regex per file, e.g. `Foo|Bar|Baz`). It is editable by maintainers as they catch new contamination during reviews. Treat it as an append-only ledger.
+Detection of style-decoupling regressions (rule 2) is intentionally **manual review**, not an automated grep. We don't keep a list of forbidden names checked into the repo — that would defeat the purpose of removing them. Reviewers should read every modified SKILL.md and reject any of:
+
+- Proper-noun references (people, products, accounts, newsletters, third-party libraries)
+- "X-style" labels naming a specific person
+- Quotes attributed to a named individual
+- Voice opinions tied to a name ("<name>'s most differentiated format")
+
+If you need a one-off heuristic during review, a coarse `grep -nE "[A-Z][a-z]+ [A-Z][a-z]+|@[a-zA-Z0-9_]+|\b[A-Z][a-z]+(-style|'s)\b"` flags two-capitalized-word phrases, @-handles, and "Name-style"/"Name's" possessives — expect false positives, use as a starting point only.

@@ -117,7 +117,7 @@ When a skill needs to reference voice/tone/examples, it must say:
 
 Not embed the voice itself.
 
-The pre-commit grep in `.claude/rules/skills.md` keeps a **regression-detection list** of names previously found in skill bodies — that list is for catching re-introductions, not a prescriptive whitelist of "the only forbidden names". Anything name-shaped is forbidden.
+Detection is by **manual code review**, not by an automated allowlist or denylist of names. Keeping a ledger of forbidden names checked into the repo would defeat the purpose of removing them. Reviewers read every modified SKILL.md; anything name-shaped is rejected.
 
 ---
 
