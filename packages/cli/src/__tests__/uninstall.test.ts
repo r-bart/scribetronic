@@ -22,14 +22,14 @@ afterEach(() => {
 
 describe('uninstallCommand', () => {
   it('disables the plugin when it was registered', async () => {
-    registerGitHubPlugin(project, PLUGIN_NAME, MARKETPLACE_NAME, GITHUB_MARKETPLACE_REPO);
+    await registerGitHubPlugin(project, PLUGIN_NAME, MARKETPLACE_NAME, GITHUB_MARKETPLACE_REPO);
     await uninstallCommand({ path: project });
 
-    expect(isPluginRegistered(project, PLUGIN_NAME, MARKETPLACE_NAME)).toBe(false);
+    expect(await isPluginRegistered(project, PLUGIN_NAME, MARKETPLACE_NAME)).toBe(false);
   });
 
   it('preserves the user content (scribetronic/ is left intact)', async () => {
-    registerGitHubPlugin(project, PLUGIN_NAME, MARKETPLACE_NAME, GITHUB_MARKETPLACE_REPO);
+    await registerGitHubPlugin(project, PLUGIN_NAME, MARKETPLACE_NAME, GITHUB_MARKETPLACE_REPO);
     mkdirSync(join(project, 'scribetronic/calendar'), { recursive: true });
     writeFileSync(join(project, 'scribetronic/calendar/plan.md'), 'my draft');
 

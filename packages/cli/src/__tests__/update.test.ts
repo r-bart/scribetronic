@@ -25,8 +25,8 @@ describe('updateCommand', () => {
   it('registers the plugin when settings is empty', async () => {
     await updateCommand({ path: project });
 
-    expect(isPluginRegistered(project, PLUGIN_NAME, MARKETPLACE_NAME)).toBe(true);
-    const s = readClaudeSettings(project);
+    expect(await isPluginRegistered(project, PLUGIN_NAME, MARKETPLACE_NAME)).toBe(true);
+    const s = await readClaudeSettings(project);
     expect(s.extraKnownMarketplaces?.[MARKETPLACE_NAME]?.source.repo).toBe(
       GITHUB_MARKETPLACE_REPO
     );
@@ -34,16 +34,16 @@ describe('updateCommand', () => {
 
   it('rewrites a stale marketplace source (e.g. local-dev directory)', async () => {
     // Simulate an old install pointing at a local directory
-    const stale = readClaudeSettings(project);
+    const stale = await readClaudeSettings(project);
     stale.extraKnownMarketplaces = {
       [MARKETPLACE_NAME]: { source: { source: 'directory', path: '/old/path' } },
     };
     stale.enabledPlugins = { [`${PLUGIN_NAME}@${MARKETPLACE_NAME}`]: true };
-    writeClaudeSettings(project, stale);
+    await writeClaudeSettings(project, stale);
 
     await updateCommand({ path: project });
 
-    const s = readClaudeSettings(project);
+    const s = await readClaudeSettings(project);
     expect(s.extraKnownMarketplaces?.[MARKETPLACE_NAME]?.source).toEqual({
       source: 'github',
       repo: GITHUB_MARKETPLACE_REPO,

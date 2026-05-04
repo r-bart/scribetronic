@@ -55,22 +55,22 @@ export async function listCommand(options: ListOptions = {}): Promise<void> {
 
   const grouped = groupByCategory(skills);
 
-  process.stderr.write('\n');
-  process.stderr.write(chalk.bold('scribetronic skills') + chalk.dim(` (${skills.length})`) + '\n');
-  process.stderr.write('\n');
+  out.line('\n');
+  out.line(chalk.bold('scribetronic skills') + chalk.dim(` (${skills.length})`) + '\n');
+  out.line('\n');
 
   for (const cat of CATEGORY_ORDER) {
     const items = grouped[cat];
     if (items.length === 0) continue;
 
-    process.stderr.write(`  ${chalk.bold.underline(cat)}\n`);
+    out.line(`  ${chalk.bold.underline(cat)}\n`);
     for (const skill of items) {
       const desc = oneLineDescription(skill.frontmatter.description);
       const namePart = chalk.cyan(skill.name.padEnd(32));
       const descPart = desc.length > 0 ? chalk.dim(desc) : chalk.dim('(no description)');
-      process.stderr.write(`    ${chalk.dim('•')} ${namePart} ${descPart}\n`);
+      out.line(`    ${chalk.dim('•')} ${namePart} ${descPart}\n`);
     }
-    process.stderr.write('\n');
+    out.line('\n');
   }
 }
 

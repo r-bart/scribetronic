@@ -41,7 +41,7 @@ describe('doctorCommand (human mode)', () => {
     writeFileSync(join(project, 'scribetronic/publish-config.yaml'), 'target: blog');
     mkdirSync(join(project, 'scribetronic/style'), { recursive: true });
     writeFileSync(join(project, 'scribetronic/style/writing-style.md'), '---\nname: x\n---\n');
-    registerGitHubPlugin(project, 'scribetronic', 'scribetronic', 'r-bart/scribetronic-plugin');
+    await registerGitHubPlugin(project, 'scribetronic', 'scribetronic', 'r-bart/scribetronic-plugin');
 
     streams = captureStreams();
 
@@ -55,7 +55,7 @@ describe('doctorCommand (human mode)', () => {
   it('reports a marketplace mismatch and exits 3', async () => {
     mkdirSync(join(project, 'scribetronic/calendar'), { recursive: true });
     writeFileSync(join(project, 'scribetronic/publish-config.yaml'), 'target: blog');
-    registerGitHubPlugin(project, 'scribetronic', 'scribetronic', 'someone/fork');
+    await registerGitHubPlugin(project, 'scribetronic', 'scribetronic', 'someone/fork');
 
     streams = captureStreams();
 
@@ -91,7 +91,7 @@ describe('doctorCommand (--json)', () => {
     writeFileSync(join(project, 'scribetronic/publish-config.yaml'), 'target: blog');
     mkdirSync(join(project, 'scribetronic/style'), { recursive: true });
     writeFileSync(join(project, 'scribetronic/style/writing-style.md'), '---\nname: x\n---\n');
-    registerGitHubPlugin(project, 'scribetronic', 'scribetronic', 'r-bart/scribetronic-plugin');
+    await registerGitHubPlugin(project, 'scribetronic', 'scribetronic', 'r-bart/scribetronic-plugin');
 
     streams = captureStreams({ json: true });
 

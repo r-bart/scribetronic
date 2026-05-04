@@ -60,8 +60,8 @@ export async function doctorCommand(options: DoctorOptions): Promise<void> {
   });
 
   // 4. .claude/settings.json registers the plugin
-  const settings = readClaudeSettings(targetDir);
-  const pluginRegistered = isPluginRegistered(targetDir, PLUGIN_NAME, MARKETPLACE_NAME);
+  const settings = await readClaudeSettings(targetDir);
+  const pluginRegistered = await isPluginRegistered(targetDir, PLUGIN_NAME, MARKETPLACE_NAME);
   checks.push({
     label: `${PLUGIN_KEY} enabled in .claude/settings.json`,
     ok: pluginRegistered,
@@ -106,22 +106,22 @@ export async function doctorCommand(options: DoctorOptions): Promise<void> {
   }
 
   // Human mode: report on stderr.
-  process.stderr.write('\n');
-  process.stderr.write(chalk.bold('scribetronic doctor') + '\n');
-  process.stderr.write(chalk.dim(targetDir) + '\n');
-  process.stderr.write('\n');
+  out.line('\n');
+  out.line(chalk.bold('scribetronic doctor') + '\n');
+  out.line(chalk.dim(targetDir) + '\n');
+  out.line('\n');
 
   for (const c of checks) {
     const mark = c.ok ? chalk.green('✓') : chalk.red('✗');
-    process.stderr.write(`  ${mark} ${c.label}\n`);
-    if (c.detail) process.stderr.write(`     ${chalk.dim(c.detail)}\n`);
+    out.line(`  ${mark} ${c.label}\n`);
+    if (c.detail) out.line(`     ${chalk.dim(c.detail)}\n`);
   }
 
-  process.stderr.write('\n');
+  out.line('\n');
   if (failed === 0) {
-    process.stderr.write(chalk.green(`all ${checks.length} checks passed`) + '\n');
+    out.line(chalk.green(`all ${checks.length} checks passed`) + '\n');
   } else {
-    process.stderr.write(chalk.red(`${failed}/${checks.length} check(s) failed`) + '\n');
+    out.line(chalk.red(`${failed}/${checks.length} check(s) failed`) + '\n');
     process.exit(ExitCode.State);
   }
 }

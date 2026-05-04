@@ -34,13 +34,13 @@ export async function uninstallCommand(options: UninstallOptions): Promise<void>
     process.exit(ExitCode.Usage);
   }
 
-  if (!isPluginRegistered(targetDir, PLUGIN_NAME, MARKETPLACE_NAME)) {
+  if (!(await isPluginRegistered(targetDir, PLUGIN_NAME, MARKETPLACE_NAME))) {
     out.note(chalk.dim(`${PLUGIN_KEY} is not registered in this project — nothing to do.`));
     if (out.isInteractive()) p.outro(chalk.dim('No changes.'));
     return;
   }
 
-  unregisterPlugin(targetDir, PLUGIN_NAME, MARKETPLACE_NAME);
+  await unregisterPlugin(targetDir, PLUGIN_NAME, MARKETPLACE_NAME);
 
   out.success(`${PLUGIN_KEY} disabled and marketplace entry removed.`);
   out.note(

@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 
 const SETTINGS_FILE = '.claude/settings.json';
@@ -20,11 +20,11 @@ export interface ClaudeSettings {
  * Reads `.claude/settings.json` from the target directory.
  * Returns an empty object if the file is missing or unparseable — never throws.
  */
-export function readClaudeSettings(targetDir: string): ClaudeSettings {
+export async function readClaudeSettings(targetDir: string): Promise<ClaudeSettings> {
   const settingsPath = join(targetDir, SETTINGS_FILE);
-  if (!existsSync(settingsPath)) return {};
   try {
-    return JSON.parse(readFileSync(settingsPath, 'utf-8')) as ClaudeSettings;
+    const raw = await readFile(settingsPath, 'utf-8');
+    return JSON.parse(raw) as ClaudeSettings;
   } catch {
     return {};
   }
@@ -34,10 +34,13 @@ export function readClaudeSettings(targetDir: string): ClaudeSettings {
  * Writes `.claude/settings.json`, creating `.claude/` if needed.
  * Preserves all existing keys — callers should read-modify-write.
  */
-export function writeClaudeSettings(targetDir: string, settings: ClaudeSettings): void {
+export async function writeClaudeSettings(
+  targetDir: string,
+  settings: ClaudeSettings
+): Promise<void> {
   const settingsPath = join(targetDir, SETTINGS_FILE);
-  mkdirSync(dirname(settingsPath), { recursive: true });
-  writeFileSync(settingsPath, `${JSON.stringify(settings, null, 2)}\n`);
+  await mkdir(dirname(settingsPath), { recursive: true });
+  await writeFile(settingsPath, `${JSON.stringify(settings, null, 2)}\n`);
 }
 
 /**
@@ -49,13 +52,13 @@ export function writeClaudeSettings(targetDir: string, settings: ClaudeSettings)
  * directory pointer from a local-dev run), the entry is rewritten to the new
  * source. Other entries (third-party plugins) are left untouched.
  */
-export function registerGitHubPlugin(
+export async function registerGitHubPlugin(
   targetDir: string,
   pluginName: string,
   marketplaceName: string,
   githubRepo: string
-): void {
-  const settings = readClaudeSettings(targetDir);
+): Promise<void> {
+  const settings = await readClaudeSettings(targetDir);
 
   if (!settings.extraKnownMarketplaces) {
     settings.extraKnownMarketplaces = {};
@@ -72,19 +75,19 @@ export function registerGitHubPlugin(
     settings.enabledPlugins[pluginKey] = true;
   }
 
-  writeClaudeSettings(targetDir, settings);
+  await writeClaudeSettings(targetDir, settings);
 }
 
 /**
  * Disables the named plugin and removes its marketplace entry.
  * Idempotent. Leaves other plugins/marketplaces intact.
  */
-export function unregisterPlugin(
+export async function unregisterPlugin(
   targetDir: string,
   pluginName: string,
   marketplaceName: string
-): void {
-  const settings = readClaudeSettings(targetDir);
+): Promise<void> {
+  const settings = await readClaudeSettings(targetDir);
   const pluginKey = `${pluginName}@${marketplaceName}`;
 
   if (settings.enabledPlugins) {
@@ -94,18 +97,18 @@ export function unregisterPlugin(
     delete settings.extraKnownMarketplaces[marketplaceName];
   }
 
-  writeClaudeSettings(targetDir, settings);
+  await writeClaudeSettings(targetDir, settings);
 }
 
 /**
  * True iff the plugin is currently enabled in this project's settings.
  */
-export function isPluginRegistered(
+export async function isPluginRegistered(
   targetDir: string,
   pluginName: string,
   marketplaceName: string
-): boolean {
-  const settings = readClaudeSettings(targetDir);
+): Promise<boolean> {
+  const settings = await readClaudeSettings(targetDir);
   const pluginKey = `${pluginName}@${marketplaceName}`;
   return settings.enabledPlugins?.[pluginKey] === true;
 }

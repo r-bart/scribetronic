@@ -85,6 +85,21 @@ export function note(msg: string): void {
 }
 
 /**
+ * Raw line on **stderr**. Always written in human mode (TTY or not),
+ * suppressed in JSON mode. Use for the body of human-mode reports
+ * (rendering loops in `list`, `info`, `doctor`) where suppression-when-piped
+ * would lose the report entirely. Unlike `note()`, this prints even when
+ * stdout is not a TTY — so `cmd 2> report.log` keeps the content.
+ *
+ * No prefix, no color logic — the caller is responsible for chalk-styling
+ * the string (and chalk's auto-level handles NO_COLOR).
+ */
+export function line(msg: string): void {
+  if (cfg.json) return;
+  process.stderr.write(msg + (msg.endsWith('\n') ? '' : '\n'));
+}
+
+/**
  * Success line on **stderr**. Suppressed in JSON mode. In non-TTY/NO_COLOR
  * runs the leading glyph is dropped but the message still prints (so a CI
  * log shows what happened).

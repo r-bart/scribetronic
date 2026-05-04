@@ -38,8 +38,8 @@ export async function updateCommand(options: UpdateOptions): Promise<void> {
     process.exit(ExitCode.Usage);
   }
 
-  const wasRegistered = isPluginRegistered(targetDir, PLUGIN_NAME, MARKETPLACE_NAME);
-  registerGitHubPlugin(targetDir, PLUGIN_NAME, MARKETPLACE_NAME, GITHUB_MARKETPLACE_REPO);
+  const wasRegistered = await isPluginRegistered(targetDir, PLUGIN_NAME, MARKETPLACE_NAME);
+  await registerGitHubPlugin(targetDir, PLUGIN_NAME, MARKETPLACE_NAME, GITHUB_MARKETPLACE_REPO);
 
   out.success(
     wasRegistered

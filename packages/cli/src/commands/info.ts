@@ -35,10 +35,10 @@ export async function infoCommand(skillName: string, options: InfoOptions = {}):
     return;
   }
 
-  process.stderr.write('\n');
-  process.stderr.write(chalk.bold.cyan(skillName) + '\n');
-  process.stderr.write(chalk.dim(skillPath) + '\n');
-  process.stderr.write('\n');
+  out.line('\n');
+  out.line(chalk.bold.cyan(skillName) + '\n');
+  out.line(chalk.dim(skillPath) + '\n');
+  out.line('\n');
 
   const fields: Array<[string, string | string[] | undefined]> = [
     ['name', frontmatter.name],
@@ -51,7 +51,7 @@ export async function infoCommand(skillName: string, options: InfoOptions = {}):
   for (const [label, value] of fields) {
     if (value === undefined) continue;
     const formatted = Array.isArray(value) ? value.join(', ') : value;
-    process.stderr.write(`  ${chalk.bold(label.padEnd(14))}${chalk.dim(':')} ${formatted}\n`);
+    out.line(`  ${chalk.bold(label.padEnd(14))}${chalk.dim(':')} ${formatted}\n`);
   }
 
   // Surface any other frontmatter keys we don't have a dedicated label for.
@@ -59,12 +59,12 @@ export async function infoCommand(skillName: string, options: InfoOptions = {}):
   for (const [key, value] of Object.entries(frontmatter)) {
     if (known.has(key) || value === undefined) continue;
     const formatted = Array.isArray(value) ? value.join(', ') : value;
-    process.stderr.write(`  ${chalk.bold(key.padEnd(14))}${chalk.dim(':')} ${formatted}\n`);
+    out.line(`  ${chalk.bold(key.padEnd(14))}${chalk.dim(':')} ${formatted}\n`);
   }
 
-  process.stderr.write('\n');
-  process.stderr.write(chalk.bold.underline('Body') + '\n');
-  process.stderr.write('\n');
-  process.stderr.write(body.trimEnd() + '\n');
-  process.stderr.write('\n');
+  out.line('\n');
+  out.line(chalk.bold.underline('Body') + '\n');
+  out.line('\n');
+  out.line(body.trimEnd() + '\n');
+  out.line('\n');
 }

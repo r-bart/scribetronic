@@ -94,7 +94,7 @@ export async function initCommand(options: InitOptions): Promise<void> {
 
   if (spinner) spinner.stop('Templates processed');
 
-  registerGitHubPlugin(targetDir, PLUGIN_NAME, MARKETPLACE_NAME, GITHUB_MARKETPLACE_REPO);
+  await registerGitHubPlugin(targetDir, PLUGIN_NAME, MARKETPLACE_NAME, GITHUB_MARKETPLACE_REPO);
 
   const allCopied = [...claudeResult.copied, ...projectResult.copied].sort();
   const allSkipped = [...claudeResult.skipped, ...projectResult.skipped].sort();
