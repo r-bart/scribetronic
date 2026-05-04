@@ -1,15 +1,22 @@
 ---
 name: ai-slop-check
 description: Detection pass for AI-generated patterns and clichés. Final check before publishing. Returns a list of detected issues with severity and fix suggestions.
-inherits: ../writing-style/SKILL.md
-applies_to: [long-form/*, short-form/*]
 ---
+
+## Metadata
+
+- **inherits**: `../writing-style/SKILL.md`
+- **applies to**: long-form/*, short-form/*
 
 # ai-slop-check
 
 Last pass before publishing. Scans for the patterns that signal "AI wrote this" or "human writing in a hurry adopted AI defaults".
 
-Inspired by sociilabs/claude-content-writer's "humanizer" approach, but tightened to Roberto's voice.
+## Voice resolution
+
+The detection list below is the default. Before running, load the user's voice override from `scribetronic/style/writing-style.md` (project root) if it exists — its anti-patterns and blacklist sections add to the defaults. If the project-local override is absent, fall back to the bundled `writing-style/SKILL.md` template (generic baseline).
+
+The project-local override always wins over the template.
 
 ## How to run
 
@@ -91,7 +98,7 @@ If 1+ HIGH or 3+ MEDIUM, revise and rerun.
 
 If you're not sure, ask these 3 questions:
 
-1. **Could a generic AI write this?** If yes, the post lacks Roberto-specific evidence. Add a number, a name, or a personal scene.
+1. **Could a generic AI write this?** If yes, the post lacks personal-specific evidence. Add a number, a name, or a personal scene.
 2. **Could this post appear in any other niche under any other byline?** If yes, it's too generic.
 3. **Does the closer commit to something?** If not, the post leaks energy at the end.
 

@@ -20,8 +20,8 @@ afterEach(() => {
 describe('transformDestPath', () => {
   it('renames *.example.yaml to *.yaml', () => {
     expect(transformDestPath('rules.example.yaml')).toBe('rules.yaml');
-    expect(transformDestPath('thoughts/writing/calendar/rules.example.yaml')).toBe(
-      'thoughts/writing/calendar/rules.yaml'
+    expect(transformDestPath('scribetronic/calendar/rules.example.yaml')).toBe(
+      'scribetronic/calendar/rules.yaml'
     );
   });
 

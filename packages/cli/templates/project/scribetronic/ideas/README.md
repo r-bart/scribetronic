@@ -5,7 +5,7 @@ Loose backlog, one file per content type. The writer adds bullets freely; nothin
 ## Layout
 
 ```
-thoughts/writing/ideas/
+scribetronic/ideas/
 ├── README.md                    ← you are here
 ├── weekly-newsletter.md
 ├── monthly-devlog.md

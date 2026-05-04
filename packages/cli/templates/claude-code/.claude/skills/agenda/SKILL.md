@@ -1,11 +1,11 @@
 ---
 name: agenda
-description: Manages the writing cadence using per-ISO-week directories under thoughts/writing/calendar/. Combines recurring rules + per-week plan.md + history. Subcommands: show, plan-week, add, skip, done, rules. Used by /write router and /write-publish.
+description: Manages the writing cadence using per-ISO-week directories under scribetronic/calendar/. Combines recurring rules + per-week plan.md + history. Subcommands: show, plan-week, add, skip, done, rules. Used by /write router and /write-publish.
 ---
 
 # /agenda
 
-Manages writing cadence using ISO-week-scoped directories. Reads `thoughts/writing/calendar/rules.yaml` for recurring slot rules, reads and writes `thoughts/writing/calendar/<YYYY-WNN>/plan.md` for each week's planned posts, and reads `thoughts/writing/calendar/history.md` for the append-only event log.
+Manages writing cadence using ISO-week-scoped directories. Reads `scribetronic/calendar/rules.yaml` for recurring slot rules, reads and writes `scribetronic/calendar/<YYYY-WNN>/plan.md` for each week's planned posts, and reads `scribetronic/calendar/history.md` for the append-only event log.
 
 This skill READS rules.yaml. It READS and WRITES `<week>/plan.md` (specifically: it seeds rows on `plan-week` and flips Status to `skipped` on `skip`). It only READS history.md. `/write` Phase 6 transitions plan.md rows to `drafted`; `/write-publish` transitions them to `published` and is the only writer of `history.md` rows tagged `published`.
 
@@ -13,12 +13,12 @@ This skill READS rules.yaml. It READS and WRITES `<week>/plan.md` (specifically:
 
 | Path | Read | Write |
 |---|---|---|
-| `thoughts/writing/calendar/rules.yaml` | yes | no — `/agenda rules edit` opens the file in `$EDITOR`; user saves |
-| `thoughts/writing/calendar/<YYYY-WNN>/plan.md` | yes | yes — `plan-week` scaffolds; `add` appends; `skip` flips Status |
-| `thoughts/writing/calendar/history.md` | yes | no — owned by `/write` and `/write-publish` |
-| `thoughts/writing/calendar/archive/<YYYY-WNN>/` | yes | no — historical week dirs moved here manually |
+| `scribetronic/calendar/rules.yaml` | yes | no — `/agenda rules edit` opens the file in `$EDITOR`; user saves |
+| `scribetronic/calendar/<YYYY-WNN>/plan.md` | yes | yes — `plan-week` scaffolds; `add` appends; `skip` flips Status |
+| `scribetronic/calendar/history.md` | yes | no — owned by `/write` and `/write-publish` |
+| `scribetronic/calendar/archive/<YYYY-WNN>/` | yes | no — historical week dirs moved here manually |
 
-The week directory `thoughts/writing/calendar/<YYYY-WNN>/` is created ONLY by `/agenda plan-week`. No other skill creates it. Subdirectories `derivatives/` inside a week dir are created by `/write` Phase 5.
+The week directory `scribetronic/calendar/<YYYY-WNN>/` is created ONLY by `/agenda plan-week`. No other skill creates it. Subdirectories `derivatives/` inside a week dir are created by `/write` Phase 5.
 
 ## Invocation
 
@@ -39,11 +39,11 @@ The week directory `thoughts/writing/calendar/<YYYY-WNN>/` is created ONLY by `/
 Default `N = 4` weeks. For each day in the window:
 
 1. Compute `week_id` for the day (ISO week, `date +%G-W%V`).
-2. If `thoughts/writing/calendar/<week_id>/plan.md` exists, read its rows and find the row matching the day's date.
+2. If `scribetronic/calendar/<week_id>/plan.md` exists, read its rows and find the row matching the day's date.
 3. Apply the resolution algorithm (see below): plan beats rules, skip beats both.
 4. Print: Date, Day, Slot type, Slug, Seed (truncated), Status.
 
-Footer: last 3 entries from `thoughts/writing/calendar/history.md` as "recently published". If the file is missing, omit the footer.
+Footer: last 3 entries from `scribetronic/calendar/history.md` as "recently published". If the file is missing, omit the footer.
 
 ### `/agenda plan-week <YYYY-MM-DD> [flags]`
 
@@ -62,7 +62,7 @@ Scaffolds a single ISO week's `plan.md` from a recurring-rule pass plus a defaul
 1. week_id = `date -d "<date>" +%G-W%V` (or equivalent ISO week calc).
    ALWAYS use %G-W%V (NOT %Y-W%V — %Y drifts at year boundaries).
 2. week_start = Monday of that ISO week. week_end = Sunday.
-3. Target dir: thoughts/writing/calendar/<week_id>/
+3. Target dir: scribetronic/calendar/<week_id>/
    - If exists and --replace not passed: abort, print the path. Do NOT overwrite.
    - If exists and --replace passed: rm -rf the dir, continue.
 4. Acquire newsletter seed:
@@ -92,7 +92,7 @@ Scaffolds a single ISO week's `plan.md` from a recurring-rule pass plus a defaul
 7. Write <week>/plan.md with the frontmatter (see Contract: plan.md schema below)
    and the 6-7 row table.
 8. Print:
-     ✓ Scaffolded thoughts/writing/calendar/<week_id>/plan.md
+     ✓ Scaffolded scribetronic/calendar/<week_id>/plan.md
      - 1 newsletter (Sun)
      - 5 derivatives (Mon-Fri)
      Next: /write long-form-weekly-newsletter (drafts the parent), then /write --repurpose for derivatives.
@@ -104,7 +104,7 @@ Scaffolds a single ISO week's `plan.md` from a recurring-rule pass plus a defaul
 
 Append a new row to the relevant `<week>/plan.md`.
 
-- Compute `week_id` from `<date>`. If `thoughts/writing/calendar/<week_id>/plan.md` does not exist: refuse and instruct the user to run `plan-week <date>` first. Do NOT auto-create.
+- Compute `week_id` from `<date>`. If `scribetronic/calendar/<week_id>/plan.md` does not exist: refuse and instruct the user to run `plan-week <date>` first. Do NOT auto-create.
 - Validate `<type>` against the 13 writing types. If invalid, suggest the closest match and stop.
 - Slug auto-generated from seed (Slug rules below) unless explicit.
 - Date must fall in `[week_start, week_end]` for that `week_id`.
@@ -121,14 +121,14 @@ Append a new row to the relevant `<week>/plan.md`.
 
 ### `/agenda done <slug>`
 
-- Search `<active week>/plan.md` first, then up to 4 prior weeks (`thoughts/writing/calendar/<week_id>/plan.md`).
+- Search `<active week>/plan.md` first, then up to 4 prior weeks (`scribetronic/calendar/<week_id>/plan.md`).
 - Find the row whose Slug column matches `<slug>`. Set its Status to `published`.
 - Idempotent: if the row is already `published`, no-op.
 - Auto-called by `/write-publish` after a successful publish — manual invocation is for backfilling.
 
 ### `/agenda rules [edit]`
 
-- No arg: print current `thoughts/writing/calendar/rules.yaml` formatted as a table (name, when, type, active window, overrides).
+- No arg: print current `scribetronic/calendar/rules.yaml` formatted as a table (name, when, type, active window, overrides).
 - `edit`: open the file in `$EDITOR`. Do not mutate without user confirmation.
 
 ## Resolution algorithm
@@ -137,11 +137,11 @@ For a given date D:
 
 ```
 1. week_id = ISO week containing D (date +%G-W%V).
-2. Read thoughts/writing/calendar/<week_id>/plan.md (if exists).
+2. Read scribetronic/calendar/<week_id>/plan.md (if exists).
    - Find row with Date == D. If found:
      - Status == skipped → return null.
      - Otherwise → return (type, slug, seed-equivalent, status). Source = "plan".
-3. Read thoughts/writing/calendar/rules.yaml. Apply rule resolution per the inline algorithm:
+3. Read scribetronic/calendar/rules.yaml. Apply rule resolution per the inline algorithm:
    - Filter by active_from / active_until window.
    - Match `when`.
    - Apply `overrides` (each rule's `overrides` list contains `name`s of OTHER rules it beats).
@@ -244,7 +244,7 @@ Example body:
 
 ### `history.md`
 
-Lives at `thoughts/writing/calendar/history.md`. Markdown table:
+Lives at `scribetronic/calendar/history.md`. Markdown table:
 
 ```
 | Date | Type | Slug | Status | Source |
@@ -257,7 +257,7 @@ Append-only. One row per event. Status from the `history.md` enum above. Source 
 
 ### `rules.yaml`
 
-Lives at `thoughts/writing/calendar/rules.yaml`. Source of truth is the inline schema in the file itself. Top-level key is `rules:` (a list). Each rule has `name`, `when`, `type`, optional `seed_template`, `active_from`, `active_until`, `overrides`. Selectors: `weekday` (full word), `monthday` (1..31 or negative), `nth_weekday_of_month` ("first sunday" etc).
+Lives at `scribetronic/calendar/rules.yaml`. Source of truth is the inline schema in the file itself. Top-level key is `rules:` (a list). Each rule has `name`, `when`, `type`, optional `seed_template`, `active_from`, `active_until`, `overrides`. Selectors: `weekday` (full word), `monthday` (1..31 or negative), `nth_weekday_of_month` ("first sunday" etc).
 
 The recurring Sunday rule is `long-form-weekly-newsletter`. **No `id`, no `priority`, no `cron`, no `schedule` field.** If you find them in code or docs, that's a bug — fix it to match this file.
 
@@ -311,7 +311,7 @@ Unknown variables are left literal and a warning is printed. The expansion happe
 Compact tables, one block per week in the window. One row per day. Empty days are listed (the gap is information).
 
 ```
-Week of 2026-04-27 (W18) — thoughts/writing/calendar/2026-W18/plan.md
+Week of 2026-04-27 (W18) — scribetronic/calendar/2026-W18/plan.md
   Date        Day  Slot                          Slug                                  Status
   2026-04-27  Mon  observation                   mw18-product2-recap-mon-observation   queued
   2026-04-28  Tue  x-vs-y                        mw18-product2-recap-tue-xvsy          queued
@@ -352,7 +352,7 @@ Same convention as `/write`:
 - Don't put a platform suffix on derivative filenames (no `-x`/`-li`/`-threads`). Platform lives in the frontmatter.
 - Don't auto-create week directories. The week dir is created ONLY by `/agenda plan-week`.
 - Don't reference or re-introduce a top-level queue file. The week's `plan.md` is the only queue.
-- Don't consume from `thoughts/writing/ideas/`. The ideas pool is writer-owned and out of scope for this skill.
+- Don't consume from `scribetronic/ideas/`. The ideas pool is writer-owned and out of scope for this skill.
 
 ## Failure modes
 
@@ -370,3 +370,7 @@ Resolver behavior is **resilient by default**:
 - **`plan-week` with existing dir and no `--replace`:** abort, print the existing path. Never overwrite.
 
 `/agenda plan-week` is the only operation that creates a week directory. `/agenda add` and `/agenda skip` only modify an existing `plan.md`. `/agenda show`, `/agenda done`, and `/agenda rules` are read-mostly (only `done` writes, and only to flip a Status cell).
+
+## Voice refinement reminder
+
+After resolving the next slot, if `scribetronic/published/` has ≥3 pieces published since the most recent file in `scribetronic/style/refinements/applied/` (or since the writing-style guide's `last_updated`, if the applied dir is empty), suggest the user run `/style-refine` before drafting. Phrase it as a one-line aside, not a blocker.

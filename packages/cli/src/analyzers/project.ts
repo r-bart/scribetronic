@@ -6,8 +6,8 @@ export interface ProjectAnalysis {
   hasScribetronic: boolean;
   /** True if any `.claude/skills/<name>/SKILL.md` exists at all. */
   hasClaudeSkills: boolean;
-  /** True if `thoughts/writing/` exists. */
-  hasWritingDir: boolean;
+  /** True if `scribetronic/` exists at the project root. */
+  hasScribetronicDir: boolean;
 }
 
 /**
@@ -17,10 +17,10 @@ export interface ProjectAnalysis {
  */
 export function analyzeProject(targetDir: string): ProjectAnalysis {
   const claudeSkillsDir = join(targetDir, '.claude', 'skills');
-  const writingDir = join(targetDir, 'thoughts', 'writing');
+  const scribetronicDir = join(targetDir, 'scribetronic');
 
   const hasClaudeSkills = existsSync(claudeSkillsDir);
-  const hasWritingDir = existsSync(writingDir);
+  const hasScribetronicDir = existsSync(scribetronicDir);
 
   const orchestrators = ['agenda', 'write', 'write-publish'];
   const hasAnyOrchestrator = orchestrators.some((name) =>
@@ -28,8 +28,8 @@ export function analyzeProject(targetDir: string): ProjectAnalysis {
   );
 
   return {
-    hasScribetronic: hasAnyOrchestrator && hasWritingDir,
+    hasScribetronic: hasAnyOrchestrator && hasScribetronicDir,
     hasClaudeSkills,
-    hasWritingDir,
+    hasScribetronicDir,
   };
 }

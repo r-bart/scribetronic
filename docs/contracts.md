@@ -24,7 +24,7 @@ These contracts are preserved verbatim from the source-of-truth in the original 
 ## Contract 2: Week directory layout
 
 ```
-thoughts/writing/calendar/<YYYY-WNN>/
+scribetronic/calendar/<YYYY-WNN>/
 ├── plan.md                          # required — the week's table (see Contract 3)
 ├── newsletter.md                    # optional — present once /write drafts the newsletter
 └── derivatives/                     # optional — present once any derivative is drafted
@@ -198,7 +198,7 @@ When a config and a consumer skill split responsibilities, the **config wins**. 
 
 ## Contract 8: Ideas pool
 
-Pure brainstorming backlog. Lives at `thoughts/writing/ideas/`, ONE file per content type. **Not** consumed automatically by any skill — it's a writer's notebook the user grep/skims when they need a seed.
+Pure brainstorming backlog. Lives at `scribetronic/ideas/`, ONE file per content type. **Not** consumed automatically by any skill — it's a writer's notebook the user grep/skims when they need a seed.
 
 **File schema** (every `<type>.md`):
 
@@ -261,7 +261,7 @@ There is no version number embedded in this document. Changes are tracked via gi
 - Don't infer status from filename or path. Read frontmatter.
 - Don't use `%Y-W%V` for ISO week — always `%G-W%V`. `%Y` drifts at year boundaries.
 - Don't introduce new fields to `rules.yaml`. Schema is closed.
-- Don't run any drafting phase without loading `writing-style/SKILL.md` first. The voice base is non-negotiable.
+- Don't run any drafting phase without loading the voice base first (project override or bundled template). The voice base is non-negotiable.
 - Don't auto-fix MEDIUM slop without asking unless `--auto`.
 
 ---

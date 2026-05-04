@@ -9,10 +9,122 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Planned
 
+- `/write` Phase 4 adopts `/review` as default quality gate (opt-out via `--no-review`)
 - Calendar export (ICS, Notion, Google Calendar)
 - Multi-author voice profiles
-- Claude Code plugin marketplace distribution
 - Analytics hooks feeding back into `/agenda`
+
+---
+
+## [0.2.1] — 2026-05-04
+
+First public npm release. Bundles the plugin marketplace migration, the spec-compliant frontmatter fix, the format/style decoupling, the writing-style override path, the agent-friendly CLI, and the new `/review` skill.
+
+### Added — `/scribetronic:review` (parallel multi-focus draft review)
+
+- New shared skill that dispatches one Task subagent per focus in a single message and aggregates findings into one severity-grouped table on stdout. Faster than running `editing-pass` + `ai-slop-check` sequentially and covers more dimensions. Stderr carries per-focus dispatch progress; `--quiet` suppresses everything except the verdict and HIGH findings. Uses Haiku for pattern-matching focuses; Sonnet bumps in for `factual`. Skill count: 22 → 23.
+  - **Full mode** (default): 5 focuses (`voice`, `structure`, `slop`, `hook`, `closer`) over the entire draft, ~10s wall time.
+  - **Delta mode** (`--since-last` | `--since <revspec>` | `--since-staged`): 3 focuses (`voice`, `slop`, `continuity`) over only what changed since the last snapshot or git ref, ~5s wall time, ~80% fewer tokens. The `continuity` focus is delta-only — it compares the new lines against the surrounding paragraph context (tone shift, orphan references, tense breaks). `--since-last` keeps a per-draft snapshot in `.scribetronic/snapshots/<basename>.md` (gitignored by the project template). Designed for "I just wrote two paragraphs, are they OK before I keep going?".
+  - `--with-evidence` adds the optional `factual` focus to either mode, comparing claims against `scribetronic/calendar/<week>/notes.md`.
+- New project template: `scribetronic/.gitignore` ignoring `.scribetronic/` (the local state directory used by `--since-last`).
+
+### Fixed
+
+- **All 22 skills now load correctly in Claude Code.** Previously the bundled SKILL.md frontmatter included custom keys (`inherits`, `length_target`, `cadence`, `formats`, `applies_to`, `input`, `format`, `quota`, `status`, `language`, `target_voice`, `sources`, `last_updated`) that the Claude Code skills loader silently rejected — only 4 of 22 skills were actually loading. Frontmatter now contains only the spec-allowed keys (`name`, `description`); the operational metadata moved to a `## Metadata` section at the top of each skill body where it remains visible to humans and to skills that read it.
+
+### Changed
+
+- **Skills decoupled from style.** Every `long-form-*`, `short-form-*`, `editing-pass`, and `ai-slop-check` SKILL.md is now format-only — no embedded references to specific authors, posts, or accounts. The skills describe how a piece is shaped (structure, length, anti-patterns); the voice/tone/reference layer lives entirely in `writing-style/SKILL.md`. This makes every format skill reusable by any user in any niche without editing.
+- **`writing-style/SKILL.md` rewritten as a personalization template.** Ships with a new `## Reference sources` section, `<your-name>` placeholders throughout, "How to fill this file" instructions, and a generalized "native-language interference watch" section (was Spanish-specific). Users either fill it manually (~30-60 min) or run `/scribetronic:style-extract` against their own samples to get a first draft.
+- Bumped CLI to `0.2.1` and plugin lockstep to `0.2.1`.
+
+### Tooling
+
+- `scripts/normalize-skill-frontmatter.mjs` — extracts non-spec keys from any SKILL.md frontmatter and migrates them to a `## Metadata` body section. Run after editing or adding skills.
+
+### Agent-friendly CLI
+
+Tier-1 fixes from the post-publish CLI audit. Every read-only command (`list`, `info`, `doctor`) now supports `--json` and emits a single newline-terminated JSON line on stdout; chrome (progress, hints, decorations) goes to stderr in human mode and is suppressed entirely in JSON mode. Errors in JSON mode emit `{"ok": false, "error": {"message", "code"}}` on stdout (gh / kubectl convention).
+
+- `--json` flag on `list`, `info`, `doctor` — schema documented in `docs/cli-reference.md`.
+- All commands route decoration/progress to **stderr**; stdout is reserved for data. `scribetronic init >/dev/null` now silently mutates without losing the error output.
+- `NO_COLOR=1` and non-TTY stdout disable color and clack chrome globally.
+- Granular exit codes: `0` success, `1` unexpected, `2` usage error (bad args/path, unknown skill), `3` state error (plugin not registered, doctor checks failed). Documented in `--help` epilog and `docs/cli-reference.md`.
+- `scribetronic style --reset` accepts `--yes` (or `SCRIBETRONIC_YES=1`) to bypass the confirm prompt — required for non-interactive shells (CI, agent invocations).
+- `scribetronic style` (no flags, existing target, non-TTY) prints the writing-style path on **stdout** so an agent can capture it via `path=$(scribetronic style)`.
+- `scribetronic --help` epilog now lists agent-canonical examples + the exit-code table.
+- Test suite grew from 78 to 106 tests across 14 files; coverage 91.26% statements / 78.74% branches / 95.74% functions.
+
+### Voice override path (BREAKING for `scribetronic style`)
+
+- **`scribetronic style` now writes to `scribetronic/style/writing-style.md` (project root) instead of `.claude/skills/writing-style/SKILL.md`.** The old path was a leftover from before the plugin marketplace and was effectively orphaned: skills loaded `writing-style` from the marketplace cache, never from the project, so user edits had no effect.
+- The four voice-consuming skills (`/scribetronic:write`, `/scribetronic:editing-pass`, `/scribetronic:ai-slop-check`, `/scribetronic:short-form-voice-adjustments`) now read voice in this resolution order: project-local override (`scribetronic/style/writing-style.md`) → bundled `writing-style/SKILL.md` template fallback. The override always wins when present.
+- `/scribetronic:style-refine` and `/scribetronic:style-extract` updated to read/write the new path.
+- `init` scaffolds `scribetronic/style/README.md` with seeding instructions.
+- `doctor` checks the new path.
+- **Migration**: if you already ran `scribetronic style` on v0.2.0 and edited `.claude/skills/writing-style/SKILL.md`, move that content to `scribetronic/style/writing-style.md` and delete the old file. (v0.2.0 was live for hours with no users, so practical impact is zero.)
+
+### Migration
+
+- v0.2.0 was live for hours with no production users, so no migration is required for skill content.
+- If you forked v0.2.0 and personalized `writing-style/SKILL.md`: port your customizations to the new template structure (sections renumbered; section 0 "Reference sources" is new).
+
+---
+
+## [0.2.0] — 2026-05-04
+
+### Added
+
+- **Claude Code plugin marketplace distribution.** Skills now ship from a separate repo (`r-bart/scribetronic-plugin`) and are loaded by Claude Code at runtime. Auto-update, no `init` re-run needed.
+- New CLI commands:
+  - `scribetronic update [path]` — re-applies the marketplace registration in `.claude/settings.json` (corrects drift, refreshes after CLI upgrades).
+  - `scribetronic doctor [path]` — verifies the install (project skeleton, publish-config, plugin registration, marketplace source, writing-style seed). Exits 1 on failure.
+  - `scribetronic uninstall [path]` — disables the plugin and removes the marketplace entry. Leaves `scribetronic/` content untouched.
+- Workflow hooks shipped with the plugin:
+  - `SessionStart` — surfaces today's editorial slot from `scribetronic/calendar/<week>/plan.md`. Silent in non-scribetronic projects.
+  - `Stop` — reminds about `/editing-pass` + `/ai-slop-check` if drafts under `scribetronic/calendar/*/drafts/` were touched in the session.
+- Skills become namespaced as `/scribetronic:write`, `/scribetronic:agenda`, etc. The bare `/write` form continues to work.
+- `npm run test:coverage` (`@vitest/coverage-v8`).
+- 29 new tests (settings, doctor, update, uninstall). Total suite: 78 tests across 12 files.
+- npm publish automation: `.github/workflows/release.yml` (tag `v*.*.*` → `npm publish --provenance`), `prepublishOnly` quality gate, `publishConfig` for public access + provenance attestation.
+- CI matrix on Node 20 / 22 (`.github/workflows/ci.yml`). Node 18 was dropped because vitest v4's bundled rolldown imports `node:util#styleText`, which only exists in Node 20.12+.
+- Maintainer release runbook (`docs/releasing.md`).
+
+### Changed (BREAKING)
+
+- **`scribetronic init` no longer copies `SKILL.md` files into the project.** Skills are loaded from the plugin marketplace at runtime. Migration for existing v0.1.x installs:
+
+  ```bash
+  npx scribetronic update     # registers the marketplace
+  rm -rf .claude/skills/agenda .claude/skills/write .claude/skills/write-publish \
+         .claude/skills/long-form-* .claude/skills/short-form-* \
+         .claude/skills/writing-style .claude/skills/editing-pass \
+         .claude/skills/ai-slop-check .claude/skills/style-extract \
+         .claude/skills/style-refine
+  ```
+
+  Then restart Claude Code. Skills will reappear under the `/scribetronic:` namespace, sourced from the marketplace.
+
+- `init` now writes `.claude/settings.json` with `extraKnownMarketplaces.scribetronic` and `enabledPlugins["scribetronic@scribetronic"]`. Pre-existing keys (themes, third-party plugins, etc.) are preserved.
+
+---
+
+## [0.1.1] — 2026-05-04
+
+### Added
+
+- `/style-refine` skill — proposes evidence-backed deltas to `writing-style/SKILL.md` from the user's `(draft → published)` edit history. Requires ≥2 supporting pairs per delta. Manual review only; never auto-rewrites the voice guide. Cross-referenced from `/agenda` and `/write-publish` as a periodic maintenance nudge after 3+ pieces published.
+
+### Changed (BREAKING)
+
+- **Editorial root renamed from `thoughts/writing/` to `scribetronic/`.** The scaffolded directory tree is now top-level under your project root, decoupled from the devtronic `thoughts/` convention (which is reserved for internal dev notes/plans/design). Migration for existing v0.1.0 installs:
+
+  ```bash
+  mv thoughts/writing scribetronic
+  rmdir thoughts 2>/dev/null  # only if empty
+  ```
+
+  All bundled skills (`/agenda`, `/write`, `/write-publish`, `/style-extract`) and `publish-config.yaml` examples have been updated to reference the new path. No content or schema changes — only the directory location.
 
 ---
 
@@ -48,5 +160,6 @@ Initial public release. Migrated from a private editorial pipeline into a standa
 - This release is the first public extraction. Skills were refined across ~12 months of personal use before publishing.
 - Repo will be created at `https://github.com/r-bart/scribetronic` when v0.1.0 is tagged.
 
-[Unreleased]: https://github.com/r-bart/scribetronic/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/r-bart/scribetronic/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/r-bart/scribetronic/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/r-bart/scribetronic/releases/tag/v0.1.0

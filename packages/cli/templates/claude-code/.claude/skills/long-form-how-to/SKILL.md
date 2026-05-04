@@ -1,16 +1,19 @@
 ---
 name: long-form-how-to
-description: Actionable guide. ~1500-3500 words. Teaches the reader to do something specific you've actually done. Style influence: Marcus Moretti's Claude Code for PMs + Welsh's actionable format.
-inherits: ../writing-style/SKILL.md
-length_target: 1500-3500 words
-cadence: ad-hoc — when you've completed a process worth teaching
+description: Actionable guide (~1500-3500 words). Teaches the reader to do something specific you've actually done end-to-end. Use when you've completed a process, project, or workflow worth teaching — and you can ship a worked example, not just theory.
 ---
+
+## Metadata
+
+- **inherits**: `../writing-style/SKILL.md`
+- **length target**: 1500-3500 words
+- **cadence**: ad-hoc — when you've completed a process worth teaching
 
 # long-form-how-to
 
 A guide that teaches the reader to do something specific. Authority comes from having done it, not from research. If you haven't done it, don't write it.
 
-Style influence: Marcus Moretti's PM guide + Welsh's actionable format.
+Voice, tone, and any author/post references come from `writing-style/SKILL.md`.
 
 ## Structure
 

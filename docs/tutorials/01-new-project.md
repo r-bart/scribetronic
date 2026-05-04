@@ -46,15 +46,15 @@ created  .claude/skills/style-extract/SKILL.md
 created  .claude/skills/long-form-weekly-newsletter/SKILL.md
 created  .claude/skills/long-form-monthly-devlog/SKILL.md
 ... (12 more skills)
-created  thoughts/writing/README.md
-created  thoughts/writing/publish-config.yaml         (from publish-config.example.yaml)
-created  thoughts/writing/calendar/README.md
-created  thoughts/writing/calendar/index.md
-created  thoughts/writing/calendar/rules.yaml         (from rules.example.yaml)
-created  thoughts/writing/calendar/history.md
-created  thoughts/writing/calendar/archive/.gitkeep
-created  thoughts/writing/ideas/README.md
-created  thoughts/writing/ideas/weekly-newsletter.md
+created  scribetronic/README.md
+created  scribetronic/publish-config.yaml         (from publish-config.example.yaml)
+created  scribetronic/calendar/README.md
+created  scribetronic/calendar/index.md
+created  scribetronic/calendar/rules.yaml         (from rules.example.yaml)
+created  scribetronic/calendar/history.md
+created  scribetronic/calendar/archive/.gitkeep
+created  scribetronic/ideas/README.md
+created  scribetronic/ideas/weekly-newsletter.md
 ... (13 more idea files)
 
 ✓ scribetronic installed.
@@ -64,7 +64,7 @@ created  thoughts/writing/ideas/weekly-newsletter.md
 Verify the tree:
 
 ```bash
-$ tree -L 4 .claude thoughts
+$ tree -L 4 .claude scribetronic
 .claude
 ├── agents
 ├── rules
@@ -74,22 +74,21 @@ $ tree -L 4 .claude thoughts
     ├── ai-slop-check
     │   └── SKILL.md
     ... (19 more)
-thoughts
-└── writing
-    ├── README.md
-    ├── calendar
-    │   ├── README.md
-    │   ├── archive
-    │   ├── history.md
-    │   ├── index.md
-    │   └── rules.yaml
-    ├── ideas
-    │   ├── README.md
-    │   └── ... (14 type files)
-    └── publish-config.yaml
+scribetronic
+├── README.md
+├── calendar
+│   ├── README.md
+│   ├── archive
+│   ├── history.md
+│   ├── index.md
+│   └── rules.yaml
+├── ideas
+│   ├── README.md
+│   └── ... (14 type files)
+└── publish-config.yaml
 ```
 
-You should see **20 skill folders** (orchestrators + shared + types) and a fully populated `thoughts/writing/` tree. The `writing-style` skill is **not** yet present — that's the next step.
+You should see **20 skill folders** (orchestrators + shared + types) and a fully populated `scribetronic/` tree. The `writing-style` skill is **not** yet present — that's the next step.
 
 ---
 
@@ -132,8 +131,8 @@ Open Claude Code in this project and run:
 Claude Code resolves "today" to the current ISO week (e.g. `2026-W18`) and creates the week directory:
 
 ```
-✓ created thoughts/writing/calendar/2026-W18/
-✓ created thoughts/writing/calendar/2026-W18/plan.md
+✓ created scribetronic/calendar/2026-W18/
+✓ created scribetronic/calendar/2026-W18/plan.md
   scaffolded 7 rows with default rotation:
     Mon  observation        x         queued
     Tue  x-vs-y             linkedin  queued
@@ -147,7 +146,7 @@ Claude Code resolves "today" to the current ISO week (e.g. `2026-W18`) and creat
 Open `plan.md`:
 
 ```bash
-$ cat thoughts/writing/calendar/2026-W18/plan.md
+$ cat scribetronic/calendar/2026-W18/plan.md
 ---
 week: 2026-W18
 week_start: 2026-04-27
@@ -191,8 +190,8 @@ You should be able to confirm:
 
 - [ ] `find .claude/skills -name SKILL.md | wc -l` returns at least 21.
 - [ ] `.claude/skills/writing-style/SKILL.md` exists and contains your voice.
-- [ ] `thoughts/writing/calendar/<current-week>/plan.md` exists with a 6-row table.
-- [ ] `thoughts/writing/calendar/rules.yaml` and `thoughts/writing/publish-config.yaml` exist.
+- [ ] `scribetronic/calendar/<current-week>/plan.md` exists with a 6-row table.
+- [ ] `scribetronic/calendar/rules.yaml` and `scribetronic/publish-config.yaml` exist.
 - [ ] `git log --oneline` shows your bootstrap commit.
 
 ---
@@ -214,7 +213,7 @@ Now that the scaffold is in place:
 You haven't run `npm link` yet, or your shell can't find the linked binary. Either: (a) `cd scribetronic/packages/cli && npm link` to register the bin globally, (b) add an alias to your shell rc pointing at `node /path/to/scribetronic/packages/cli/dist/index.js`, or (c) call the binary by absolute path. See the [root README install section](../../README.md#install).
 
 **`/agenda plan-week today` produces no output.**
-Open the file `thoughts/writing/calendar/<current-week>/plan.md` directly. The skill writes to disk silently; the chat output is a summary. If the file isn't there, check that `thoughts/writing/calendar/` exists and is writable.
+Open the file `scribetronic/calendar/<current-week>/plan.md` directly. The skill writes to disk silently; the chat output is a summary. If the file isn't there, check that `scribetronic/calendar/` exists and is writable.
 
 **`scribetronic style` says `parent directory missing`.**
 Run `scribetronic init` first. The `style` command writes into `.claude/skills/writing-style/`, which `init` creates the parent for.

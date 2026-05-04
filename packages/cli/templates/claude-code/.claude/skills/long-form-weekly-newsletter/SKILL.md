@@ -1,16 +1,19 @@
 ---
 name: long-form-weekly-newsletter
 description: Weekly newsletter — the parent piece of the week. ~600-1200 words. Drafted Sunday. Spawns 5-7 derivative short-form pieces for X / LinkedIn / Threads via /write Phase 5. The recurring Sunday default.
-inherits: ../writing-style/SKILL.md
-length_target: 600-1200 words
-cadence: weekly
 ---
+
+## Metadata
+
+- **inherits**: `../writing-style/SKILL.md`
+- **length target**: 600-1200 words
+- **cadence**: weekly
 
 # long-form-weekly-newsletter
 
-The long-form parent piece of the week. Justin Welsh authority crossed with Roberto's voice — honest with numbers, blunt about misses, no soft fades. Drafted Sunday. Designed so each section can be spun out into a short-form piece during the week (thread, observation, x-vs-y, listicle, carousel). If a section can't be spun out, it shouldn't be in the newsletter.
+The long-form parent piece of the week. Drafted Sunday. Designed so each section can be spun out into a short-form piece during the week (thread, observation, x-vs-y, listicle, carousel). If a section can't be spun out, it shouldn't be in the newsletter.
 
-This is the default Sunday recurring piece — the one that anchors the week.
+This is the default Sunday recurring piece — the one that anchors the week. Voice and tone come from `writing-style/SKILL.md` — this skill only owns the format and the spin-out contract with `/write --repurpose`.
 
 ## Structure
 

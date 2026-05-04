@@ -19,7 +19,7 @@ Five-minute path from zero to publishing a week:
 /write long-form-weekly-newsletter
 
 # Sunday: spin out the week's derivatives (Mon-Fri pieces)
-/write --repurpose thoughts/writing/calendar/<YYYY-WNN>/newsletter.md
+/write --repurpose scribetronic/calendar/<YYYY-WNN>/newsletter.md
 
 # Monday-Friday: each day, publish that day's piece
 /write-publish <example-slug>
@@ -28,13 +28,13 @@ Five-minute path from zero to publishing a week:
 /write-publish <newsletter-slug>
 ```
 
-Each week is its own directory under `thoughts/writing/calendar/<YYYY-WNN>/`. The newsletter is the parent piece, drafted Sunday from a single seed. Daily derivatives (Mon-Fri short-form) spin out from the newsletter once it's drafted. Publishing a piece flips its row in `plan.md` from `drafted` to `published`; once every row is `published` or `skipped`, the whole week directory is offered for archival.
+Each week is its own directory under `scribetronic/calendar/<YYYY-WNN>/`. The newsletter is the parent piece, drafted Sunday from a single seed. Daily derivatives (Mon-Fri short-form) spin out from the newsletter once it's drafted. Publishing a piece flips its row in `plan.md` from `drafted` to `published`; once every row is `published` or `skipped`, the whole week directory is offered for archival.
 
 ---
 
 ## How a week flows
 
-1. **Sunday — plan the week.** `/agenda plan-week today` creates `thoughts/writing/calendar/<YYYY-WNN>/plan.md` with rows for the newsletter and 5 daily derivatives (Mon-Fri). Each row starts as `queued`. The skill asks once for the newsletter seed and uses it as the spine for the whole week.
+1. **Sunday — plan the week.** `/agenda plan-week today` creates `scribetronic/calendar/<YYYY-WNN>/plan.md` with rows for the newsletter and 5 daily derivatives (Mon-Fri). Each row starts as `queued`. The skill asks once for the newsletter seed and uses it as the spine for the whole week.
 2. **Sunday — draft the newsletter.** `/write long-form-weekly-newsletter` interviews you, drafts the long-form piece, runs editing-pass and ai-slop-check. Saves to `<week>/newsletter.md`. Flips the row to `drafted`.
 3. **Sunday — repurpose.** `/write --repurpose <newsletter>` reads the newsletter and generates short-form pieces, one per Mon-Fri row in `plan.md`. Each derivative goes to `<week>/derivatives/<weekday>-<type>-<slug>.md` with `platform: x | linkedin | threads | carousel` in its frontmatter.
 4. **Monday-Friday — daily publish.** Open the file (you can hand-tune before publishing). Then `/write-publish <slug>` archives it to the right social subdirectory and flips its row to `published`.
@@ -58,12 +58,12 @@ Each week is its own directory under `thoughts/writing/calendar/<YYYY-WNN>/`. Th
 
 3. **Repurpose an existing newsletter into derivatives.**
    ```
-   /write --repurpose thoughts/writing/calendar/<YYYY-WNN>/newsletter.md
+   /write --repurpose scribetronic/calendar/<YYYY-WNN>/newsletter.md
    ```
 
 4. **Edit a draft after the fact.**
    ```
-   /write --edit thoughts/writing/calendar/<YYYY-WNN>/derivatives/<weekday>-<type>-<example-slug>.md
+   /write --edit scribetronic/calendar/<YYYY-WNN>/derivatives/<weekday>-<type>-<example-slug>.md
    ```
    Re-runs editing-pass + slop-check.
 
@@ -86,7 +86,7 @@ Each week is its own directory under `thoughts/writing/calendar/<YYYY-WNN>/`. Th
    Marks the matching `plan.md` row as `published`. Use when you posted manually and want the calendar to know.
 
 8. **Browse the brainstorming pool when stuck for an idea.**
-   Look under `thoughts/writing/ideas/`. Each content type has its own backlog file (one per long-form and short-form type) with `## Active`, `## Used`, `## Cold / parked` sections. Skim the relevant file for a seed before answering the `plan-week` interview.
+   Look under `scribetronic/ideas/`. Each content type has its own backlog file (one per long-form and short-form type) with `## Active`, `## Used`, `## Cold / parked` sections. Skim the relevant file for a seed before answering the `plan-week` interview.
 
 ---
 
@@ -98,8 +98,8 @@ Each week is its own directory under `thoughts/writing/calendar/<YYYY-WNN>/`. Th
 |---|---|---|---|
 | `long-form-weekly-newsletter` | Default Sunday recurring slot. Parent piece of the week. | 600-1200w | weekly |
 | `long-form-monthly-devlog` | Monthly reflection / devlog. | 1200-2000w | monthly |
-| `long-form-hot-take` | Contrarian opinion, Koe-style. | 800-1500w | as-needed |
-| `long-form-how-to` | Tutorial, Moretti-style. | 1500-3500w | as-needed |
+| `long-form-hot-take` | Contrarian opinion against conventional wisdom. | 800-1500w | as-needed |
+| `long-form-how-to` | Actionable tutorial grounded in personal experience. | 1500-3500w | as-needed |
 | `long-form-launch-retro` | Post-launch breakdown with real numbers. Strongest format. | 800-1500w | as-needed |
 | `long-form-manifesto` | Vision/strategy. Highest slop risk — use sparingly. | 1500-3000w | rare |
 
@@ -135,10 +135,10 @@ Each week is its own directory under `thoughts/writing/calendar/<YYYY-WNN>/`. Th
 /write --auto long-form-launch-retro "<seed>"
 
 # Repurpose long-form into derivatives
-/write --repurpose thoughts/writing/calendar/<YYYY-WNN>/newsletter.md
+/write --repurpose scribetronic/calendar/<YYYY-WNN>/newsletter.md
 
 # Edit (rerun pass) a draft
-/write --edit thoughts/writing/calendar/<YYYY-WNN>/derivatives/<file>.md
+/write --edit scribetronic/calendar/<YYYY-WNN>/derivatives/<file>.md
 
 # Publish
 /write-publish <example-slug>
@@ -162,10 +162,10 @@ Each week is its own directory under `thoughts/writing/calendar/<YYYY-WNN>/`. Th
 
 ## Architecture (light)
 
-The writing system stores all editorial state under `thoughts/writing/calendar/`:
+The writing system stores all editorial state under `scribetronic/calendar/`:
 
 ```
-thoughts/writing/
+scribetronic/
 ├── calendar/                    ← editorial state (see calendar/README.md)
 │   ├── rules.yaml
 │   ├── history.md
@@ -180,7 +180,7 @@ thoughts/writing/
 └── publish-config.yaml          ← publish targets, frontmatter mappings
 ```
 
-For the per-week directory layout (rules, plan rows, derivatives), see [`thoughts/writing/calendar/README.md`](calendar/README.md).
+For the per-week directory layout (rules, plan rows, derivatives), see [`scribetronic/calendar/README.md`](calendar/README.md).
 
 For the engineering view (contracts, extension recipes, anti-patterns), see the scribetronic engineering docs (`docs/contracts.md` and `docs/skills.md` in the scribetronic repo).
 
@@ -188,7 +188,7 @@ For the engineering view (contracts, extension recipes, anti-patterns), see the 
 
 ## Cadence (default)
 
-Defined in `thoughts/writing/calendar/rules.yaml`:
+Defined in `scribetronic/calendar/rules.yaml`:
 
 - Sunday → `long-form-weekly-newsletter` (the parent)
 - First Sunday of the month → `long-form-monthly-devlog` (overrides `long-form-weekly-newsletter` that day)
@@ -214,7 +214,7 @@ Edit via `/agenda rules edit`.
 
 ## Brainstorming pool
 
-Ideas live under `thoughts/writing/ideas/`, one file per content type. Each file has `## Active`, `## Used`, `## Cold / parked` sections. When scaffolding a week, skim the relevant type files for a seed. When a bullet becomes a draft, move it to `## Used` with a trail line (`→ drafted <date>` or `→ published <date> as <slug>`). The pool is writer-owned — `/agenda` doesn't read from it automatically.
+Ideas live under `scribetronic/ideas/`, one file per content type. Each file has `## Active`, `## Used`, `## Cold / parked` sections. When scaffolding a week, skim the relevant type files for a seed. When a bullet becomes a draft, move it to `## Used` with a trail line (`→ drafted <date>` or `→ published <date> as <slug>`). The pool is writer-owned — `/agenda` doesn't read from it automatically.
 
 ---
 

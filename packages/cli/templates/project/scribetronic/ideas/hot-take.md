@@ -1,6 +1,6 @@
 ---
 type: hot-take
-description: Contrarian opinion piece, Koe-style. ~800-1500 words.
+description: Contrarian opinion piece against conventional wisdom. ~800-1500 words.
 ---
 
 # Ideas — hot-take

@@ -1,23 +1,26 @@
 ---
 name: long-form-launch-retro
-description: Post-launch breakdown — what you shipped, the numbers (good or bad), what worked, what didn't. ~800-1500 words. This is Roberto's most differentiated format — own it.
-inherits: ../writing-style/SKILL.md
-length_target: 800-1500 words
-cadence: per launch
+description: Post-launch breakdown (~800-1500 words). What you shipped, the numbers (good or bad), what worked, what didn't, what you'd change next time. Use after every product/launch/release where you have real numbers to share — including (especially) when the numbers are embarrassing.
 ---
+
+## Metadata
+
+- **inherits**: `../writing-style/SKILL.md`
+- **length target**: 800-1500 words
+- **cadence**: per launch
 
 # long-form-launch-retro
 
-A retrospective on a launch. Numbers up front (especially when they're bad), what you tried, what worked, what you'd change. This is the format where Roberto's "honest with numbers" voice is sharpest — own it.
+A retrospective on a launch. Numbers up front (especially when they're bad), what you tried, what worked, what you'd change. Honesty with numbers is the differentiator — most launches get written up as victory laps; this format works because it doesn't.
 
-Reference: own MW#2 (Product #1 MakerOps) — the format already works, just sharpen the closer and cut the soft framing.
+Voice and tone come from `writing-style/SKILL.md`.
 
 ## Structure
 
 ```
-[Title: states what launched + the headline number. Examples:
-  - "Product #4 launched. €0 in sales. Here's what I learned."
-  - "MakerOps shipped to 8 free coupons and zero paid. Notes."
+[Title: states what launched + the headline number. Example shapes (replace with your own):
+  - "<product name> launched. €0 in sales. Here's what I learned."
+  - "<product name> shipped to 8 free signups and zero paid. Notes."
   Don't bury the lede.]
 [Subtitle: 1 sentence — what you're going to walk through.]
 

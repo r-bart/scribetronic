@@ -1,23 +1,26 @@
 # CLI Reference
 
-Scribetronic exposes four commands plus standard `--version` / `--help` flags.
+Scribetronic exposes seven commands plus standard `--version` / `--help` flags.
 
 ```
 scribetronic init [path]
-scribetronic style [--reset]
-scribetronic list
-scribetronic info <skill>
+scribetronic style [--reset] [--yes]
+scribetronic list [--json]
+scribetronic info <skill> [--json]
+scribetronic update [path]
+scribetronic doctor [path] [--json]
+scribetronic uninstall [path]
 scribetronic --version
 scribetronic --help
 ```
 
-All commands exit with code `0` on success, non-zero on failure. Exit codes documented per command below.
+All commands exit with code `0` on success, non-zero on failure. Exit codes follow a global contract: `1` unexpected, `2` usage error, `3` state error. Per-command details documented below; the full contract and agent-friendly modes are in the [Agent-friendly modes](#agent-friendly-modes) section at the bottom.
 
 ---
 
 ## `scribetronic init [path]`
 
-Scaffold scribetronic into a project. Copies the bundled templates into the target project's `.claude/` and `thoughts/writing/` directories.
+Scaffold scribetronic into a project. Copies project-level templates into `<target>/scribetronic/` and registers the [plugin marketplace](./plugin-mode.md) in `<target>/.claude/settings.json`. **Skills are not copied** — they load at runtime from the marketplace as `/scribetronic:<name>`.
 
 ### Synopsis
 
@@ -32,7 +35,7 @@ scribetronic init /abs/path        # absolute path also works
 1. Resolves the target path (default: `process.cwd()`).
 2. Verifies the target is a directory and writable.
 3. Walks `templates/claude-code/` and copies into `<target>/.claude/`.
-4. Walks `templates/project/` and copies into `<target>/thoughts/writing/`.
+4. Walks `templates/project/` and copies into `<target>/scribetronic/`.
 5. During copy, files matching `*.example.yaml` are renamed to `*.yaml` at the destination.
 6. Existing files are **never overwritten** — each is logged with a yellow `exists` line and skipped.
 7. Prints a summary: count copied, count skipped, count renamed.
@@ -46,32 +49,43 @@ Running `scribetronic init` multiple times in the same directory is safe. The se
 ```
 <target>/
 ├── .claude/
-│   ├── agents/
-│   ├── rules/
-│   └── skills/                                  # 21 skills
-│       ├── agenda/SKILL.md
-│       ├── write/SKILL.md
-│       ├── write-publish/SKILL.md
-│       └── ... (18 more)
-└── thoughts/
-    └── writing/
+│   └── settings.json                       # registers the plugin marketplace
+└── scribetronic/
+    ├── README.md
+    ├── publish-config.yaml                 # renamed from .example.yaml
+    ├── calendar/
+    │   ├── README.md
+    │   ├── index.md
+    │   ├── rules.yaml                      # renamed from .example.yaml
+    │   ├── history.md
+    │   └── archive/.gitkeep
+    └── ideas/
         ├── README.md
-        ├── publish-config.yaml                  # renamed from .example.yaml
-        ├── calendar/
-        │   ├── README.md
-        │   ├── index.md
-        │   ├── rules.yaml                       # renamed from .example.yaml
-        │   ├── history.md
-        │   └── archive/.gitkeep
-        └── ideas/
-            ├── README.md
-            └── <14 type files>.md
+        └── <14 type files>.md
 ```
+
+`.claude/settings.json` is created (or merged into) with:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "scribetronic": {
+      "source": { "source": "github", "repo": "r-bart/scribetronic-plugin" }
+    }
+  },
+  "enabledPlugins": {
+    "scribetronic@scribetronic": true
+  }
+}
+```
+
+Pre-existing keys (themes, third-party plugins) are preserved.
 
 ### What gets NOT created
 
-- `writing-style/SKILL.md` — this is left to `scribetronic style` (see below). The reasoning is that voice is personal; the user should be prompted to author it deliberately rather than have a generic seed silently appear.
-- Week directories under `calendar/<YYYY-WNN>/` — these are created by `/agenda plan-week` once you start using the pipeline.
+- **`SKILL.md` files**. They live in [`r-bart/scribetronic-plugin`](https://github.com/r-bart/scribetronic-plugin) and load at runtime. Restart Claude Code after `init`.
+- `writing-style.md` — this is left to `scribetronic style`. Voice is personal; the user should engage with it deliberately rather than have a generic seed silently appear.
+- Week directories under `calendar/<YYYY-WNN>/` — created by `/scribetronic:agenda plan-week` once you start using the pipeline.
 
 ### Options
 
@@ -84,19 +98,20 @@ Running `scribetronic init` multiple times in the same directory is safe. The se
 ```bash
 # Initialise the current project
 $ scribetronic init
-created  .claude/skills/agenda/SKILL.md
-created  .claude/skills/write/SKILL.md
+copied  scribetronic/calendar/rules.yaml         (from rules.example.yaml)
+copied  scribetronic/publish-config.yaml         (from publish-config.example.yaml)
+copied  scribetronic/README.md
 ...
-created  thoughts/writing/calendar/rules.yaml         (from rules.example.yaml)
-created  thoughts/writing/calendar/publish-config.yaml (from publish-config.example.yaml)
-✓ scribetronic installed. Run `scribetronic style` next.
+plugin: scribetronic@scribetronic (r-bart/scribetronic-plugin)
+✓ Done. Restart Claude Code — skills load as `/scribetronic:<name>`.
 
 # Re-running is safe
 $ scribetronic init
-exists   .claude/skills/agenda/SKILL.md
-exists   .claude/skills/write/SKILL.md
+skipped  scribetronic/calendar/rules.yaml (exists)
+skipped  scribetronic/publish-config.yaml (exists)
 ...
-✓ no changes.
+plugin: scribetronic@scribetronic (r-bart/scribetronic-plugin)
+✓ no changes to existing files.
 ```
 
 ### Exit codes
@@ -104,15 +119,14 @@ exists   .claude/skills/write/SKILL.md
 | Code | Meaning |
 |---|---|
 | 0 | Success (including no-op idempotent runs). |
-| 1 | Target path does not exist or is not a directory. |
-| 2 | Target path is not writable. |
-| 3 | Internal error (template missing, copy failed). |
+| 1 | Internal error (template missing, copy failed). |
+| 2 | Target path does not exist or is not writable. |
 
 ---
 
 ## `scribetronic style [--reset]`
 
-Seed or edit the writer's voice file at `.claude/skills/writing-style/SKILL.md`.
+Seed or edit the writer's voice file at `scribetronic/style/writing-style.md`.
 
 This is the only file scribetronic treats as personal-by-default. It defines the voice that all long-form templates inherit, so it's separated from `init` to make sure the user actually engages with it.
 
@@ -128,7 +142,7 @@ scribetronic style --reset      # overwrite with seed (with confirmation)
 The command resolves to one of three modes based on file state and flags:
 
 1. **Seed mode** (file does not exist, no `--reset` flag):
-   - Copies `templates/claude-code/.claude/skills/writing-style/SKILL.md` to `<cwd>/.claude/skills/writing-style/SKILL.md`.
+   - Copies `templates/claude-code/scribetronic/style/writing-style.md` to `<cwd>/scribetronic/style/writing-style.md`.
    - Prints the absolute path of the created file.
    - Suggests the user run `scribetronic style` again to open in their editor.
    - Exits 0.
@@ -141,7 +155,7 @@ The command resolves to one of three modes based on file state and flags:
 
 3. **Reset mode** (`--reset` flag passed):
    - If the file does not exist, behaves like seed mode.
-   - If the file exists, prompts via `@clack/prompts`: `Overwrite existing writing-style/SKILL.md with the seed? (y/N)`.
+   - If the file exists, prompts via `@clack/prompts`: `Overwrite existing writing-style.md with the seed? (y/N)`.
    - On `y`: overwrites with the bundled seed and exits 0.
    - On `n` or cancel: exits 0 without modifying the file.
    - In non-interactive mode (`--reset` with no TTY), the command refuses and exits 4.
@@ -161,7 +175,7 @@ The first non-empty value wins. If `$EDITOR` is set but the binary doesn't exist
 ```bash
 # First run — file doesn't exist
 $ scribetronic style
-✓ seeded /Users/jane/proj/.claude/skills/writing-style/SKILL.md
+✓ seeded /Users/jane/proj/scribetronic/style/writing-style.md
 Edit it now: scribetronic style
 
 # Second run — file exists, opens editor
@@ -170,12 +184,12 @@ $ scribetronic style
 
 # Reset to the bundled seed
 $ scribetronic style --reset
-? Overwrite existing writing-style/SKILL.md with the seed? (y/N) y
+? Overwrite existing writing-style.md with the seed? (y/N) y
 ✓ reset to seed.
 
 # Non-TTY (e.g. CI) — prints path
 $ scribetronic style < /dev/null
-/Users/jane/proj/.claude/skills/writing-style/SKILL.md
+/Users/jane/proj/scribetronic/style/writing-style.md
 ```
 
 ### Exit codes
@@ -183,9 +197,9 @@ $ scribetronic style < /dev/null
 | Code | Meaning |
 |---|---|
 | 0 | Success (seeded, edited, reset, or no-op). |
-| 1 | `.claude/skills/` parent directory missing — run `scribetronic init` first. |
-| 4 | `--reset` passed in non-interactive mode (would skip the confirmation prompt). |
-| 5 | Editor binary not found on `$PATH`. |
+| 1 | Internal error (bundled seed missing, editor spawn failed). |
+| 2 | `--reset` in non-TTY without `--yes` / `SCRIBETRONIC_YES=1`. |
+| _other_ | When `$EDITOR` exits non-zero, the command propagates that exit code. |
 
 ---
 
@@ -232,7 +246,7 @@ SHORT-FORM (8)
   /short-form-voice-adjustments   Voice deltas for short-form
 ```
 
-Total: 21 skills.
+Total: 23 skills.
 
 ### Exit codes
 
@@ -262,7 +276,7 @@ $ scribetronic info long-form-weekly-newsletter
 
 skill:        long-form-weekly-newsletter
 description:  Recurring Sunday default — 800–1500 word newsletter
-inherits:     ../writing-style/SKILL.md
+inherits:     ../writing-style.md
 length_target: 800-1500 words
 cadence:      weekly
 
@@ -314,27 +328,189 @@ Options:
   -h, --help         display help for command
 
 Commands:
-  init [path]        Scaffold writing system into a project
-  style              Seed or edit writing-style/SKILL.md
-  list               List bundled skills
+  init [path]        Scaffold writing system + register plugin marketplace
+  style [options]    Seed or edit writing-style.md
+  list               List bundled skills (mirrors what the marketplace ships)
   info <skill>       Show skill metadata
+  update [path]      Refresh marketplace registration in .claude/settings.json
+  doctor [path]      Verify the install end-to-end
+  uninstall [path]   Disable the plugin (leaves your scribetronic/ intact)
   help [command]     display help for command
 ```
 
 ---
 
-## Out of scope for v0.1
+## `scribetronic update [path]`
 
-The following commands are reserved for future versions and are NOT available in v0.1:
+Re-applies the plugin marketplace registration in `<target>/.claude/settings.json`. Use after a fresh `git clone` of a scribetronic project, after upgrading the CLI globally, or whenever `settings.json` drifts (legacy entries, manual edits, etc.).
 
-- `scribetronic add <skill>` — install one skill into an existing project.
-- `scribetronic addon <name>` — install an optional addon (e.g. cross-poster).
-- `scribetronic update` — refresh skills from the latest scribetronic release.
-- `scribetronic doctor` — diagnose installation issues.
-- `scribetronic regenerate` — re-derive skill content from sources.
-- `scribetronic uninstall` — remove scribetronic from a project.
-- `scribetronic mode` — switch between strict / lenient modes.
-- `scribetronic diff` — diff installed skills against bundled templates.
-- `scribetronic status` — show project state (active week, pending drafts).
+Idempotent. If the marketplace source has changed (e.g. a stale local-directory pointer from a dev session), it gets rewritten to the canonical GitHub repo. Other settings keys are preserved.
 
-These are tracked in the v0.2+ roadmap.
+### Behaviour
+
+1. Reads `<target>/.claude/settings.json` (or starts empty).
+2. Sets `extraKnownMarketplaces.scribetronic.source = { source: "github", repo: "r-bart/scribetronic-plugin" }`.
+3. Sets `enabledPlugins["scribetronic@scribetronic"] = true` if undefined. **Does not flip an explicit `false`** (the user's choice wins).
+4. Writes settings back.
+
+### Exit codes
+
+| Code | Meaning |
+|---|---|
+| 0 | Success. |
+| 2 | Target path does not exist (Usage error). |
+
+---
+
+## `scribetronic doctor [path]`
+
+Health check for an existing installation. Verifies six things:
+
+1. `scribetronic/` directory exists.
+2. `scribetronic/calendar/` exists.
+3. `scribetronic/publish-config.yaml` exists.
+4. The plugin (`scribetronic@scribetronic`) is enabled in `.claude/settings.json`.
+5. The marketplace source resolves to `r-bart/scribetronic-plugin`.
+6. `writing-style.md` has been seeded.
+
+Each check renders as `✓` (pass) or `✗` (fail) with a short detail line. Failed checks include a hint at how to fix them.
+
+### Exit codes
+
+| Code | Meaning |
+|---|---|
+| 0 | All six checks passed. |
+| 3 | At least one check failed (State error). |
+
+### Example
+
+```bash
+$ scribetronic doctor
+scribetronic doctor
+/Users/me/blog
+
+  ✓ scribetronic/ directory
+  ✓ scribetronic/calendar/ directory
+  ✓ scribetronic/publish-config.yaml
+  ✓ scribetronic@scribetronic enabled in .claude/settings.json
+  ✓ marketplace source resolves to r-bart/scribetronic-plugin
+  ✗ writing-style.md seeded
+     missing — run `scribetronic style`
+
+1/6 check(s) failed
+```
+
+---
+
+## `scribetronic uninstall [path]`
+
+Disables the scribetronic plugin and removes its marketplace entry from `<target>/.claude/settings.json`. **Does not** touch `scribetronic/` content — drafts, calendar, history, and `publish-config.yaml` are yours; we never delete prose.
+
+### Behaviour
+
+1. If the plugin is not registered, prints "nothing to do" and exits 0.
+2. Otherwise, removes `enabledPlugins["scribetronic@scribetronic"]` and `extraKnownMarketplaces.scribetronic`.
+3. Reminds the user they can `rm -rf scribetronic/` manually if they no longer need it.
+
+### Exit codes
+
+| Code | Meaning |
+|---|---|
+| 0 | Success (including no-op). |
+| 2 | Target path does not exist (Usage error). |
+
+---
+
+## Agent-friendly modes
+
+Every read-only command (`list`, `info`, `doctor`) supports `--json` for machine-readable output. Mutation commands (`init`, `update`, `uninstall`, `style`) follow stdout/stderr discipline by default and respect `NO_COLOR`.
+
+### `--json` output
+
+When `--json` is passed:
+
+- The single payload is a newline-terminated JSON line on **stdout**.
+- All chrome (progress, hints, decorations) is suppressed.
+- Errors emit a structured envelope on **stdout** (yes, stdout — gh / kubectl convention) with shape `{"ok": false, "error": {"message": "...", "code": "..."}}`. The exit code is still non-zero.
+
+#### Schemas
+
+`scribetronic list --json`
+```json
+{
+  "skills": [
+    { "name": "agenda", "category": "Orchestrators", "path": "/abs/path/SKILL.md", "description": "..." }
+  ]
+}
+```
+
+`scribetronic info <skill> --json`
+```json
+{
+  "name": "agenda",
+  "path": "/abs/path/SKILL.md",
+  "frontmatter": { "name": "agenda", "description": "...", "...": "..." },
+  "body": "..."
+}
+```
+
+`scribetronic doctor [path] --json`
+```json
+{
+  "ok": true,
+  "target": "/abs/path",
+  "checks": [
+    { "label": "scribetronic/ directory", "ok": true, "detail": "..." }
+  ]
+}
+```
+
+### Exit codes (global contract)
+
+| Code | Meaning | When |
+|---|---|---|
+| 0 | Success | Command completed |
+| 1 | Unexpected error | Uncaught throw, internal bug, FS failure mid-op |
+| 2 | Usage error | Bad argument, missing path, unknown skill, `--reset` without TTY/`--yes` |
+| 3 | State error | Plugin not registered when expected, `doctor` checks failed |
+
+### Environment variables
+
+| Variable | Effect |
+|---|---|
+| `NO_COLOR` | If set to any non-empty value, disables ANSI color and the clack `intro/spinner/note/outro` boxes. Same effect as not having a TTY. |
+| `SCRIBETRONIC_YES` | Set to `1` to bypass `--reset` confirm prompts. Same as passing `--yes`. |
+| `EDITOR` | Editor invoked by `scribetronic style` (existing target, TTY). Falls back to `$VISUAL`, then `vi`. |
+| `VISUAL` | Fallback for `$EDITOR`. |
+
+### stdout vs stderr discipline
+
+| Stream | Contents |
+|---|---|
+| **stdout** | The command's data payload. In JSON mode: one JSON line. In human mode: only the value `style` prints when target exists in non-TTY (the absolute path). Everything else mutation-related goes to stderr. |
+| **stderr** | All chrome: headers, summaries, progress spinners, hints, error messages, success confirmations. |
+
+This means `scribetronic list | jq '.skills[].name' --raw-input` works; `scribetronic init >/dev/null 2>&1` is silent on success; `scribetronic doctor 2> doctor.log` keeps the report even with stdout discarded.
+
+### Examples for agents
+
+```bash
+# Read-only introspection, parseable
+scribetronic list --json | jq '.skills | length'                # → 22
+scribetronic info agenda --json | jq -r '.frontmatter.description'
+
+# Health check with structured output
+scribetronic doctor /repo --json | jq '.checks[] | select(.ok == false)'
+
+# Idempotent setup (silent on success)
+scribetronic update /repo > /dev/null 2>&1
+echo $?                                                          # → 0
+
+# Non-interactive reset
+scribetronic style --reset --yes
+SCRIBETRONIC_YES=1 scribetronic style --reset                    # equivalent
+
+# Capture writing-style path
+path=$(scribetronic style)
+cat "$path"
+```

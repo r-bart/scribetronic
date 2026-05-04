@@ -1,10 +1,13 @@
 ---
 name: long-form-monthly-devlog
 description: Monthly devlog — longer, more reflective recap. ~1200-2000 words. Stitches together the month's work, names the pattern, draws a non-obvious lesson. Goes deeper than a weekly recap.
-inherits: ../writing-style/SKILL.md
-length_target: 1200-2000 words
-cadence: monthly
 ---
+
+## Metadata
+
+- **inherits**: `../writing-style/SKILL.md`
+- **length target**: 1200-2000 words
+- **cadence**: monthly
 
 # long-form-monthly-devlog
 

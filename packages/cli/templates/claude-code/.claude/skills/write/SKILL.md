@@ -62,7 +62,7 @@ If no type provided AND no `--repurpose`/`--edit` flag:
 First, unless `--ignore-agenda` was passed, consult today's agenda via the active week's plan:
 
 1. Compute `current_week` = ISO week of today using `date +%G-W%V` (note: `%G`, not `%Y` — required around year boundaries). Format is `YYYY-WNN` (e.g. `2026-W18`).
-2. Look for `thoughts/writing/calendar/<current_week>/plan.md`.
+2. Look for `scribetronic/calendar/<current_week>/plan.md`.
    - If file missing: resolver returns null (no week scaffolded). The fallback interview (below) should suggest `/agenda plan-week today` before continuing.
 3. Find rows in plan.md where `Date` == today AND `Status` == `queued`.
    - 0 matches → resolver returns null. Fall through to rules-only resolution per `/agenda`'s algorithm, then to the interview if still null.
@@ -90,7 +90,9 @@ If type IS provided: skip Phase 0.
 
 Load context (mandatory order):
 
-1. `writing-style/SKILL.md` (always).
+1. **Voice base** (always). Resolve in this order:
+   a. `scribetronic/style/writing-style.md` in the project root, if it exists — user's personalized override.
+   b. Otherwise, the bundled `writing-style/SKILL.md` template.
 2. The type's template file (e.g., `long-form-hot-take/SKILL.md`, `long-form-weekly-newsletter/SKILL.md`).
 3. If short-form: also `short-form-voice-adjustments/SKILL.md`.
 
@@ -107,23 +109,23 @@ Stop after seed is captured. Confirm with user: "Ready to draft? (y / change see
 
 ### Phase 2 — Draft
 
-Generate draft following the template's structure exactly. Apply `writing-style/SKILL.md` voice rules.
+Generate draft following the template's structure exactly. Apply the voice rules loaded in Phase 1 (project override or bundled template).
 
 **Save path** — drafts live inside the active week's calendar directory:
 
 1. Compute `current_week` = `date +%G-W%V` (format `YYYY-WNN`).
-2. If `thoughts/writing/calendar/<current_week>/` does NOT exist, refuse with the message:
+2. If `scribetronic/calendar/<current_week>/` does NOT exist, refuse with the message:
    > "No week scaffolded for `<current_week>`. Run `/agenda plan-week today` first."
 
    Do NOT auto-scaffold the week — that requires a newsletter seed and is owned by `/agenda plan-week`.
 3. Determine the path:
    - For `type == long-form-weekly-newsletter`:
      ```
-     thoughts/writing/calendar/<current_week>/newsletter.md
+     scribetronic/calendar/<current_week>/newsletter.md
      ```
    - For all other types:
      ```
-     thoughts/writing/calendar/<current_week>/derivatives/<weekday>-<type>-<slug>.md
+     scribetronic/calendar/<current_week>/derivatives/<weekday>-<type>-<slug>.md
      ```
      where `<weekday>` is today's weekday as a lowercase 3-letter abbreviation (`mon`/`tue`/`wed`/`thu`/`fri`/`sat`/`sun`).
    - Lazily create `derivatives/` if it doesn't exist yet.
@@ -207,11 +209,11 @@ Skip if:
 
 Otherwise, derive short-form pieces from the just-finished long-form parent (the newsletter):
 
-1. Read `thoughts/writing/calendar/<current_week>/plan.md`.
+1. Read `scribetronic/calendar/<current_week>/plan.md`.
 2. Find rows whose `Source` is `newsletter` (or `newsletter (thread)`) AND whose `Status` is `queued`. These are the planned derivatives for this week.
 3. For each such row, generate one derivative draft using `short-form-thread-from-longform/SKILL.md`. Save to:
    ```
-   thoughts/writing/calendar/<current_week>/derivatives/<weekday>-<type>-<slug>.md
+   scribetronic/calendar/<current_week>/derivatives/<weekday>-<type>-<slug>.md
    ```
    where:
    - `<weekday>` is the row's `Day` (lowercase 3-letter abbreviation),
@@ -230,7 +232,7 @@ There is ONE file per derivative. The channel (X, LinkedIn, Threads, carousel) i
 Print:
 
 ```
-✓ Long-form: thoughts/writing/calendar/<current_week>/newsletter.md
+✓ Long-form: scribetronic/calendar/<current_week>/newsletter.md
 ✓ Edited: yes
 ✓ Slop check: clean (or: 1 MEDIUM unresolved)
 Derivatives:
@@ -247,13 +249,13 @@ Update frontmatter `status` to `ready` on the main draft (and on each derivative
 
 Then update calendar bookkeeping (both files use markdown tables — see `agenda/SKILL.md` for the full schema):
 
-1. **history.md** — append a row to the markdown table at `thoughts/writing/calendar/history.md`:
+1. **history.md** — append a row to the markdown table at `scribetronic/calendar/history.md`:
    ```
    | YYYY-MM-DD | {type} | {slug} | ready | /write |
    ```
    Use today's date. Schema: `| Date | Type | Slug | Status | Source |`. If the file or table is missing (first run), create it with the header documented in `agenda/SKILL.md` § File contracts, then append. Append one row per finalized draft (the newsletter and each derivative).
 
-2. **plan.md** — for each finalized draft, find the row in `thoughts/writing/calendar/<current_week>/plan.md` whose `Slug` matches the draft's slug, and set its `Status` from `queued` to `drafted`. Plan column schema:
+2. **plan.md** — for each finalized draft, find the row in `scribetronic/calendar/<current_week>/plan.md` whose `Slug` matches the draft's slug, and set its `Status` from `queued` to `drafted`. Plan column schema:
    ```
    | Date | Day | Type | Slug | Platform | Source | Status |
    ```
@@ -286,26 +288,26 @@ This avoids race conditions when multiple flows touch the same files.
 
 ```
 /write
-→ Phase 0: reads thoughts/writing/calendar/2026-W18/plan.md. Finds today's queued slot.
+→ Phase 0: reads scribetronic/calendar/2026-W18/plan.md. Finds today's queued slot.
 → "Today's slot is `long-form-weekly-newsletter` — 'shipping fast is overrated...'. Proceed? (y / pick another / cancel)"
 → y → loads long-form-weekly-newsletter template + writing-style.
-→ Drafts to thoughts/writing/calendar/2026-W18/newsletter.md. Edits. Slop-checks.
+→ Drafts to scribetronic/calendar/2026-W18/newsletter.md. Edits. Slop-checks.
 → Phase 5 reads plan.md, derives the queued thread + carousel rows. Done.
 
 /write long-form-hot-take "shipping fast is overrated when you have no audience"
 → Loads long-form-hot-take template + writing-style.
 → Asks: "Whose advice are you disagreeing with? What's your alternative?"
-→ Drafts to thoughts/writing/calendar/2026-W18/derivatives/mon-long-form-hot-take-shipping-fast-overrated.md.
+→ Drafts to scribetronic/calendar/2026-W18/derivatives/mon-long-form-hot-take-shipping-fast-overrated.md.
 → Edits. Slop-checks. Repurpose? → derives matching plan.md rows.
 
-/write --from thoughts/writing/ideas/idea-launch-retro.md
+/write --from scribetronic/ideas/idea-launch-retro.md
 → Reads file. Auto-detects type if possible (else asks).
 → Drafts using file as seed, into the active week's directory.
 
-/write --repurpose thoughts/writing/calendar/2026-W18/newsletter.md
+/write --repurpose scribetronic/calendar/2026-W18/newsletter.md
 → Skips Phases 0-4. Reads same week's plan.md, generates queued derivatives.
 
-/write --edit thoughts/writing/calendar/2026-W18/derivatives/wed-short-form-thread-from-longform-niches-are-dead.md
+/write --edit scribetronic/calendar/2026-W18/derivatives/wed-short-form-thread-from-longform-niches-are-dead.md
 → Runs editing-pass + ai-slop-check on existing draft only.
 
 /write --auto long-form-launch-retro "Product #2 — Boilerplate kit"
@@ -317,11 +319,11 @@ This avoids race conditions when multiple flows touch the same files.
 
 ## Anti-patterns
 
-- Don't run any phase without loading `writing-style/SKILL.md` first. The voice base is non-negotiable.
+- Don't run any phase without loading the voice base first (Phase 1 step 1: project-local override `scribetronic/style/writing-style.md` if present, else bundled `writing-style/SKILL.md`). The voice base is non-negotiable.
 - Don't skip the seed interview for ambiguous types — the 2-4 quick questions save 10 minutes of bad draft.
 - Don't auto-fix MEDIUM slop issues without asking unless `--auto`.
 - Don't generate a draft + 4 derivatives in one phase. Repurpose is its own phase, optional, separate output.
-- Don't write outside `thoughts/writing/calendar/<current_week>/`. The week directory is the unit of organization.
+- Don't write outside `scribetronic/calendar/<current_week>/`. The week directory is the unit of organization.
 - Don't append `-x`/`-li`/`-threads`/`-carousel` to filenames. ONE file per derivative; platform is in frontmatter.
 - Don't auto-scaffold a missing week directory. Refuse and instruct the user to run `/agenda plan-week today`.
 

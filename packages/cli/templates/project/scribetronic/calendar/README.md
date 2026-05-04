@@ -5,7 +5,7 @@ The editorial calendar for the writing system. One directory per ISO week (`<YYY
 ## Layout
 
 ```
-thoughts/writing/calendar/
+scribetronic/calendar/
 ├── README.md                    ← you are here
 ├── rules.yaml                   ← recurring slot rules
 ├── history.md                   ← append-only event log
@@ -26,7 +26,7 @@ thoughts/writing/calendar/
 1. **Scaffold.** `/agenda plan-week <YYYY-MM-DD>` creates `<YYYY-WNN>/plan.md` with 6-7 rows (1 newsletter + 5 derivatives), all `queued`.
 2. **Draft the newsletter (Sunday).** `/write weekly-newsletter` saves to `<week>/newsletter.md` and flips its plan.md row to `drafted`.
 3. **Repurpose.** `/write --repurpose` reads the newsletter, generates the derivative drafts under `<week>/derivatives/`, flips each row to `drafted`.
-4. **Publish (daily Mon-Fri + Sun).** `/write-publish <slug>` moves the piece to `src/content/blog/` (newsletter) or `thoughts/writing/published/social/<platform>/` (derivatives), flips row to `published`.
+4. **Publish (daily Mon-Fri + Sun).** `/write-publish <slug>` moves the piece to `src/content/blog/` (newsletter) or `scribetronic/published/social/<platform>/` (derivatives), flips row to `published`.
 5. **Archive.** When every row is `published` or `skipped`, `/write-publish` offers to move `<week>/` to `archive/`.
 
 ## Where to look for…
@@ -42,6 +42,6 @@ thoughts/writing/calendar/
 
 ## See also
 
-- User guide: `thoughts/writing/README.md`
+- User guide: `scribetronic/README.md`
 - Engineering reference: scribetronic `docs/contracts.md` and `docs/skills.md`
-- Brainstorming pool (ideas backlog): `thoughts/writing/ideas/`
+- Brainstorming pool (ideas backlog): `scribetronic/ideas/`

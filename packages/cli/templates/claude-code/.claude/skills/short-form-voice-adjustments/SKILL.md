@@ -1,13 +1,23 @@
 ---
 name: short-form-voice-adjustments
 description: Voice deltas for short-form (X, LinkedIn, Threads). Inherits writing-style and overrides specific rules where short-form requires it. Always loaded by short-form skills.
-inherits: ../writing-style/SKILL.md
-applies_to: [X/Twitter, LinkedIn, Threads]
 ---
+
+## Metadata
+
+- **inherits**: `../writing-style/SKILL.md`
+- **applies to**: X/Twitter, LinkedIn, Threads
 
 # Short-form voice adjustments
 
-The base voice (`writing-style/SKILL.md`) still applies. This file lists the deltas — where short-form requires you to break or sharpen a long-form rule.
+## Voice resolution
+
+The base voice still applies. Load it in this order:
+
+1. **`scribetronic/style/writing-style.md`** in the project root, if it exists — user's personalized override.
+2. **Bundled `writing-style/SKILL.md`** template otherwise.
+
+This file lists the deltas — where short-form requires you to break or sharpen a long-form rule from whichever base loaded.
 
 ## Why short-form is different
 
@@ -34,7 +44,7 @@ Three forces are stronger here than in long-form:
 | Max 1 rhetorical question per piece | Same cap. But often the hook IS the question. |
 | Paragraphs of 1-3 sentences | Single-line "paragraphs" are normal — visual rhythm via line breaks. |
 | Cite tools/numbers/names | Even more critical. Specifics are 80% of why short-form posts work. |
-| One Welsh-punctuation paragraph allowed | Still one cap. (Don't turn every line into "Why?".) |
+| One staccato 2-3 word paragraph allowed (_"That's it."_, _"Why?"_) | Still one cap. (Don't turn every line into a one-word jab.) |
 
 ## Hook patterns that work
 
@@ -80,5 +90,5 @@ Use one, never the soft exit:
 
 ### Threads
 - Closer to X in tone but tolerates slightly longer.
-- Conversational > authoritative. Slightly more first-person, slightly less Welsh-tone.
+- Conversational > authoritative. Slightly more first-person, slightly less declarative-punch.
 - Lower stakes — Threads is where you can be more playful with the rules.

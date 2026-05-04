@@ -1,9 +1,12 @@
 ---
 name: short-form-x-vs-y
-description: Short-form comparison post. Two things contrasted to reveal a non-obvious preference. Welsh format #1.
-inherits: ../short-form-voice-adjustments/SKILL.md
-formats: [X single, X thread, LinkedIn]
+description: Short-form comparison post (X / LinkedIn / Threads). Two things contrasted to reveal a non-obvious preference. Use when the user wants to publish an "X vs Y" take — tools, approaches, mindsets, frameworks — and stake a side. Pairs well after a hot-take or how-to long-form piece.
 ---
+
+## Metadata
+
+- **inherits**: `../short-form-voice-adjustments/SKILL.md`
+- **formats**: X single, X thread, LinkedIn
 
 # short-form-x-vs-y
 
@@ -49,7 +52,11 @@ Compare two things to expose a non-obvious preference. The reader should finish 
 - Comparison without preference. Pick a side.
 - More than 5 contrasts in the table. Picks 3.
 
-## Examples to model
+## Example shapes
 
-Welsh: _"Renting an audience vs owning an audience."_
-Welsh: _"Working in public vs working in private."_
+Two illustrative x-vs-y framings (replace with comparisons rooted in your own niche):
+
+- _"Renting an audience vs owning an audience."_
+- _"Working in public vs working in private."_
+
+Notice both are nouns vs nouns, both surface a preference the writer is willing to defend, neither is a strawman. For author-specific examples in your voice, see `writing-style/SKILL.md`.

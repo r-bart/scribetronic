@@ -1,10 +1,13 @@
 ---
 name: short-form-carousel-li
-description: LinkedIn carousel — multi-slide PDF post. Derives from a long-form piece OR a strong listicle/how-to. Format-specific: 8-10 slides typical.
-inherits: ../short-form-voice-adjustments/SKILL.md
-input: a long-form piece OR a strong listicle/how-to topic
-format: LinkedIn carousel (PDF, 8-10 slides)
+description: LinkedIn carousel — multi-slide PDF post (8–10 slides typical). Derives from a long-form piece OR a strong listicle / how-to topic. Use when repurposing a published long-form into LinkedIn's highest-engagement format, or when a user has a step-by-step / numbered insight that benefits from one-idea-per-slide pacing.
 ---
+
+## Metadata
+
+- **inherits**: `../short-form-voice-adjustments/SKILL.md`
+- **input**: a long-form piece OR a strong listicle/how-to topic
+- **format**: LinkedIn carousel (PDF, 8-10 slides)
 
 # short-form-carousel-li
 

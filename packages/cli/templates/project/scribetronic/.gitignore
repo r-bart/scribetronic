@@ -1,0 +1,5 @@
+# scribetronic local state
+# - .scribetronic/snapshots/ stores per-draft snapshots used by
+#   /scribetronic:review --since-last to compute deltas. Local-only,
+#   not collaboration content.
+.scribetronic/

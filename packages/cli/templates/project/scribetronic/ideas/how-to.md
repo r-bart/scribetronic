@@ -1,6 +1,6 @@
 ---
 type: how-to
-description: Actionable guide / tutorial, Moretti-style. ~1500-3500 words.
+description: Actionable guide / tutorial grounded in personal experience. ~1500-3500 words.
 ---
 
 # Ideas — how-to

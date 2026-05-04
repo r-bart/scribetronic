@@ -1,16 +1,19 @@
 ---
 name: long-form-hot-take
-description: Contrarian opinion piece. ~800-1500 words. Stakes a position against conventional wisdom in your niche. Style influence: Dan Koe + Justin Welsh's contrarian format.
-inherits: ../writing-style/SKILL.md
-length_target: 800-1500 words
-cadence: ad-hoc — when you have something to disagree with
+description: Contrarian opinion piece (~800-1500 words). Stakes a position against conventional wisdom in your niche. Use when you have a real fight to pick — a widely-held belief in your space that you genuinely disagree with and can defend with evidence.
 ---
+
+## Metadata
+
+- **inherits**: `../writing-style/SKILL.md`
+- **length target**: 800-1500 words
+- **cadence**: ad-hoc — when you have something to disagree with
 
 # long-form-hot-take
 
 A short essay that picks a fight with conventional wisdom in your niche. Goal: make the reader either nod or push back — never shrug.
 
-Style influence: Dan Koe's "You don't need a niche, you need a point of view" + Welsh's contrarian format.
+The voice and tone come from `writing-style/SKILL.md`. This skill only owns the format. If your style guide names contrarian-format references (specific authors, specific posts you admire), put them there — not here.
 
 ## Structure
 

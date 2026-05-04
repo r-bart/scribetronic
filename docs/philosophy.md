@@ -66,12 +66,12 @@ A consumer project that adopts scribetronic ends up with two trees:
 ```
 <project>/
 ├── .claude/skills/         ← installed by scribetronic; rarely edited
-└── thoughts/writing/       ← project-owned; the writer's working set
+└── scribetronic/       ← project-owned; the writer's working set
 ```
 
 The split is intentional:
 
-- **Skills are reusable.** They contain no project-specific paths, no hardcoded blog targets, no individual voice. They read from config files in `thoughts/writing/`.
+- **Skills are reusable.** They contain no project-specific paths, no hardcoded blog targets, no individual voice. They read from config files in `scribetronic/`.
 - **Thoughts are personal.** Your ideas, your calendar, your published archive — none of that belongs in a plugin. It's yours.
 
 Updating scribetronic (e.g. `scribetronic init` after a new release) refreshes the skills without touching your content. Conversely, editing your `rules.yaml` or `publish-config.yaml` doesn't fork the plugin.
@@ -88,7 +88,7 @@ Concrete examples:
 
 - `/write-publish` reads target paths from `publish-config.yaml`. It does not hardcode `src/content/blog/`.
 - `/agenda` reads cadence rules from `calendar/rules.yaml`. It does not hardcode "Sunday is newsletter day".
-- Long-form templates inherit voice from `writing-style/SKILL.md`. They do not duplicate voice rules.
+- Long-form templates inherit voice resolved from `scribetronic/style/writing-style.md` (project override) or `writing-style/SKILL.md` (bundled template fallback). They do not duplicate voice rules.
 
 The rule, formalised: **config wins over code**. If a skill contradicts a config file, the skill is wrong. Fix the skill, not the config.
 
@@ -176,6 +176,6 @@ If those tradeoffs are deal-breakers, scribetronic is the wrong tool. If they're
 ## Further reading
 
 - [contracts.md](contracts.md) — the data contracts the pipeline depends on.
-- [skills.md](skills.md) — catalog of all 21 skills.
+- [skills.md](skills.md) — catalog of all 23 skills.
 - [tutorials/01-new-project.md](tutorials/01-new-project.md) — get started in 5 minutes.
 - [tutorials/03-weekly-flow.md](tutorials/03-weekly-flow.md) — what a week looks like in practice.
