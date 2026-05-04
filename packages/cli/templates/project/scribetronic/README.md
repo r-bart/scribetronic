@@ -98,8 +98,8 @@ Each week is its own directory under `scribetronic/calendar/<YYYY-WNN>/`. The ne
 |---|---|---|---|
 | `long-form-weekly-newsletter` | Default Sunday recurring slot. Parent piece of the week. | 600-1200w | weekly |
 | `long-form-monthly-devlog` | Monthly reflection / devlog. | 1200-2000w | monthly |
-| `long-form-hot-take` | Contrarian opinion, Koe-style. | 800-1500w | as-needed |
-| `long-form-how-to` | Tutorial, Moretti-style. | 1500-3500w | as-needed |
+| `long-form-hot-take` | Contrarian opinion against conventional wisdom. | 800-1500w | as-needed |
+| `long-form-how-to` | Actionable tutorial grounded in personal experience. | 1500-3500w | as-needed |
 | `long-form-launch-retro` | Post-launch breakdown with real numbers. Strongest format. | 800-1500w | as-needed |
 | `long-form-manifesto` | Vision/strategy. Highest slop risk — use sparingly. | 1500-3000w | rare |
 

@@ -10,10 +10,11 @@ Flat catalog of writing skills for the scribetronic system. Each skill lives in 
 
 ## Shared / Quality
 
-- **`writing-style`** — Roberto's voice base. Inherited by every type and quality skill.
+- **`writing-style`** — User's voice base, shipped as a personalization template. Inherited by every type and quality skill.
 - **`editing-pass`** — Read-and-revise pass. Tightens prose, kills filler, sharpens closer.
 - **`ai-slop-check`** — Detection pass for AI-generated patterns and clichés. Last gate before publish.
 - **`style-extract`** — Distil a reusable writing-style guide from 3-5 reference samples + 1-2 of your own.
+- **`style-refine`** — Propose evidence-backed deltas to `writing-style/SKILL.md` from real (draft → published) edit history.
 
 ## Long-form types
 
@@ -37,4 +38,4 @@ Flat catalog of writing skills for the scribetronic system. Each skill lives in 
 
 ---
 
-21 skills total. See [docs/skills.md](../../../../../../docs/skills.md) for detail.
+22 skills total. See [docs/skills.md](../../../../../../docs/skills.md) for detail.
