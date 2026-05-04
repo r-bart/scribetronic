@@ -15,6 +15,7 @@ Flat catalog of writing skills for the scribetronic system. Each skill lives in 
 - **`ai-slop-check`** — Detection pass for AI-generated patterns and clichés. Last gate before publish.
 - **`style-extract`** — Distil a reusable writing-style guide from 3-5 reference samples + 1-2 of your own.
 - **`style-refine`** — Propose evidence-backed deltas to `writing-style/SKILL.md` from real (draft → published) edit history.
+- **`review`** — Parallel multi-focus review (voice, structure, slop, hook, closer, optional factual). Spawns N subagents concurrently and aggregates findings into a severity-grouped report.
 
 ## Long-form types
 
@@ -38,4 +39,4 @@ Flat catalog of writing skills for the scribetronic system. Each skill lives in 
 
 ---
 
-22 skills total. See [docs/skills.md](../../../../../../docs/skills.md) for detail.
+23 skills total. See [docs/skills.md](../../../../../../docs/skills.md) for detail.

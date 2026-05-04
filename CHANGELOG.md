@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`/scribetronic:review` skill — parallel multi-focus draft review.** Dispatches one Task subagent per focus (default: `voice`, `structure`, `slop`, `hook`, `closer`; opt-in `factual` with `--with-evidence`) in a single message, then aggregates findings into one severity-grouped table on stdout. Faster than running `editing-pass` + `ai-slop-check` sequentially (~10s vs ~50s for 5 focuses) and covers more dimensions. Stderr carries per-focus dispatch progress; `--quiet` suppresses everything except the verdict and HIGH findings. Uses Haiku for pattern-matching focuses; Sonnet bumps in for `factual`. Skill count: 22 → 23.
+- `/write` Phase 4 will adopt `/review` as its default quality gate from v0.3.0 (opt-out via `--no-review` for the legacy sequential `editing-pass + ai-slop-check`).
+
 ### Planned
 
 - Calendar export (ICS, Notion, Google Calendar)

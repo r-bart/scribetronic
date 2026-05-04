@@ -80,7 +80,7 @@ No `SKILL.md` files in your project — those live in the marketplace repo and l
 .claude-plugin/marketplace.json             # marketplace descriptor
 plugins/scribetronic/
 ├── .claude-plugin/plugin.json              # plugin metadata + version
-├── skills/                                 # 22 SKILL.md files
+├── skills/                                 # 23 SKILL.md files
 └── hooks/hooks.json                        # SessionStart + Stop hooks
 ```
 

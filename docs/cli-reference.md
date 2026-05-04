@@ -246,7 +246,7 @@ SHORT-FORM (8)
   /short-form-voice-adjustments   Voice deltas for short-form
 ```
 
-Total: 22 skills.
+Total: 23 skills.
 
 ### Exit codes
 

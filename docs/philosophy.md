@@ -176,6 +176,6 @@ If those tradeoffs are deal-breakers, scribetronic is the wrong tool. If they're
 ## Further reading
 
 - [contracts.md](contracts.md) — the data contracts the pipeline depends on.
-- [skills.md](skills.md) — catalog of all 22 skills.
+- [skills.md](skills.md) — catalog of all 23 skills.
 - [tutorials/01-new-project.md](tutorials/01-new-project.md) — get started in 5 minutes.
 - [tutorials/03-weekly-flow.md](tutorials/03-weekly-flow.md) — what a week looks like in practice.

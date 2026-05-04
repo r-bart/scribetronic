@@ -29,7 +29,7 @@ The CLI will:
 2. Register the [scribetronic plugin marketplace](https://github.com/r-bart/scribetronic-plugin) in `.claude/settings.json`
 3. Create the folder structure for drafts, published pieces, and notes
 
-Restart Claude Code; the 22 skills load as `/scribetronic:write`, `/scribetronic:agenda`, etc. The bare `/write` form also works.
+Restart Claude Code; the 23 skills load as `/scribetronic:write`, `/scribetronic:agenda`, etc. The bare `/write` form also works.
 
 ### Option B — Plugin marketplace only (skills, no project scaffolding)
 
@@ -81,11 +81,11 @@ That's the whole loop.
 
 ## What you get
 
-- **22 skills** covering planning, drafting, editing, and quality
+- **23 skills** covering planning, drafting, editing, and quality
 - **3 orchestrators** that compose the pipeline
 - **6 long-form formats** (newsletter, devlog, hot take, how-to, launch retro, manifesto)
 - **8 short-form formats** (X vs Y, listicles, observations, carousels, threads, etc.)
-- **5 shared utilities** (style, editing, AI-slop check, style extraction, style refinement)
+- **6 shared utilities** (style, editing, AI-slop check, style extraction, style refinement, parallel review)
 - **A small CLI** to install, list, and inspect skills
 
 No accounts. No SaaS. Plain markdown files in your repo.
@@ -99,7 +99,7 @@ No accounts. No SaaS. Plain markdown files in your repo.
 | [Architecture](./docs/ARCHITECTURE.md) | Repo layout and skill organization |
 | [Plugin Mode](./docs/plugin-mode.md) | Marketplace architecture, hooks, and v0.1.x → v0.2.x migration |
 | [Philosophy](./docs/philosophy.md) | Why scribetronic exists and what it bets on |
-| [Skills Reference](./docs/skills.md) | Detailed docs for all 22 skills |
+| [Skills Reference](./docs/skills.md) | Detailed docs for all 23 skills |
 | [CLI Reference](./docs/cli-reference.md) | Full command documentation |
 | [Customization](./docs/customization.md) | Editing `rules.yaml`, `publish-config.yaml`, voice |
 | [Contracts](./docs/contracts.md) | Pipeline data contracts (week IDs, plan schema, etc.) |
@@ -117,7 +117,7 @@ No accounts. No SaaS. Plain markdown files in your repo.
 | `/write` | Drafts a single piece in the chosen format |
 | `/write-publish` | Polishes a draft, runs quality gates, marks it ready |
 
-### Shared utilities (5)
+### Shared utilities (6)
 
 | Skill | What it does |
 |-------|--------------|
@@ -126,6 +126,7 @@ No accounts. No SaaS. Plain markdown files in your repo.
 | `/ai-slop-check` | Detects generic AI patterns, hedge words, em-dash abuse |
 | `/style-extract` | Extracts a style profile from existing writing samples |
 | `/style-refine` | Proposes evidence-backed deltas to `writing-style/SKILL.md` from real edit history |
+| `/review` | Parallel multi-focus review (voice, structure, slop, hook, closer, optional factual) — N subagents concurrent, severity-grouped report |
 
 ### Long-form (6)
 

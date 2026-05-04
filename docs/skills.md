@@ -1,9 +1,9 @@
 # Skills Catalog
 
-Scribetronic ships 22 skills, organised into four groups:
+Scribetronic ships 23 skills, organised into four groups:
 
 - **3 orchestrators** — user-invokable entry points.
-- **5 shared** — voice, editing, slop-detection, style extraction, style refinement.
+- **6 shared** — voice, editing, slop-detection, style extraction, style refinement, parallel review.
 - **6 long-form types** — newsletters, devlogs, retros, manifestos, etc.
 - **8 short-form types** — derivatives produced from long-form.
 
@@ -77,7 +77,7 @@ Publishing to blog target + social archive. Eleven steps.
 
 ---
 
-## Shared (5)
+## Shared (6)
 
 These are loaded by orchestrators, not invoked directly. Listed here for reference.
 
@@ -139,6 +139,16 @@ Closes the feedback loop between drafted and published copy. Diffs each `(draft,
 **Inputs:** the existing `writing-style/SKILL.md` plus ≥3 `(draft, published)` pairs from `scribetronic/calendar/<W>/` and `scribetronic/published/`. Aborts if fewer than 3 pairs exist or if drafts are byte-identical to published versions.
 
 **Outputs:** `scribetronic/style/refinements/YYYY-MM-DD.md` with proposed deltas, each backed by ≥2 textual diffs. The user reviews, copies the deltas they accept into `writing-style/SKILL.md`, then archives the proposal under `applied/`.
+
+### `/review`
+
+Parallel multi-focus review of a draft. Spawns one Task subagent per focus (default: `voice,structure,slop,hook,closer`; opt-in `factual` with `--with-evidence`) — all dispatched in a single message — then aggregates findings into one severity-grouped report. Faster than running `editing-pass` + `ai-slop-check` sequentially (~10s vs ~50s for 5 focuses) and covers more dimensions.
+
+**When to use:** mid-draft for fast iterative feedback (every 200 words), or as a quality gate before `/scribetronic:write-publish`. Replaces the sequential `editing-pass + ai-slop-check` step in `/write` Phase 4 from v0.3.0.
+
+**Inputs:** `<draft-path>` (required), `--focus <list>` (default 5 focuses), `--with-evidence` (enables `factual` against `scribetronic/calendar/<week>/notes.md`), `--quiet` (only verdict + HIGH).
+
+**Outputs:** stdout — markdown tables grouped by severity (HIGH / MEDIUM / LOW) with columns `Focus | Location | Finding`. Verdict line: `SHIP` (0 HIGH, ≤2 MEDIUM) or `REVISE`. Stderr — per-focus dispatch progress (silenced with `--quiet`).
 
 ---
 

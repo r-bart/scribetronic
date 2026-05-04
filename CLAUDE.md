@@ -9,10 +9,10 @@
 `scribetronic` is an npm package that ships:
 
 1. A small Node CLI (`packages/cli/`) — commands: `init`, `style`, `list`, `info`, `update`, `doctor`, `uninstall`
-2. A bundle of 22 Claude Code skills, distributed via the [scribetronic-plugin](https://github.com/r-bart/scribetronic-plugin) marketplace (loaded by Claude Code at runtime, not copied to the user's project)
+2. A bundle of 23 Claude Code skills, distributed via the [scribetronic-plugin](https://github.com/r-bart/scribetronic-plugin) marketplace (loaded by Claude Code at runtime, not copied to the user's project)
 3. Editorial calendar templates (`templates/project/`) installed into user projects by `init`
 
-The CLI also keeps the 22 skills bundled inside `templates/claude-code/.claude/skills/` as the source of truth for `list` / `info` and for syncing to the plugin repo on release.
+The CLI also keeps the 23 skills bundled inside `templates/claude-code/.claude/skills/` as the source of truth for `list` / `info` and for syncing to the plugin repo on release.
 
 Distributed as `scribetronic` on npm. Single package, no monorepo split.
 
@@ -205,7 +205,7 @@ When stuck:
 ## References
 
 - **docs/ARCHITECTURE.md** — Folder structure
-- **docs/skills.md** — All 22 skills documented
+- **docs/skills.md** — All 23 skills documented
 - **docs/cli-reference.md** — Full CLI reference
 - **AGENTS.md** — Quick start for AI agents
 - **CONTRIBUTING.md** — Contributor guide
