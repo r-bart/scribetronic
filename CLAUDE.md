@@ -104,10 +104,10 @@ The script is idempotent — it only touches files that have non-spec keys.
 
 Skills under `templates/claude-code/.claude/skills/` are **format-only**. Never embed:
 
-- Author names (Welsh, Koe, Moretti, Röhl, etc.)
-- References to specific posts, accounts, or third-party content libraries
-- "Roberto"-specifics (MakerOps, MW#N, personal newsletter URLs)
-- "X-style" labels naming a specific person ("Welsh-style closer", "Moretti tag-line")
+- Specific author or creator names
+- References to specific posts, accounts, newsletters, or third-party content libraries
+- The maintainer's own personal identifiers (real name, product names, internal project codenames, personal URLs)
+- "X-style" labels that name a specific person ("<author>-style closer", "<author>-tag-line")
 
 The single point of personalization is `writing-style/SKILL.md`, which ships as a **template the user fills in**. Every other skill remains universal — usable by any writer in any niche without editing.
 
@@ -116,6 +116,8 @@ When a skill needs to reference voice/tone/examples, it must say:
 > "Voice and tone come from `writing-style/SKILL.md`."
 
 Not embed the voice itself.
+
+The pre-commit grep in `.claude/rules/skills.md` keeps a **regression-detection list** of names previously found in skill bodies — that list is for catching re-introductions, not a prescriptive whitelist of "the only forbidden names". Anything name-shaped is forbidden.
 
 ---
 
