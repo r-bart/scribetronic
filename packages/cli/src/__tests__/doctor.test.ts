@@ -40,8 +40,8 @@ describe('doctorCommand', () => {
     // Project skeleton
     mkdirSync(join(project, 'scribetronic/calendar'), { recursive: true });
     writeFileSync(join(project, 'scribetronic/publish-config.yaml'), 'target: blog');
-    mkdirSync(join(project, 'scribetronic/writing-style'), { recursive: true });
-    writeFileSync(join(project, 'scribetronic/writing-style/SKILL.md'), '---\nname: x\n---\n');
+    mkdirSync(join(project, 'scribetronic/style'), { recursive: true });
+    writeFileSync(join(project, 'scribetronic/style/writing-style.md'), '---\nname: x\n---\n');
 
     // Plugin registration
     registerGitHubPlugin(project, 'scribetronic', 'scribetronic', 'r-bart/scribetronic-plugin');

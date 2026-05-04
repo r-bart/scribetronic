@@ -1,6 +1,6 @@
 ---
 name: style-refine
-description: Propone deltas concretos a writing-style/SKILL.md a partir del historial real de edición del usuario (draft vs publicado). No reescribe automáticamente — genera un documento de propuestas con evidencia textual obligatoria. Invocar tras 3+ piezas publicadas o cuando el usuario sienta drift de voz.
+description: Propone deltas concretos a `scribetronic/style/writing-style.md` (la guía de voz personalizada del usuario) a partir del historial real de edición del usuario (draft vs publicado). No reescribe automáticamente — genera un documento de propuestas con evidencia textual obligatoria. Invocar tras 3+ piezas publicadas o cuando el usuario sienta drift de voz.
 ---
 
 ## Metadata
@@ -9,7 +9,7 @@ description: Propone deltas concretos a writing-style/SKILL.md a partir del hist
 
 # style-refine
 
-Cierra el loop entre lo que Claude redactó y lo que el usuario realmente publicó. Lee el historial de edición (draft → publicado), detecta patrones recurrentes, y propone deltas a `writing-style/SKILL.md`. **No reescribe nada automáticamente.** Produce un documento de propuestas que el usuario revisa y aplica a mano.
+Cierra el loop entre lo que Claude redactó y lo que el usuario realmente publicó. Lee el historial de edición (draft → publicado), detecta patrones recurrentes, y propone deltas a `scribetronic/style/writing-style.md` (la guía personalizada del usuario, no el template del plugin). **No reescribe nada automáticamente.** Produce un documento de propuestas que el usuario revisa y aplica a mano.
 
 Complementa a `style-extract`:
 - `style-extract` **crea** la guía desde muestras externas + propias.
@@ -25,7 +25,7 @@ Umbral mínimo: un delta requiere **≥2 pares distintos** mostrando el mismo pa
 
 Antes de empezar, comprobar y exigir:
 
-1. **`writing-style/SKILL.md` existente** en `.claude/skills/writing-style/SKILL.md`. Si falta, parar y sugerir `style-extract` primero.
+1. **`scribetronic/style/writing-style.md` existente** en la raíz del proyecto. Si falta, parar y sugerir `scribetronic style` (para sembrar desde el template) o `/scribetronic:style-extract` (para generar desde muestras).
 2. **≥3 pares (draft, published)** disponibles. Un par válido es:
    - Un draft en `scribetronic/calendar/<W>/newsletter.md` (o cualquier `.md` largo en una semana) que tenga `status: drafted` o `published` en su frontmatter.
    - Una versión publicada del mismo contenido en `scribetronic/published/` (mismo slug o título).
@@ -100,7 +100,7 @@ N deltas propuestos basados en M pares analizados.
 
 Para aplicarlos:
 1. Abre el archivo y revisa cada delta.
-2. Pega manualmente los que aceptes en .claude/skills/writing-style/SKILL.md.
+2. Pega manualmente los que aceptes en scribetronic/style/writing-style.md.
 3. Mueve este archivo a scribetronic/style/refinements/applied/ cuando termines.
 ```
 
@@ -148,7 +148,7 @@ Pares analizados:
 
 ### Proposed change
 
-Añadir a `writing-style/SKILL.md` sección "5. Anti-patterns":
+Añadir a `scribetronic/style/writing-style.md` sección "5. Anti-patterns":
 
 ```
 | "no es solo X, es Y" | suena AI, vacío, sobre-corregido | reescribir como afirmación directa: "es Y" |
@@ -178,7 +178,7 @@ Patrones detectados con <2 pares — no se proponen pero se registran para futur
 
 - Crear `scribetronic/style/refinements/YYYY-MM-DD.md` con `status: proposed`.
 - Crear el directorio padre si no existe.
-- No tocar `writing-style/SKILL.md` bajo ningún concepto.
+- No tocar `scribetronic/style/writing-style.md` bajo ningún concepto.
 - Imprimir resumen + instrucciones de aplicación.
 
 ## Cuándo correr este skill
@@ -189,10 +189,10 @@ Patrones detectados con <2 pares — no se proponen pero se registran para futur
 
 ## Qué NO hacer
 
-- **No reescribir `writing-style/SKILL.md`.** Solo proponer.
+- **No reescribir `scribetronic/style/writing-style.md`.** Solo proponer.
 - **No proponer deltas con <2 pares de evidencia.** Registrar como "patrón en observación", pero no proponer.
 - **No inventar ediciones.** Si el draft y el publicado son idénticos, no hay datos.
 - **No interpretar intención.** "El usuario quitó esta palabra" es un hecho. "El usuario probablemente prefiere X" es interpretación — solo permitida si ≥2 pares la respaldan textualmente.
 - **No proponer cambios estructurales (estructura, voice, tono) basados en una sola pieza emocional o atípica.** Los outliers no son evidencia.
 - **No tocar archivos fuera de `scribetronic/style/refinements/`.**
-- **No correr en un repo sin `writing-style/SKILL.md`.** Sugerir `style-extract` y abortar.
+- **No correr en un repo sin `scribetronic/style/writing-style.md`.** Sugerir `style-extract` y abortar.

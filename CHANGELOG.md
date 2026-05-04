@@ -31,6 +31,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `scripts/normalize-skill-frontmatter.mjs` — extracts non-spec keys from any SKILL.md frontmatter and migrates them to a `## Metadata` body section. Run after editing or adding skills.
 
+### Voice override path (BREAKING for `scribetronic style`)
+
+- **`scribetronic style` now writes to `scribetronic/style/writing-style.md` (project root) instead of `.claude/skills/writing-style/SKILL.md`.** The old path was a leftover from before the plugin marketplace and was effectively orphaned: skills loaded `writing-style` from the marketplace cache, never from the project, so user edits had no effect.
+- The four voice-consuming skills (`/scribetronic:write`, `/scribetronic:editing-pass`, `/scribetronic:ai-slop-check`, `/scribetronic:short-form-voice-adjustments`) now read voice in this resolution order: project-local override (`scribetronic/style/writing-style.md`) → bundled `writing-style/SKILL.md` template fallback. The override always wins when present.
+- `/scribetronic:style-refine` and `/scribetronic:style-extract` updated to read/write the new path.
+- `init` scaffolds `scribetronic/style/README.md` with seeding instructions.
+- `doctor` checks the new path.
+- **Migration**: if you already ran `scribetronic style` on v0.2.0 and edited `.claude/skills/writing-style/SKILL.md`, move that content to `scribetronic/style/writing-style.md` and delete the old file. (v0.2.0 was live for hours with no users, so practical impact is zero.)
+
 ### Migration
 
 - v0.2.0 was live for hours with no production users, so no migration is required for skill content.

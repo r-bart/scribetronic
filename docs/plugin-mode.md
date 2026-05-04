@@ -86,6 +86,36 @@ plugins/scribetronic/
 
 ---
 
+## Voice override (`scribetronic/style/writing-style.md`)
+
+The plugin marketplace ships a neutral `writing-style/SKILL.md` template. Your **personalized voice** lives in your project at `scribetronic/style/writing-style.md`. Voice-consuming skills resolve in this order:
+
+1. `scribetronic/style/writing-style.md` (project root) — if present, this wins.
+2. `writing-style/SKILL.md` (bundled with the plugin) — fallback baseline.
+
+To create the override:
+
+```bash
+scribetronic style              # copies the template, then opens in $EDITOR
+scribetronic style --reset      # overwrite (asks for confirmation)
+```
+
+Or generate from samples:
+
+```
+/scribetronic:style-extract     # interview-driven, reads 3-5 reference + 1-2 own samples
+```
+
+To refine after publishing:
+
+```
+/scribetronic:style-refine      # proposes deltas from your real (draft → published) edit history
+```
+
+This is the only file that requires personalization. Every other skill is format-only and works the same for everyone.
+
+---
+
 ## Hooks
 
 Two hooks ship with the plugin and run automatically. Both stay silent in non-scribetronic projects, so the plugin is safe to enable globally.
@@ -105,7 +135,7 @@ Both use the Haiku model (cheap, fast) and exit silently when irrelevant.
 |---|---|
 | `scribetronic init [path]` | Scaffolds project templates **and** registers the marketplace in `.claude/settings.json`. |
 | `scribetronic update [path]` | Re-applies the marketplace registration. Use after a fresh `git clone` of a scribetronic project, after upgrading the CLI globally, or if `settings.json` drifted. |
-| `scribetronic doctor [path]` | Verifies the install end-to-end. Checks: `scribetronic/` exists, `calendar/` exists, `publish-config.yaml` is present, plugin is enabled in settings, marketplace points at the canonical repo, `writing-style/SKILL.md` is seeded. Exits 1 on failure. |
+| `scribetronic doctor [path]` | Verifies the install end-to-end. Checks: `scribetronic/` exists, `calendar/` exists, `publish-config.yaml` is present, plugin is enabled in settings, marketplace points at the canonical repo, `scribetronic/style/writing-style.md` (the user's voice override) is seeded. Exits 1 on failure. |
 | `scribetronic uninstall [path]` | Disables the plugin and removes the marketplace entry. Leaves `scribetronic/` content (drafts, calendar, history) intact — those are yours. |
 
 ---

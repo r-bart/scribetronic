@@ -10,7 +10,12 @@ export interface StyleOptions {
 }
 
 /**
- * Manages `.claude/skills/writing-style/SKILL.md` in the current project.
+ * Manages `scribetronic/style/writing-style.md` in the current project.
+ *
+ * This is the user's voice override. The skills loaded from the plugin
+ * marketplace (`/scribetronic:write`, `/scribetronic:editing-pass`, etc.)
+ * read this path first; the bundled `writing-style/SKILL.md` template only
+ * applies when the override is absent.
  *
  * - Missing target + no `--reset`: copy the seed and exit.
  * - Existing target + no `--reset` + TTY: open in `$EDITOR`.
@@ -19,7 +24,7 @@ export interface StyleOptions {
  */
 export async function styleCommand(options: StyleOptions): Promise<void> {
   const cwd = resolve(process.cwd());
-  const targetPath = join(cwd, '.claude', 'skills', 'writing-style', 'SKILL.md');
+  const targetPath = join(cwd, 'scribetronic', 'style', 'writing-style.md');
   const seedPath = join(
     getTemplatesDir(),
     'claude-code',

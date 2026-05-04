@@ -90,7 +90,9 @@ If type IS provided: skip Phase 0.
 
 Load context (mandatory order):
 
-1. `writing-style/SKILL.md` (always).
+1. **Voice base** (always). Resolve in this order:
+   a. `scribetronic/style/writing-style.md` in the project root, if it exists — user's personalized override.
+   b. Otherwise, the bundled `writing-style/SKILL.md` template.
 2. The type's template file (e.g., `long-form-hot-take/SKILL.md`, `long-form-weekly-newsletter/SKILL.md`).
 3. If short-form: also `short-form-voice-adjustments/SKILL.md`.
 
@@ -107,7 +109,7 @@ Stop after seed is captured. Confirm with user: "Ready to draft? (y / change see
 
 ### Phase 2 — Draft
 
-Generate draft following the template's structure exactly. Apply `writing-style/SKILL.md` voice rules.
+Generate draft following the template's structure exactly. Apply the voice rules loaded in Phase 1 (project override or bundled template).
 
 **Save path** — drafts live inside the active week's calendar directory:
 
@@ -317,7 +319,7 @@ This avoids race conditions when multiple flows touch the same files.
 
 ## Anti-patterns
 
-- Don't run any phase without loading `writing-style/SKILL.md` first. The voice base is non-negotiable.
+- Don't run any phase without loading the voice base first (Phase 1 step 1: project-local override `scribetronic/style/writing-style.md` if present, else bundled `writing-style/SKILL.md`). The voice base is non-negotiable.
 - Don't skip the seed interview for ambiguous types — the 2-4 quick questions save 10 minutes of bad draft.
 - Don't auto-fix MEDIUM slop issues without asking unless `--auto`.
 - Don't generate a draft + 4 derivatives in one phase. Repurpose is its own phase, optional, separate output.

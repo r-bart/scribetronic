@@ -10,7 +10,14 @@ description: Voice deltas for short-form (X, LinkedIn, Threads). Inherits writin
 
 # Short-form voice adjustments
 
-The base voice (`writing-style/SKILL.md`) still applies. This file lists the deltas — where short-form requires you to break or sharpen a long-form rule.
+## Voice resolution
+
+The base voice still applies. Load it in this order:
+
+1. **`scribetronic/style/writing-style.md`** in the project root, if it exists — user's personalized override.
+2. **Bundled `writing-style/SKILL.md`** template otherwise.
+
+This file lists the deltas — where short-form requires you to break or sharpen a long-form rule from whichever base loaded.
 
 ## Why short-form is different
 

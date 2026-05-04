@@ -84,7 +84,7 @@ Pre-existing keys (themes, third-party plugins) are preserved.
 ### What gets NOT created
 
 - **`SKILL.md` files**. They live in [`r-bart/scribetronic-plugin`](https://github.com/r-bart/scribetronic-plugin) and load at runtime. Restart Claude Code after `init`.
-- `writing-style/SKILL.md` — this is left to `scribetronic style`. Voice is personal; the user should engage with it deliberately rather than have a generic seed silently appear.
+- `writing-style.md` — this is left to `scribetronic style`. Voice is personal; the user should engage with it deliberately rather than have a generic seed silently appear.
 - Week directories under `calendar/<YYYY-WNN>/` — created by `/scribetronic:agenda plan-week` once you start using the pipeline.
 
 ### Options
@@ -127,7 +127,7 @@ plugin: scribetronic@scribetronic (r-bart/scribetronic-plugin)
 
 ## `scribetronic style [--reset]`
 
-Seed or edit the writer's voice file at `.claude/skills/writing-style/SKILL.md`.
+Seed or edit the writer's voice file at `scribetronic/style/writing-style.md`.
 
 This is the only file scribetronic treats as personal-by-default. It defines the voice that all long-form templates inherit, so it's separated from `init` to make sure the user actually engages with it.
 
@@ -143,7 +143,7 @@ scribetronic style --reset      # overwrite with seed (with confirmation)
 The command resolves to one of three modes based on file state and flags:
 
 1. **Seed mode** (file does not exist, no `--reset` flag):
-   - Copies `templates/claude-code/.claude/skills/writing-style/SKILL.md` to `<cwd>/.claude/skills/writing-style/SKILL.md`.
+   - Copies `templates/claude-code/scribetronic/style/writing-style.md` to `<cwd>/scribetronic/style/writing-style.md`.
    - Prints the absolute path of the created file.
    - Suggests the user run `scribetronic style` again to open in their editor.
    - Exits 0.
@@ -156,7 +156,7 @@ The command resolves to one of three modes based on file state and flags:
 
 3. **Reset mode** (`--reset` flag passed):
    - If the file does not exist, behaves like seed mode.
-   - If the file exists, prompts via `@clack/prompts`: `Overwrite existing writing-style/SKILL.md with the seed? (y/N)`.
+   - If the file exists, prompts via `@clack/prompts`: `Overwrite existing writing-style.md with the seed? (y/N)`.
    - On `y`: overwrites with the bundled seed and exits 0.
    - On `n` or cancel: exits 0 without modifying the file.
    - In non-interactive mode (`--reset` with no TTY), the command refuses and exits 4.
@@ -176,7 +176,7 @@ The first non-empty value wins. If `$EDITOR` is set but the binary doesn't exist
 ```bash
 # First run — file doesn't exist
 $ scribetronic style
-✓ seeded /Users/jane/proj/.claude/skills/writing-style/SKILL.md
+✓ seeded /Users/jane/proj/scribetronic/style/writing-style.md
 Edit it now: scribetronic style
 
 # Second run — file exists, opens editor
@@ -185,12 +185,12 @@ $ scribetronic style
 
 # Reset to the bundled seed
 $ scribetronic style --reset
-? Overwrite existing writing-style/SKILL.md with the seed? (y/N) y
+? Overwrite existing writing-style.md with the seed? (y/N) y
 ✓ reset to seed.
 
 # Non-TTY (e.g. CI) — prints path
 $ scribetronic style < /dev/null
-/Users/jane/proj/.claude/skills/writing-style/SKILL.md
+/Users/jane/proj/scribetronic/style/writing-style.md
 ```
 
 ### Exit codes
@@ -277,7 +277,7 @@ $ scribetronic info long-form-weekly-newsletter
 
 skill:        long-form-weekly-newsletter
 description:  Recurring Sunday default — 800–1500 word newsletter
-inherits:     ../writing-style/SKILL.md
+inherits:     ../writing-style.md
 length_target: 800-1500 words
 cadence:      weekly
 
@@ -330,7 +330,7 @@ Options:
 
 Commands:
   init [path]        Scaffold writing system + register plugin marketplace
-  style [options]    Seed or edit writing-style/SKILL.md
+  style [options]    Seed or edit writing-style.md
   list               List bundled skills (mirrors what the marketplace ships)
   info <skill>       Show skill metadata
   update [path]      Refresh marketplace registration in .claude/settings.json
@@ -372,7 +372,7 @@ Health check for an existing installation. Verifies six things:
 3. `scribetronic/publish-config.yaml` exists.
 4. The plugin (`scribetronic@scribetronic`) is enabled in `.claude/settings.json`.
 5. The marketplace source resolves to `r-bart/scribetronic-plugin`.
-6. `writing-style/SKILL.md` has been seeded.
+6. `writing-style.md` has been seeded.
 
 Each check renders as `✓` (pass) or `✗` (fail) with a short detail line. Failed checks include a hint at how to fix them.
 
@@ -395,7 +395,7 @@ scribetronic doctor
   ✓ scribetronic/publish-config.yaml
   ✓ scribetronic@scribetronic enabled in .claude/settings.json
   ✓ marketplace source resolves to r-bart/scribetronic-plugin
-  ✗ writing-style/SKILL.md seeded
+  ✗ writing-style.md seeded
      missing — run `scribetronic style`
 
 1/6 check(s) failed

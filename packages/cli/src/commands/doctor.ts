@@ -71,14 +71,15 @@ export async function doctorCommand(options: DoctorOptions): Promise<void> {
     detail: expectedRepo ? `current: ${expectedRepo}` : 'no marketplace entry',
   });
 
-  // 6. writing-style/SKILL.md seeded
-  const writingStyle = join(scribetronicDir, 'style', 'writing-style', 'SKILL.md');
-  const writingStyleAlt = join(scribetronicDir, 'writing-style', 'SKILL.md');
-  const writingStyleOk = existsSync(writingStyle) || existsSync(writingStyleAlt);
+  // 6. scribetronic/style/writing-style.md seeded (user voice override)
+  const writingStyle = join(scribetronicDir, 'style', 'writing-style.md');
+  const writingStyleOk = existsSync(writingStyle);
   checks.push({
-    label: 'writing-style/SKILL.md seeded',
+    label: 'scribetronic/style/writing-style.md seeded',
     ok: writingStyleOk,
-    detail: writingStyleOk ? 'present' : 'missing — run `scribetronic style`',
+    detail: writingStyleOk
+      ? `present: ${writingStyle}`
+      : 'missing — run `scribetronic style` to seed your voice from the template',
   });
 
   console.log();

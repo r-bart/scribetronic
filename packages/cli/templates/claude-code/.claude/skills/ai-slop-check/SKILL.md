@@ -12,7 +12,11 @@ description: Detection pass for AI-generated patterns and clichés. Final check 
 
 Last pass before publishing. Scans for the patterns that signal "AI wrote this" or "human writing in a hurry adopted AI defaults".
 
-The detection list below is the default. The user's `writing-style/SKILL.md` may add or override patterns — load it first when running this pass so any user-specific tics are checked alongside.
+## Voice resolution
+
+The detection list below is the default. Before running, load the user's voice override from `scribetronic/style/writing-style.md` (project root) if it exists — its anti-patterns and blacklist sections add to the defaults. If the project-local override is absent, fall back to the bundled `writing-style/SKILL.md` template (generic baseline).
+
+The project-local override always wins over the template.
 
 ## How to run
 

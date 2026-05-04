@@ -1,11 +1,27 @@
 ---
 name: writing-style
-description: The shared style guide every long-form and short-form post inherits. Reference for tone, structure, sentence rhythm, signature moves, and anti-patterns. Always loaded by drafting and editing skills. This is the file you personalize — every other skill stays format-only.
+description: The shared style guide every long-form and short-form post inherits. Reference for tone, structure, sentence rhythm, signature moves, and anti-patterns. Always loaded by drafting and editing skills. This is the only skill that should be personalized — every other skill stays format-only.
+---
+
+## How this skill works
+
+This SKILL.md ships as a **neutral template** inside the plugin marketplace. Your **personalized voice override** lives in your project at `scribetronic/style/writing-style.md`. Skills that need voice always look there first; this template is the fallback.
+
+**To create the override** in your project:
+
+```bash
+scribetronic style    # copies this template to scribetronic/style/writing-style.md, then opens it
+```
+
+After that, every drafting/editing skill will read your override automatically.
+
+If you don't have a `scribetronic/` directory in the project (i.e. you installed the plugin without the CLI), the rules below apply directly — they're a generic baseline good enough to start, but you'll want to personalize.
+
 ---
 
 ## Metadata
 
-- **status**: template — fill in your specifics
+- **status**: template — fill in your specifics in `scribetronic/style/writing-style.md`
 - **last reviewed**: <!-- YYYY-MM-DD -->
 
 # Writing style — `<your-name>`

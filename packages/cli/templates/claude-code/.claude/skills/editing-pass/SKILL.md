@@ -12,6 +12,15 @@ description: Read-and-revise pass for any drafted post. Applies writing-style.md
 
 A structured editing pass for any draft. Three goals: enforce the voice, cut filler, sharpen the closer.
 
+## Voice resolution
+
+Before editing, load voice rules in this order:
+
+1. **`scribetronic/style/writing-style.md`** in the project root, if it exists — this is the user's personalized voice override.
+2. **The bundled `writing-style/SKILL.md`** template otherwise — generic baseline.
+
+If both exist, the project-local file wins. The user creates it via `scribetronic style` or `/scribetronic:style-extract`.
+
 ## When to run
 
 After drafting and BEFORE `ai-slop-check`. The two are complementary:

@@ -50,14 +50,14 @@ afterEach(() => {
 describe('styleCommand', () => {
   it('copies the seed when target is missing', async () => {
     await styleCommand({});
-    const target = join(project, '.claude/skills/writing-style/SKILL.md');
+    const target = join(project, 'scribetronic/style/writing-style.md');
     expect(existsSync(target)).toBe(true);
     expect(readFileSync(target, 'utf-8')).toContain('seed body');
   });
 
   it('prints the absolute path when target exists and stdin is not a TTY', async () => {
-    const target = join(project, '.claude/skills/writing-style/SKILL.md');
-    mkdirSync(join(project, '.claude/skills/writing-style'), { recursive: true });
+    const target = join(project, 'scribetronic/style/writing-style.md');
+    mkdirSync(join(project, 'scribetronic/style'), { recursive: true });
     writeFileSync(target, 'user-customised');
 
     // Force non-TTY
@@ -95,8 +95,8 @@ describe('styleCommand', () => {
   });
 
   it('--reset on non-TTY exits with an error before touching the file', async () => {
-    const target = join(project, '.claude/skills/writing-style/SKILL.md');
-    mkdirSync(join(project, '.claude/skills/writing-style'), { recursive: true });
+    const target = join(project, 'scribetronic/style/writing-style.md');
+    mkdirSync(join(project, 'scribetronic/style'), { recursive: true });
     writeFileSync(target, 'user-customised');
 
     const origIsTTY = process.stdin.isTTY;
