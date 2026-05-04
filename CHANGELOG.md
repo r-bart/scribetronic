@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- npm publish automation: `.github/workflows/release.yml` (tag `v*.*.*` → `npm publish --provenance`), `prepublishOnly` quality gate, `publishConfig` for public access + provenance attestation.
+- CI matrix on Node 18 / 20 / 22 (`.github/workflows/ci.yml`) running typecheck, lint, test, build, and pack-dry-run on every push and PR.
+- Maintainer release runbook (`docs/releasing.md`) covering pre-flight, tagging, post-publish verification, rollback, and failure modes.
+
+### Planned
+
+- Calendar export (ICS, Notion, Google Calendar)
+- Multi-author voice profiles
+- Claude Code plugin marketplace distribution
+- Analytics hooks feeding back into `/agenda`
+
+---
+
+## [0.1.1] — 2026-05-04
+
+### Added
+
 - `/style-refine` skill — proposes evidence-backed deltas to `writing-style/SKILL.md` from the user's `(draft → published)` edit history. Requires ≥2 supporting pairs per delta. Manual review only; never auto-rewrites the voice guide. Cross-referenced from `/agenda` and `/write-publish` as a periodic maintenance nudge after 3+ pieces published.
 
 ### Changed (BREAKING)
@@ -21,13 +38,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ```
 
   All bundled skills (`/agenda`, `/write`, `/write-publish`, `/style-extract`) and `publish-config.yaml` examples have been updated to reference the new path. No content or schema changes — only the directory location.
-
-### Planned
-
-- Calendar export (ICS, Notion, Google Calendar)
-- Multi-author voice profiles
-- Claude Code plugin marketplace distribution
-- Analytics hooks feeding back into `/agenda`
 
 ---
 
@@ -63,5 +73,6 @@ Initial public release. Migrated from a private editorial pipeline into a standa
 - This release is the first public extraction. Skills were refined across ~12 months of personal use before publishing.
 - Repo will be created at `https://github.com/r-bart/scribetronic` when v0.1.0 is tagged.
 
-[Unreleased]: https://github.com/r-bart/scribetronic/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/r-bart/scribetronic/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/r-bart/scribetronic/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/r-bart/scribetronic/releases/tag/v0.1.0

@@ -1,6 +1,6 @@
 {
   "name": "scribetronic",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Editorial calendar + weekly-newsletter pipeline for Claude Code",
   "type": "module",
   "bin": {
@@ -24,7 +24,12 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run typecheck && npm run lint && npm test && npm run build"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   },
   "keywords": ["writing", "newsletter", "editorial-calendar", "claude-code", "ai", "cli"],
   "author": "Roberto Díaz (rbart)",

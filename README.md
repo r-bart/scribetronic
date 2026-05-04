@@ -19,41 +19,24 @@ Works with **Claude Code** today. The skills are portable; the CLI installs them
 
 ### Install
 
-scribetronic is not on npm yet (planned for v1.0). Pick the path that fits you:
+```bash
+npm install -g scribetronic
+```
 
-**A. Install from GitHub (recommended for cross-machine use):**
+Then, from any project:
 
 ```bash
-# Clone, build, link globally
-git clone https://github.com/r-bart/scribetronic.git
-cd scribetronic/packages/cli
-npm install && npm run build && npm link
-
-# Now usable from any project:
 cd ~/your-writing-project
 scribetronic init
 ```
 
-**B. Run direct without linking (single machine, no PATH changes):**
+Or use without a global install:
 
 ```bash
-git clone https://github.com/r-bart/scribetronic.git ~/scribetronic
-cd ~/scribetronic/packages/cli && npm install && npm run build
-
-# Add to your shell rc:
-alias scribetronic="node $HOME/scribetronic/packages/cli/dist/index.js"
-
-# Use:
-cd ~/your-writing-project
-scribetronic init
+npx scribetronic init
 ```
 
-**C. Install as a project dev-dependency (when v0.2 ships a release branch):**
-
-```bash
-# Coming soon — see Roadmap.
-npm install --save-dev github:r-bart/scribetronic#release/v0.1.x
-```
+> **Hacking on scribetronic itself?** See [Local development](#local-development) below for a `git clone` + `npm link` flow.
 
 The CLI will:
 
@@ -215,12 +198,12 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full contributor guide.
 
 ## Roadmap
 
-- **v0.1** — Core skills + CLI (`init`, `style`, `list`, `info`). **Current.**
-- **v0.2** — `release/v0.1.x` branch with `package.json` at root for direct GitHub install (`npm i github:r-bart/scribetronic#release/v0.1.x`); harder `style` test cases; `update --skills-only` command.
+- **v0.1** — Core skills + CLI (`init`, `style`, `list`, `info`), published to npm. **Current.**
+- **v0.2** — Harder `style` test cases; `update --skills-only` command for in-place skill upgrades.
 - **v0.3** — Multi-author voice profiles; `list --tree` showing the inheritance graph.
 - **v0.4** — Plugin marketplace integration for Claude Code (`/plugin add scribetronic`).
 - **v0.5** — Calendar export (ICS, Notion, Google Calendar) and analytics hooks feeding back into `/agenda`.
-- **v1.0** — Public npm release.
+- **v1.0** — API stability commitment.
 
 Feedback and ideas: [open an issue](https://github.com/r-bart/scribetronic/issues).
 
