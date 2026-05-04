@@ -88,7 +88,7 @@ Concrete examples:
 
 - `/write-publish` reads target paths from `publish-config.yaml`. It does not hardcode `src/content/blog/`.
 - `/agenda` reads cadence rules from `calendar/rules.yaml`. It does not hardcode "Sunday is newsletter day".
-- Long-form templates inherit voice from `writing-style/SKILL.md`. They do not duplicate voice rules.
+- Long-form templates inherit voice resolved from `scribetronic/style/writing-style.md` (project override) or `writing-style/SKILL.md` (bundled template fallback). They do not duplicate voice rules.
 
 The rule, formalised: **config wins over code**. If a skill contradicts a config file, the skill is wrong. Fix the skill, not the config.
 

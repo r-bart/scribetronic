@@ -14,7 +14,7 @@ See also [contracts.md §7](contracts.md) for the formal source-of-truth rule.
 |---|---|---|
 | Cadence (recurring slots) | `scribetronic/calendar/rules.yaml` | You |
 | Publish targets and frontmatter mappings | `scribetronic/publish-config.yaml` | You |
-| Voice | `.claude/skills/writing-style/SKILL.md` | You (via `scribetronic style`) |
+| Voice | `scribetronic/style/writing-style.md` | You (via `scribetronic style`) |
 | Ideas backlog | `scribetronic/ideas/<type>.md` | You |
 | Per-week plan | `scribetronic/calendar/<YYYY-WNN>/plan.md` | You + `/agenda` |
 
@@ -179,7 +179,7 @@ Then any derivative whose frontmatter has `platform: mastodon` will archive to t
 
 ## Editing voice (`scribetronic style`)
 
-Voice lives in `.claude/skills/writing-style/SKILL.md`. Every long-form template inherits from it via `inherits: ../writing-style/SKILL.md`.
+Voice lives in `scribetronic/style/writing-style.md`. Every long-form template inherits from it via `inherits: ../writing-style/SKILL.md`.
 
 ### Initial seed
 
@@ -187,7 +187,7 @@ Voice lives in `.claude/skills/writing-style/SKILL.md`. Every long-form template
 
 ```bash
 $ scribetronic style
-# first run: copies the bundled seed into .claude/skills/writing-style/SKILL.md
+# first run: copies the bundled seed into scribetronic/style/writing-style.md
 # prints the path
 
 $ scribetronic style
@@ -300,7 +300,7 @@ This is your upgrade path: bump the scribetronic version (`cd ~/scribetronic/pac
 - `scribetronic/calendar/<YYYY-WNN>/` — your active and past weeks.
 - `scribetronic/calendar/history.md` — your published archive.
 - `scribetronic/ideas/<type>.md` if it already has content — only seeded the first time.
-- `.claude/skills/writing-style/SKILL.md` — managed by `scribetronic style`, not `init`.
+- `scribetronic/style/writing-style.md` — managed by `scribetronic style`, not `init`.
 - Any file in your project outside `.claude/` and `scribetronic/`.
 
 If you're worried, run `git status` after `init` to see exactly what changed.

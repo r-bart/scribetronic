@@ -57,11 +57,11 @@ The CLI does **not** automatically seed your voice — you do that explicitly wi
 ### Seed your voice
 
 ```bash
-scribetronic style          # Seeds writing-style/SKILL.md from the template, then opens it in $EDITOR
+scribetronic style          # Seeds scribetronic/style/writing-style.md from the template, then opens it in $EDITOR
 scribetronic style --reset  # Overwrite with the template (asks for confirmation)
 ```
 
-The first run copies a starter `writing-style/SKILL.md` into your project. After that, edits open it in `$EDITOR` (falls back to `$VISUAL`, then `vi`). On a non-TTY (CI, automation), it just prints the path.
+The first run copies a starter `scribetronic/style/writing-style.md` into your project. After that, edits open it in `$EDITOR` (falls back to `$VISUAL`, then `vi`). On a non-TTY (CI, automation), it just prints the path.
 
 Every long-form and short-form skill reads from this file before generating anything — that's how the pipeline stays in *your* voice instead of generic AI tone.
 
@@ -125,7 +125,7 @@ No accounts. No SaaS. Plain markdown files in your repo.
 | `/editing-pass` | Structural + line edits, preserving voice |
 | `/ai-slop-check` | Detects generic AI patterns, hedge words, em-dash abuse |
 | `/style-extract` | Extracts a style profile from existing writing samples |
-| `/style-refine` | Proposes evidence-backed deltas to `writing-style/SKILL.md` from real edit history |
+| `/style-refine` | Proposes evidence-backed deltas to `scribetronic/style/writing-style.md` from real edit history |
 | `/review` | Parallel multi-focus review (voice, structure, slop, hook, closer, optional factual) — N subagents concurrent, severity-grouped report |
 
 ### Long-form (6)

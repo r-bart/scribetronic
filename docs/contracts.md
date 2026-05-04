@@ -261,7 +261,7 @@ There is no version number embedded in this document. Changes are tracked via gi
 - Don't infer status from filename or path. Read frontmatter.
 - Don't use `%Y-W%V` for ISO week — always `%G-W%V`. `%Y` drifts at year boundaries.
 - Don't introduce new fields to `rules.yaml`. Schema is closed.
-- Don't run any drafting phase without loading `writing-style/SKILL.md` first. The voice base is non-negotiable.
+- Don't run any drafting phase without loading the voice base first (project override or bundled template). The voice base is non-negotiable.
 - Don't auto-fix MEDIUM slop without asking unless `--auto`.
 
 ---
