@@ -112,7 +112,7 @@ This is an open source project (MIT) published to npm as `scribetronic`.
 - Conventional Commits: `feat:`, `fix:`, `docs:`, `chore:`, `ci:`
 - Semantic Versioning via Keep a Changelog
 - Branches: `develop` → `main` via PR
-- CI: GitHub Actions (Node 18/20/22)
+- CI: GitHub Actions (Node 20/22)
 - Security: GitHub Security Advisories (`SECURITY.md`)
 - Release: tag `v*.*.*` → GitHub Actions publishes to npm
 - **Never include `Co-Authored-By:` lines in commit messages**

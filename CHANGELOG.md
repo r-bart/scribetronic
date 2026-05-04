@@ -87,7 +87,7 @@ Tier-1 fixes from the post-publish CLI audit. Every read-only command (`list`, `
 - `npm run test:coverage` (`@vitest/coverage-v8`).
 - 29 new tests (settings, doctor, update, uninstall). Total suite: 78 tests across 12 files.
 - npm publish automation: `.github/workflows/release.yml` (tag `v*.*.*` → `npm publish --provenance`), `prepublishOnly` quality gate, `publishConfig` for public access + provenance attestation.
-- CI matrix on Node 18 / 20 / 22 (`.github/workflows/ci.yml`).
+- CI matrix on Node 20 / 22 (`.github/workflows/ci.yml`). Node 18 was dropped because vitest v4's bundled rolldown imports `node:util#styleText`, which only exists in Node 20.12+.
 - Maintainer release runbook (`docs/releasing.md`).
 
 ### Changed (BREAKING)

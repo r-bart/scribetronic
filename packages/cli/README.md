@@ -74,7 +74,7 @@ Full docs live in the [scribetronic repo](https://github.com/r-bart/scribetronic
 
 ## Requirements
 
-- Node ≥ 18
+- Node ≥ 20
 - Claude Code (the slash commands and hooks live there)
 
 ## License
