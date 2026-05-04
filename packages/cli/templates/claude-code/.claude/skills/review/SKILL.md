@@ -1,19 +1,25 @@
 ---
 name: review
-description: Parallel review of a draft along multiple focuses (voice, structure, slop, hook, closer, optional factual). Spawns N subagents concurrently — each with a single focus and the user's writing-style — then aggregates findings into one severity-grouped report. Use mid-draft for fast iterative feedback, or as a quality gate before /scribetronic:write-publish. Faster and more thorough than running editing-pass + ai-slop-check sequentially.
-allowed-tools: Read, Glob, Grep, Bash, Task
-argument-hint: "<draft-path> [--focus voice,structure,slop,closer,hook,factual] [--with-evidence] [--quiet]"
+description: Parallel review of a draft along multiple focuses (voice, structure, slop, hook, closer, optional factual). Spawns N subagents concurrently — each with a single focus and the user's writing-style — then aggregates findings into one severity-grouped report. Use full mode mid-draft or as a pre-publish gate; use delta mode (--since-last / --since <ref>) to review only what changed since the last snapshot or git ref — 3 focuses instead of 5, ~5s instead of ~10s, ~80% fewer tokens.
+allowed-tools: Read, Glob, Grep, Bash, Task, Write
+argument-hint: "<draft-path> [--focus voice,structure,slop,closer,hook,factual] [--since-last | --since <revspec> | --since-staged] [--with-evidence] [--quiet]"
 ---
 
 # /scribetronic:review
 
 Multi-focus review of a draft. The orchestrator dispatches one subagent per focus in **parallel** (single message, multiple Task calls), each with a narrow brief and a copy of the user's writing-style override. Each subagent returns findings as a structured table; the orchestrator merges them into a single severity-grouped report.
 
-This is the parallel counterpart to `/scribetronic:editing-pass` + `/scribetronic:ai-slop-check`. Use it:
+This is the parallel counterpart to `/scribetronic:editing-pass` + `/scribetronic:ai-slop-check`. Two modes:
 
-- **Mid-draft** — pause writing, run review, get feedback in ~10s instead of ~50s sequential
-- **Pre-publish** — final gate before `/scribetronic:write-publish` flips a row to `ready`
-- **On a worked snippet** — pass a section of a long-form to review independently
+- **Full mode** (default) — review the entire draft against 5 focuses. ~10s wall time. Use as a pre-publish gate or when you want a fresh full read.
+- **Delta mode** (`--since-last` / `--since <revspec>` / `--since-staged`) — review only the lines that changed since the last snapshot or git ref. 3 focuses (voice, slop, continuity), ~5s wall time, ~80% fewer tokens. Use when you've just written a paragraph or two and want fast feedback before continuing.
+
+When to pick:
+
+- **Mid-draft, just wrote 2 paragraphs** → delta mode (`--since-last`)
+- **Mid-draft, "let me check the whole thing"** → full mode
+- **Pre-publish gate** → full mode (sometimes with `--with-evidence`)
+- **On a worked snippet from a long-form** → full mode
 
 ## Voice resolution
 
@@ -29,9 +35,14 @@ Pass the resolved voice content to every subagent so they all check against the 
 | Argument | Required? | Description |
 |---|---|---|
 | `<draft-path>` | Yes | Path to the draft markdown file (e.g. `scribetronic/calendar/2026-W18/drafts/manifesto.md`). Resolved relative to project root. |
-| `--focus <list>` | No | Comma-separated list of focuses to run. Default: `voice,structure,slop,hook,closer`. Add `factual` only when you have a verifiable evidence source. |
+| `--focus <list>` | No | Comma-separated list of focuses to run. Default in **full mode**: `voice,structure,slop,hook,closer`. Default in **delta mode**: `voice,slop,continuity`. Add `factual` to either mode when you have a verifiable evidence source. |
+| `--since-last` | No | **Delta mode.** Review only what changed since the last `/review` invocation on this file (snapshot stored in `.scribetronic/snapshots/<basename>.md`, git-ignored by default). On first invocation per file, snapshots and falls back to full mode with a note. |
+| `--since <revspec>` | No | **Delta mode.** `git diff <revspec> -- <draft-path>`. Examples: `--since HEAD`, `--since HEAD~3`, `--since main`. Errors if the file is not in a git repo. |
+| `--since-staged` | No | **Delta mode.** `git diff --staged -- <draft-path>`. Useful if you stage as you write. |
 | `--with-evidence` | No | Enables the `factual` focus. Reads `scribetronic/calendar/<week>/notes.md` (or `scribetronic/notes.md`) as the evidence source. Subagent only flags claims that contradict the evidence; never invents facts. |
 | `--quiet` | No | Suppress per-focus progress lines; only print the final aggregated report. |
+
+`--since-last`, `--since`, `--since-staged` are mutually exclusive — passing more than one is a usage error.
 
 If `<draft-path>` doesn't exist, refuse with a hint to check the path.
 
@@ -87,6 +98,19 @@ HIGH  L156-157  soft closer ("Onwards. Let's see what next week brings.")
                 → propose: "Next week: ship the publishing pipeline. Newsletter on Sunday. Same time."
 ```
 
+### continuity *(delta mode only)*
+
+> **Brief**: "Read the BEFORE block (last 1-2 paragraphs of the draft as it was) and the AFTER block (the same 1-2 paragraphs plus what was just added). Evaluate ONLY whether the AFTER continues the BEFORE coherently. Check: tone consistency (no genre shift), argument flow (does the new content build on or pivot from what was there?), no orphan references (does the AFTER name a noun the BEFORE didn't introduce?), tense/perspective consistency. Report breaks only."
+
+Output shape:
+```
+HIGH  L78-82  AFTER shifts from past tense to present, mid-paragraph (BEFORE was past throughout)
+MEDIUM L84   "the framework" — first mention; BEFORE never introduced one
+LOW   L80   tone tightens (BEFORE conversational, AFTER didactic) — intentional?
+```
+
+This focus is **only run in delta mode**. In full mode it doesn't fire (the whole draft is the content; there's no "before" to compare against).
+
 ### factual *(opt-in via `--with-evidence`)*
 
 > **Brief**: "Compare every numeric claim, named person, named tool, dated event in the draft against the evidence file <evidence-path>. Report contradictions only. Never invent corrections — only flag the discrepancy and quote both."
@@ -105,12 +129,29 @@ MEDIUM L51 draft says "MakerOps launched on August 16" — evidence has no date 
 
 1. Resolve `<draft-path>`. If missing → refuse with `error: draft not found at <path>`.
 2. Resolve voice base (`scribetronic/style/writing-style.md` → bundled template).
-3. Parse `--focus` list (default if absent).
-4. If `factual` is in the list, locate the evidence source. If absent, drop `factual` silently and warn (`note: skipping factual focus — no scribetronic/calendar/<week>/notes.md found`).
+3. Determine mode:
+   - If `--since-last`, `--since <revspec>`, or `--since-staged` is present → **delta mode**.
+   - Otherwise → **full mode**.
+   - More than one delta flag → usage error.
+4. Parse `--focus` list (default depends on mode):
+   - Full default: `voice,structure,slop,hook,closer`
+   - Delta default: `voice,slop,continuity`
+   - In delta mode, silently drop `structure`, `hook`, `closer` from `--focus` if present (they don't apply to deltas) and emit a `note:`.
+5. If `factual` is in the list, locate the evidence source. If absent, drop `factual` silently and warn (`note: skipping factual focus — no scribetronic/calendar/<week>/notes.md found`).
+6. **Delta mode only — compute the delta**:
+   - `--since-last`: read `.scribetronic/snapshots/<basename>.md` if it exists; if not, snapshot the current draft, emit `note: first --since-last on this file — snapshotted, falling back to full mode this run`, then run as full mode.
+   - `--since <revspec>`: `git diff <revspec> -- <draft-path>` (must be in a git repo; error otherwise).
+   - `--since-staged`: `git diff --staged -- <draft-path>`.
+   - The delta is the unified diff. Extract the AFTER hunks (lines prefixed `+`, excluding the `+++` header) and locate them in the current file with line numbers.
+   - If the delta is empty (no changes since the reference), emit `note: nothing changed since <reference> — nothing to review` and exit 0 successfully.
+   - Build the BEFORE/AFTER context per added hunk: 1-2 paragraphs of unchanged content immediately above and below, used as continuity anchor.
+7. **Delta mode only — at the end, update the snapshot** (only for `--since-last`): write the current draft to `.scribetronic/snapshots/<basename>.md` so the next `--since-last` invocation diffs against this run.
 
 ### Phase 2 — Dispatch in parallel
 
-Spawn one Task subagent per focus, **all in a single message** (parallel tool calls). Each subagent prompt has the same skeleton:
+Spawn one Task subagent per focus, **all in a single message** (parallel tool calls).
+
+**Full mode** prompt skeleton:
 
 ```
 You are running the "<focus>" review pass for scribetronic.
@@ -130,6 +171,30 @@ Severity: HIGH | MEDIUM | LOW. Location: line number(s) or section heading.
 Finding: 1 sentence description, optionally followed by "→ propose:" rewrite.
 Return ONLY the table, no preamble, no closer. Empty table if nothing to flag.
 ```
+
+**Delta mode** prompt skeleton (per-focus):
+
+```
+You are running the "<focus>" review pass for a delta in a scribetronic draft.
+
+## What changed (AFTER block — review THIS only)
+<lines added in the diff, with their line numbers in the current file>
+
+## What was there before (BEFORE block — context, do NOT flag issues here)
+<1-2 paragraphs of unchanged content immediately above the AFTER, plus 1 paragraph below if any>
+
+## Writing-style rules (your reference)
+<paste resolved voice base>
+
+## Your brief
+<focus-specific brief — for continuity, the brief explicitly compares BEFORE to AFTER>
+
+## Output format
+Same as full mode. ONLY flag findings located in the AFTER block.
+Empty table if the delta is clean.
+```
+
+The BEFORE block exists to give the subagent context (so it doesn't flag a pronoun whose antecedent lives in BEFORE) but is NOT itself reviewed.
 
 Subagent type: **`general-purpose`** for all focuses. Model: **`haiku`** is fine for voice/slop/hook/closer (pattern-matching tasks); use **`sonnet`** if `factual` is enabled (cross-referencing requires more reasoning).
 
@@ -185,15 +250,22 @@ This lets an agent or script do `result=$(/scribetronic:review draft.md); echo "
 - **Don't let subagents propose rewrites for HIGH violations they didn't find.** Each subagent owns its focus — voice doesn't propose hook rewrites.
 - **Don't aggregate verbatim findings if multiple focuses flag the same line.** Dedupe by `(line, finding-essence)` and keep the most specific source.
 - **Don't run `factual` without an evidence file.** Without grounding, the subagent will hallucinate corrections. Drop it silently.
-- **Don't run on drafts shorter than ~100 words.** The overhead of dispatching 5 subagents isn't worth it. Below that, just use `/scribetronic:editing-pass`.
+- **Don't run full mode on drafts shorter than ~100 words.** The overhead of dispatching 5 subagents isn't worth it. Below that, just use `/scribetronic:editing-pass`.
+- **Don't run `continuity` outside delta mode.** It needs a BEFORE/AFTER pair. If a user tries `--focus continuity` in full mode, drop it silently with a `note:`.
+- **Don't update the `--since-last` snapshot if dispatch failed.** The snapshot only advances on a successful run, so a failed review doesn't lose its reference point.
+- **Don't snapshot in any mode other than `--since-last`.** Other delta modes use git refs and don't need a snapshot file.
 
 ## When to use which
 
 | Situation | Use |
 |---|---|
-| Fast mid-draft check (every 200 words) | `/scribetronic:review <draft> --focus voice,slop` (2 subagents, fastest) |
-| Full pre-publish gate | `/scribetronic:review <draft>` (default 5 focuses) |
-| Post-launch retro with verifiable numbers | `/scribetronic:review <draft> --with-evidence` (adds factual) |
+| **Just wrote 1-3 paragraphs** | `/scribetronic:review <draft> --since-last` (delta, 3 subagents, ~5s) |
+| **Working in git, want to review the latest stage** | `/scribetronic:review <draft> --since HEAD` |
+| **Want to review only what's currently staged** | `/scribetronic:review <draft> --since-staged` |
+| Mid-draft full check, fastest possible | `/scribetronic:review <draft> --focus voice,slop` (full, 2 subagents) |
+| Pre-publish gate | `/scribetronic:review <draft>` (full, default 5 focuses) |
+| Post-launch retro with verifiable numbers | `/scribetronic:review <draft> --with-evidence` (full + factual) |
+| Delta with factual check | `/scribetronic:review <draft> --since-last --with-evidence` |
 | Tiny short-form (<100 words) | `/scribetronic:editing-pass` + `/scribetronic:ai-slop-check` |
 | You want craft-only edits inline | `/scribetronic:editing-pass` (it edits; review only reports) |
 

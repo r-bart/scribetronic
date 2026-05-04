@@ -9,8 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **`/scribetronic:review` skill — parallel multi-focus draft review.** Dispatches one Task subagent per focus (default: `voice`, `structure`, `slop`, `hook`, `closer`; opt-in `factual` with `--with-evidence`) in a single message, then aggregates findings into one severity-grouped table on stdout. Faster than running `editing-pass` + `ai-slop-check` sequentially (~10s vs ~50s for 5 focuses) and covers more dimensions. Stderr carries per-focus dispatch progress; `--quiet` suppresses everything except the verdict and HIGH findings. Uses Haiku for pattern-matching focuses; Sonnet bumps in for `factual`. Skill count: 22 → 23.
+- **`/scribetronic:review` skill — parallel multi-focus draft review.** Dispatches one Task subagent per focus in a single message, then aggregates findings into one severity-grouped table on stdout. Faster than running `editing-pass` + `ai-slop-check` sequentially and covers more dimensions. Stderr carries per-focus dispatch progress; `--quiet` suppresses everything except the verdict and HIGH findings. Uses Haiku for pattern-matching focuses; Sonnet bumps in for `factual`. Skill count: 22 → 23.
+  - **Full mode** (default): 5 focuses (`voice`, `structure`, `slop`, `hook`, `closer`) over the entire draft, ~10s wall time.
+  - **Delta mode** (`--since-last` | `--since <revspec>` | `--since-staged`): 3 focuses (`voice`, `slop`, `continuity`) over only what changed since the last snapshot or git ref, ~5s wall time, ~80% fewer tokens. The `continuity` focus is delta-only — it compares the new lines against the surrounding paragraph context (tone shift, orphan references, tense breaks). `--since-last` keeps a per-draft snapshot in `.scribetronic/snapshots/<basename>.md` (gitignored by the project template). Designed for "I just wrote two paragraphs, are they OK before I keep going?".
+  - `--with-evidence` adds the optional `factual` focus to either mode, comparing claims against `scribetronic/calendar/<week>/notes.md`.
 - `/write` Phase 4 will adopt `/review` as its default quality gate from v0.3.0 (opt-out via `--no-review` for the legacy sequential `editing-pass + ai-slop-check`).
+- New project template: `scribetronic/.gitignore` ignoring `.scribetronic/` (the local state directory used by `--since-last`).
 
 ### Planned
 
