@@ -84,11 +84,11 @@ packages/cli/
 │       └── __tests__/
 │           └── skills.test.ts
 └── templates/
-    ├── claude-code/         # mirrors a Claude Code workspace
-    │   └── .claude/
+    ├── claude-code/         # SKILL.md source-of-truth (used by `list` / `info`
+    │   └── .claude/         # and synced to r-bart/scribetronic-plugin on release)
     │       ├── agents/
     │       ├── rules/
-    │       └── skills/
+    │       └── skills/      # NOT copied into user projects since v0.2 — see docs/plugin-mode.md
     │           ├── agenda/SKILL.md
     │           ├── write/SKILL.md
     │           ├── write-publish/SKILL.md
@@ -128,7 +128,7 @@ packages/cli/
 ### Source organisation rules
 
 - Each `src/<group>/` folder owns its own `__tests__/` sibling. Tests never reach across group boundaries.
-- `src/data/` holds pure data (no I/O). The skill registry is parsed from disk once at module load.
+- `src/data/` owns the skill registry: types, frontmatter parser, category inference, and a lazy loader that reads bundled `templates/.../SKILL.md` files. The only I/O permitted here is read-only introspection of the package's own `templates/` tree — never the host project's filesystem (that belongs in `analyzers/`) and never writes (that belongs in `generators/`).
 - `src/analyzers/` is read-only project introspection. Never writes to the filesystem.
 - `src/generators/` performs filesystem mutations. Always idempotent — refuses to overwrite existing files.
 - `src/commands/` is the thin orchestration layer. Each command file exports one function and delegates to `analyzers/` + `generators/`.

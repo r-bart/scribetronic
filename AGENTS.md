@@ -14,35 +14,36 @@
 
 ---
 
-## Architecture: Clean + DDD (lite)
+## Architecture
 
-**See `docs/ARCHITECTURE.md`** for project-specific structure.
+**See `docs/ARCHITECTURE.md`** for the canonical folder map and `.claude/rules/architecture.md` for the enforced rules.
 
 ### Layer rule
 
 ```
-commands → core ← infrastructure
+commands → analyzers + generators + data
 ```
 
-Inner layers (`core/`) know nothing about outer layers.
+`analyzers/` are read-only. `generators/` are write-only. Neither imports from `commands/`. Generators never call analyzers — the command orchestrates the read→write flow.
 
 | Layer | Contains | Can Import From |
 |-------|----------|-----------------|
-| `core/` | Domain types, skill catalog, voice profile schema | Nothing external |
-| `infrastructure/` | FS access, npm metadata, interactive prompts | `core/` |
-| `commands/` | CLI handlers (`init`, `style`, `list`, `info`) | `core/`, `infrastructure/` |
+| `data/` | Skill registry, types, template-resolution helpers | `glob`, `node:fs` (read-only) |
+| `analyzers/` | Project introspection (read-only) | `data/` |
+| `generators/` | Template copy + scaffold (write-only, idempotent) | `data/` |
+| `commands/` | CLI handlers (`init`, `style`, `list`, `info`) | `analyzers/`, `generators/`, `data/` |
 
 ### Common violations
 
 ```ts
-// Bad: core importing fs
-import fs from 'node:fs'  // inside core/ — never
+// Bad: analyzer writing to disk
+await fs.writeFile(...)   // analyzers are read-only
 
-// Bad: command writing files directly
-await fs.writeFile(...)   // delegate to infrastructure
+// Bad: generator calling an analyzer
+import { detect } from '../analyzers/project'  // commands orchestrate
 
-// Good: command orchestrates, infrastructure executes
-await skillInstaller.install(skills, target)
+// Bad: importing templates as code
+import skillBody from '../../templates/.../SKILL.md'  // load at runtime
 ```
 
 ---

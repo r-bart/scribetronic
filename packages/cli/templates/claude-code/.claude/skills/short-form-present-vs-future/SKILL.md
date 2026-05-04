@@ -1,6 +1,6 @@
 ---
 name: short-form-present-vs-future
-description: Short-form comparison of how something is done today vs how it will be done. Welsh format #8. Strong for tech/AI/tooling takes.
+description: Short-form (X / LinkedIn) comparison of how something is done today vs how it will be done in 1–5 years. Welsh format #8. Strong for tech / AI / tooling takes. Use when the user wants to frame a directional bet, a tooling shift, or an obsolescence call — anything where the punchline is "this is the present; here's the future".
 inherits: ../short-form-voice-adjustments/SKILL.md
 formats: [X single, X thread, LinkedIn]
 ---

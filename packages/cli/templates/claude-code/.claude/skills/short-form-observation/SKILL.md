@@ -1,6 +1,6 @@
 ---
 name: short-form-observation
-description: Short-form post stating a single observation. No list, no contrast — just one thing noticed clearly. Welsh format #3.
+description: Short-form post (X single / LinkedIn / Threads) stating a single observation. No list, no contrast — just one thing noticed clearly and named. Welsh format #3. Use when the user has a one-line insight, pattern, or quiet contrarian take that doesn't need scaffolding to land.
 inherits: ../short-form-voice-adjustments/SKILL.md
 formats: [X single, LinkedIn, Threads]
 ---

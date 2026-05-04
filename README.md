@@ -17,34 +17,42 @@ Works with **Claude Code** today. The skills are portable; the CLI installs them
 
 ## Quick Start
 
-### Install
-
-```bash
-npm install -g scribetronic
-```
-
-Then, from any project:
-
-```bash
-cd ~/your-writing-project
-scribetronic init
-```
-
-Or use without a global install:
+### Option A — CLI (recommended)
 
 ```bash
 npx scribetronic init
 ```
 
-> **Hacking on scribetronic itself?** See [Local development](#local-development) below for a `git clone` + `npm link` flow.
-
 The CLI will:
 
 1. Scaffold the editorial calendar templates into `scribetronic/`
-2. Install the 21 skills under `.claude/skills/`
+2. Register the [scribetronic plugin marketplace](https://github.com/r-bart/scribetronic-plugin) in `.claude/settings.json`
 3. Create the folder structure for drafts, published pieces, and notes
 
-It does **not** automatically seed your voice — you do that explicitly with `scribetronic style` (next step).
+Restart Claude Code; the 22 skills load as `/scribetronic:write`, `/scribetronic:agenda`, etc. The bare `/write` form also works.
+
+### Option B — Plugin marketplace only (skills, no project scaffolding)
+
+If you only want the writing skills and don't need the editorial calendar:
+
+```
+/plugin marketplace add r-bart/scribetronic-plugin
+/plugin install scribetronic@scribetronic
+```
+
+You'll get every `/scribetronic:*` skill without `scribetronic/calendar/` or `publish-config.yaml`.
+
+### Option C — Global install
+
+```bash
+npm install -g scribetronic
+cd ~/your-writing-project
+scribetronic init
+```
+
+> **Hacking on scribetronic itself?** See [Local development](#local-development) below for a `git clone` + `npm link` flow.
+
+The CLI does **not** automatically seed your voice — you do that explicitly with `scribetronic style` (next step).
 
 ### Seed your voice
 
@@ -73,11 +81,11 @@ That's the whole loop.
 
 ## What you get
 
-- **21 skills** covering planning, drafting, editing, and quality
+- **22 skills** covering planning, drafting, editing, and quality
 - **3 orchestrators** that compose the pipeline
 - **6 long-form formats** (newsletter, devlog, hot take, how-to, launch retro, manifesto)
 - **8 short-form formats** (X vs Y, listicles, observations, carousels, threads, etc.)
-- **4 shared utilities** (style, editing, AI-slop check, style extraction)
+- **5 shared utilities** (style, editing, AI-slop check, style extraction, style refinement)
 - **A small CLI** to install, list, and inspect skills
 
 No accounts. No SaaS. Plain markdown files in your repo.
@@ -89,8 +97,9 @@ No accounts. No SaaS. Plain markdown files in your repo.
 | Document | Description |
 |----------|-------------|
 | [Architecture](./docs/ARCHITECTURE.md) | Repo layout and skill organization |
+| [Plugin Mode](./docs/plugin-mode.md) | Marketplace architecture, hooks, and v0.1.x → v0.2.x migration |
 | [Philosophy](./docs/philosophy.md) | Why scribetronic exists and what it bets on |
-| [Skills Reference](./docs/skills.md) | Detailed docs for all 21 skills |
+| [Skills Reference](./docs/skills.md) | Detailed docs for all 22 skills |
 | [CLI Reference](./docs/cli-reference.md) | Full command documentation |
 | [Customization](./docs/customization.md) | Editing `rules.yaml`, `publish-config.yaml`, voice |
 | [Contracts](./docs/contracts.md) | Pipeline data contracts (week IDs, plan schema, etc.) |
@@ -108,7 +117,7 @@ No accounts. No SaaS. Plain markdown files in your repo.
 | `/write` | Drafts a single piece in the chosen format |
 | `/write-publish` | Polishes a draft, runs quality gates, marks it ready |
 
-### Shared utilities (4)
+### Shared utilities (5)
 
 | Skill | What it does |
 |-------|--------------|
@@ -116,6 +125,7 @@ No accounts. No SaaS. Plain markdown files in your repo.
 | `/editing-pass` | Structural + line edits, preserving voice |
 | `/ai-slop-check` | Detects generic AI patterns, hedge words, em-dash abuse |
 | `/style-extract` | Extracts a style profile from existing writing samples |
+| `/style-refine` | Proposes evidence-backed deltas to `writing-style/SKILL.md` from real edit history |
 
 ### Long-form (6)
 
@@ -145,16 +155,19 @@ No accounts. No SaaS. Plain markdown files in your repo.
 
 ## CLI
 
-Four commands. That's it.
+Seven commands.
 
 ```bash
-scribetronic init [path]      # Scaffold project templates
+scribetronic init [path]      # Scaffold project + register plugin marketplace
 scribetronic style [--reset]  # Seed or edit writing-style skill
-scribetronic list             # List bundled skills
+scribetronic list             # List bundled skills (mirrors the marketplace)
 scribetronic info <skill>     # Show skill metadata
+scribetronic update [path]    # Refresh marketplace registration in settings.json
+scribetronic doctor [path]    # Verify the install end-to-end
+scribetronic uninstall [path] # Disable the plugin (leaves your content intact)
 ```
 
-See [docs/cli-reference.md](./docs/cli-reference.md) for full flags and examples.
+See [docs/cli-reference.md](./docs/cli-reference.md) for full flags and examples, or [docs/plugin-mode.md](./docs/plugin-mode.md) for the marketplace architecture.
 
 ---
 

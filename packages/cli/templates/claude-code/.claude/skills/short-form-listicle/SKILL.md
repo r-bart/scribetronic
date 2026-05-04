@@ -1,6 +1,6 @@
 ---
 name: short-form-listicle
-description: Short-form numbered list post. "X things I learned doing Y", "X mistakes that cost me Z". Welsh format #2.
+description: Short-form numbered list post for X / LinkedIn / Threads. "X things I learned doing Y", "X mistakes that cost me Z", "X principles for Z". Welsh format #2. Use when the user has a small set (3–10) of crisp, parallel points worth shipping as a standalone short-form piece — or when distilling a how-to / launch-retro long-form into a list.
 inherits: ../short-form-voice-adjustments/SKILL.md
 formats: [X thread, LinkedIn, Threads]
 ---

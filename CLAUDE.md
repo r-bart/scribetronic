@@ -8,9 +8,11 @@
 
 `scribetronic` is an npm package that ships:
 
-1. A small Node CLI (`packages/cli/`) — commands: `init`, `style`, `list`, `info`
-2. A bundle of 21 Claude Code skills (`.claude/skills/`) shipped as `templates/`
-3. Editorial calendar templates (`templates/`) installed into user projects
+1. A small Node CLI (`packages/cli/`) — commands: `init`, `style`, `list`, `info`, `update`, `doctor`, `uninstall`
+2. A bundle of 22 Claude Code skills, distributed via the [scribetronic-plugin](https://github.com/r-bart/scribetronic-plugin) marketplace (loaded by Claude Code at runtime, not copied to the user's project)
+3. Editorial calendar templates (`templates/project/`) installed into user projects by `init`
+
+The CLI also keeps the 22 skills bundled inside `templates/claude-code/.claude/skills/` as the source of truth for `list` / `info` and for syncing to the plugin repo on release.
 
 Distributed as `scribetronic` on npm. Single package, no monorepo split.
 
@@ -18,43 +20,49 @@ Distributed as `scribetronic` on npm. Single package, no monorepo split.
 
 ## Architecture
 
-**See `docs/ARCHITECTURE.md`** for full folder layout.
+**See `docs/ARCHITECTURE.md`** for full folder layout. `.claude/rules/architecture.md` is the in-repo rule file enforced during reviews.
 
-Single-package shape (Clean / DDD-lite):
+Single-package shape:
 
 ```
 packages/cli/src/
-├── commands/        # CLI command handlers (init, style, list, info)
-├── core/            # Domain logic — skill catalog, voice profile, calendar shape
-├── infrastructure/  # FS access, npm metadata, prompts (inquirer)
-└── index.ts         # Bin entrypoint
+├── commands/    # CLI entry points (init, style, list, info) — orchestrate read→write
+├── analyzers/   # Read-only project introspection (no writes)
+├── generators/  # Write-only filesystem mutations (idempotent)
+├── data/        # Skill registry + types loaded from templates/
+└── index.ts     # Bin entrypoint
 ```
 
 ### Layer rule
 
 ```
-commands → core ← infrastructure
+commands → analyzers + generators + data
 ```
 
-Dependencies point inward. `core/` knows nothing about the filesystem, prompts, or argv parsing.
+Dependencies point inward. `analyzers/` and `generators/` must not import from `commands/`. Generators never invoke analyzers — the command orchestrates the read→write flow.
 
 | Layer | Contains | Can import from |
 |-------|----------|-----------------|
-| `core/` | Skill metadata types, voice profile schema, planning logic | Nothing external |
-| `infrastructure/` | FS, prompts, npm | `core/` |
-| `commands/` | CLI handlers | `core/`, `infrastructure/` |
+| `data/` | Skill registry, types, template-resolution helpers | `glob`, `node:fs` (read-only) |
+| `analyzers/` | Project introspection | `data/` |
+| `generators/` | Template copy + scaffold | `data/` |
+| `commands/` | CLI handlers | `analyzers/`, `generators/`, `data/` |
 
 ### Common violations to avoid
 
 ```ts
-// Bad: core importing fs
-import fs from 'node:fs'  // inside core/ — no
+// Bad: generator calling an analyzer (commands orchestrate, generators just write)
+import { detectProject } from '../analyzers/project'  // inside generators/ — no
 
-// Bad: command writing files directly
-await fs.writeFile(...)  // commands should call infrastructure
+// Bad: analyzer writing to disk
+await fs.writeFile(...)  // analyzers are read-only
 
-// Good: command orchestrates, infrastructure executes
-await skillInstaller.install(skills, target)
+// Bad: importing templates as code
+import skillBody from '../../templates/.../SKILL.md'  // templates are runtime data
+
+// Good: command orchestrates, generator writes
+const project = await analyze(target)
+await templateCopier.copy(project, target)
 ```
 
 ---
@@ -69,9 +77,9 @@ await skillInstaller.install(skills, target)
 
 ### Errors
 
-- `core/` throws typed domain errors (`VoiceProfileMissingError`, etc.)
+- `analyzers/` and `data/` throw typed errors; never `process.exit()` from them
 - `commands/` catch and render friendly CLI output
-- Never `process.exit()` from `core/`
+- `generators/` are idempotent — refuse to overwrite, don't crash on re-run
 
 ### Async
 
@@ -164,7 +172,7 @@ When stuck:
 ## References
 
 - **docs/ARCHITECTURE.md** — Folder structure
-- **docs/skills.md** — All 21 skills documented
+- **docs/skills.md** — All 22 skills documented
 - **docs/cli-reference.md** — Full CLI reference
 - **AGENTS.md** — Quick start for AI agents
 - **CONTRIBUTING.md** — Contributor guide

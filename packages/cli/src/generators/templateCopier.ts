@@ -7,6 +7,15 @@ export interface CopyResult {
   skipped: string[];
 }
 
+export interface CopyOptions {
+  /**
+   * Glob patterns (relative to `sourceDir`, posix-style) that should be skipped.
+   * Matched against each file's relative path with `**` semantics. Example:
+   * `['.claude/skills/**']` will exclude every bundled skill.
+   */
+  exclude?: string[];
+}
+
 /**
  * Recursively copies files from `sourceDir` into `destDir`, preserving the
  * directory structure. Skips destination files that already exist.
@@ -18,7 +27,8 @@ export interface CopyResult {
  */
 export async function copyTemplates(
   sourceDir: string,
-  destDir: string
+  destDir: string,
+  options: CopyOptions = {}
 ): Promise<CopyResult> {
   const copied: string[] = [];
   const skipped: string[] = [];
@@ -33,6 +43,7 @@ export async function copyTemplates(
     dot: true,
     nodir: true,
     absolute: false,
+    ignore: options.exclude,
   });
 
   for (const relPath of matches) {

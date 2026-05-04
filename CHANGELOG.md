@@ -7,18 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-
-- npm publish automation: `.github/workflows/release.yml` (tag `v*.*.*` → `npm publish --provenance`), `prepublishOnly` quality gate, `publishConfig` for public access + provenance attestation.
-- CI matrix on Node 18 / 20 / 22 (`.github/workflows/ci.yml`) running typecheck, lint, test, build, and pack-dry-run on every push and PR.
-- Maintainer release runbook (`docs/releasing.md`) covering pre-flight, tagging, post-publish verification, rollback, and failure modes.
-
 ### Planned
 
 - Calendar export (ICS, Notion, Google Calendar)
 - Multi-author voice profiles
-- Claude Code plugin marketplace distribution
 - Analytics hooks feeding back into `/agenda`
+
+---
+
+## [0.2.0] — 2026-05-04
+
+### Added
+
+- **Claude Code plugin marketplace distribution.** Skills now ship from a separate repo (`r-bart/scribetronic-plugin`) and are loaded by Claude Code at runtime. Auto-update, no `init` re-run needed.
+- New CLI commands:
+  - `scribetronic update [path]` — re-applies the marketplace registration in `.claude/settings.json` (corrects drift, refreshes after CLI upgrades).
+  - `scribetronic doctor [path]` — verifies the install (project skeleton, publish-config, plugin registration, marketplace source, writing-style seed). Exits 1 on failure.
+  - `scribetronic uninstall [path]` — disables the plugin and removes the marketplace entry. Leaves `scribetronic/` content untouched.
+- Workflow hooks shipped with the plugin:
+  - `SessionStart` — surfaces today's editorial slot from `scribetronic/calendar/<week>/plan.md`. Silent in non-scribetronic projects.
+  - `Stop` — reminds about `/editing-pass` + `/ai-slop-check` if drafts under `scribetronic/calendar/*/drafts/` were touched in the session.
+- Skills become namespaced as `/scribetronic:write`, `/scribetronic:agenda`, etc. The bare `/write` form continues to work.
+- `npm run test:coverage` (`@vitest/coverage-v8`).
+- 29 new tests (settings, doctor, update, uninstall). Total suite: 78 tests across 12 files.
+- npm publish automation: `.github/workflows/release.yml` (tag `v*.*.*` → `npm publish --provenance`), `prepublishOnly` quality gate, `publishConfig` for public access + provenance attestation.
+- CI matrix on Node 18 / 20 / 22 (`.github/workflows/ci.yml`).
+- Maintainer release runbook (`docs/releasing.md`).
+
+### Changed (BREAKING)
+
+- **`scribetronic init` no longer copies `SKILL.md` files into the project.** Skills are loaded from the plugin marketplace at runtime. Migration for existing v0.1.x installs:
+
+  ```bash
+  npx scribetronic update     # registers the marketplace
+  rm -rf .claude/skills/agenda .claude/skills/write .claude/skills/write-publish \
+         .claude/skills/long-form-* .claude/skills/short-form-* \
+         .claude/skills/writing-style .claude/skills/editing-pass \
+         .claude/skills/ai-slop-check .claude/skills/style-extract \
+         .claude/skills/style-refine
+  ```
+
+  Then restart Claude Code. Skills will reappear under the `/scribetronic:` namespace, sourced from the marketplace.
+
+- `init` now writes `.claude/settings.json` with `extraKnownMarketplaces.scribetronic` and `enabledPlugins["scribetronic@scribetronic"]`. Pre-existing keys (themes, third-party plugins, etc.) are preserved.
 
 ---
 

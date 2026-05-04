@@ -1,12 +1,15 @@
 # CLI Reference
 
-Scribetronic exposes four commands plus standard `--version` / `--help` flags.
+Scribetronic exposes seven commands plus standard `--version` / `--help` flags.
 
 ```
 scribetronic init [path]
 scribetronic style [--reset]
 scribetronic list
 scribetronic info <skill>
+scribetronic update [path]
+scribetronic doctor [path]
+scribetronic uninstall [path]
 scribetronic --version
 scribetronic --help
 ```
@@ -17,7 +20,7 @@ All commands exit with code `0` on success, non-zero on failure. Exit codes docu
 
 ## `scribetronic init [path]`
 
-Scaffold scribetronic into a project. Copies the bundled templates into the target project's `.claude/` and `scribetronic/` directories.
+Scaffold scribetronic into a project. Copies project-level templates into `<target>/scribetronic/` and registers the [plugin marketplace](./plugin-mode.md) in `<target>/.claude/settings.json`. **Skills are not copied** — they load at runtime from the marketplace as `/scribetronic:<name>`.
 
 ### Synopsis
 
@@ -46,20 +49,14 @@ Running `scribetronic init` multiple times in the same directory is safe. The se
 ```
 <target>/
 ├── .claude/
-│   ├── agents/
-│   ├── rules/
-│   └── skills/                                  # 21 skills
-│       ├── agenda/SKILL.md
-│       ├── write/SKILL.md
-│       ├── write-publish/SKILL.md
-│       └── ... (18 more)
+│   └── settings.json                       # registers the plugin marketplace
 └── scribetronic/
     ├── README.md
-    ├── publish-config.yaml                  # renamed from .example.yaml
+    ├── publish-config.yaml                 # renamed from .example.yaml
     ├── calendar/
     │   ├── README.md
     │   ├── index.md
-    │   ├── rules.yaml                       # renamed from .example.yaml
+    │   ├── rules.yaml                      # renamed from .example.yaml
     │   ├── history.md
     │   └── archive/.gitkeep
     └── ideas/
@@ -67,10 +64,28 @@ Running `scribetronic init` multiple times in the same directory is safe. The se
         └── <14 type files>.md
 ```
 
+`.claude/settings.json` is created (or merged into) with:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "scribetronic": {
+      "source": { "source": "github", "repo": "r-bart/scribetronic-plugin" }
+    }
+  },
+  "enabledPlugins": {
+    "scribetronic@scribetronic": true
+  }
+}
+```
+
+Pre-existing keys (themes, third-party plugins) are preserved.
+
 ### What gets NOT created
 
-- `writing-style/SKILL.md` — this is left to `scribetronic style` (see below). The reasoning is that voice is personal; the user should be prompted to author it deliberately rather than have a generic seed silently appear.
-- Week directories under `calendar/<YYYY-WNN>/` — these are created by `/agenda plan-week` once you start using the pipeline.
+- **`SKILL.md` files**. They live in [`r-bart/scribetronic-plugin`](https://github.com/r-bart/scribetronic-plugin) and load at runtime. Restart Claude Code after `init`.
+- `writing-style/SKILL.md` — this is left to `scribetronic style`. Voice is personal; the user should engage with it deliberately rather than have a generic seed silently appear.
+- Week directories under `calendar/<YYYY-WNN>/` — created by `/scribetronic:agenda plan-week` once you start using the pipeline.
 
 ### Options
 
@@ -83,19 +98,20 @@ Running `scribetronic init` multiple times in the same directory is safe. The se
 ```bash
 # Initialise the current project
 $ scribetronic init
-created  .claude/skills/agenda/SKILL.md
-created  .claude/skills/write/SKILL.md
+copied  scribetronic/calendar/rules.yaml         (from rules.example.yaml)
+copied  scribetronic/publish-config.yaml         (from publish-config.example.yaml)
+copied  scribetronic/README.md
 ...
-created  scribetronic/calendar/rules.yaml         (from rules.example.yaml)
-created  scribetronic/calendar/publish-config.yaml (from publish-config.example.yaml)
-✓ scribetronic installed. Run `scribetronic style` next.
+plugin: scribetronic@scribetronic (r-bart/scribetronic-plugin)
+✓ Done. Restart Claude Code — skills load as `/scribetronic:<name>`.
 
 # Re-running is safe
 $ scribetronic init
-exists   .claude/skills/agenda/SKILL.md
-exists   .claude/skills/write/SKILL.md
+skipped  scribetronic/calendar/rules.yaml (exists)
+skipped  scribetronic/publish-config.yaml (exists)
 ...
-✓ no changes.
+plugin: scribetronic@scribetronic (r-bart/scribetronic-plugin)
+✓ no changes to existing files.
 ```
 
 ### Exit codes
@@ -231,7 +247,7 @@ SHORT-FORM (8)
   /short-form-voice-adjustments   Voice deltas for short-form
 ```
 
-Total: 21 skills.
+Total: 22 skills.
 
 ### Exit codes
 
@@ -313,27 +329,93 @@ Options:
   -h, --help         display help for command
 
 Commands:
-  init [path]        Scaffold writing system into a project
-  style              Seed or edit writing-style/SKILL.md
-  list               List bundled skills
+  init [path]        Scaffold writing system + register plugin marketplace
+  style [options]    Seed or edit writing-style/SKILL.md
+  list               List bundled skills (mirrors what the marketplace ships)
   info <skill>       Show skill metadata
+  update [path]      Refresh marketplace registration in .claude/settings.json
+  doctor [path]      Verify the install end-to-end
+  uninstall [path]   Disable the plugin (leaves your scribetronic/ intact)
   help [command]     display help for command
 ```
 
 ---
 
-## Out of scope for v0.1
+## `scribetronic update [path]`
 
-The following commands are reserved for future versions and are NOT available in v0.1:
+Re-applies the plugin marketplace registration in `<target>/.claude/settings.json`. Use after a fresh `git clone` of a scribetronic project, after upgrading the CLI globally, or whenever `settings.json` drifts (legacy entries, manual edits, etc.).
 
-- `scribetronic add <skill>` — install one skill into an existing project.
-- `scribetronic addon <name>` — install an optional addon (e.g. cross-poster).
-- `scribetronic update` — refresh skills from the latest scribetronic release.
-- `scribetronic doctor` — diagnose installation issues.
-- `scribetronic regenerate` — re-derive skill content from sources.
-- `scribetronic uninstall` — remove scribetronic from a project.
-- `scribetronic mode` — switch between strict / lenient modes.
-- `scribetronic diff` — diff installed skills against bundled templates.
-- `scribetronic status` — show project state (active week, pending drafts).
+Idempotent. If the marketplace source has changed (e.g. a stale local-directory pointer from a dev session), it gets rewritten to the canonical GitHub repo. Other settings keys are preserved.
 
-These are tracked in the v0.2+ roadmap.
+### Behaviour
+
+1. Reads `<target>/.claude/settings.json` (or starts empty).
+2. Sets `extraKnownMarketplaces.scribetronic.source = { source: "github", repo: "r-bart/scribetronic-plugin" }`.
+3. Sets `enabledPlugins["scribetronic@scribetronic"] = true` if undefined. **Does not flip an explicit `false`** (the user's choice wins).
+4. Writes settings back.
+
+### Exit codes
+
+| Code | Meaning |
+|---|---|
+| 0 | Success. |
+| 1 | Target path does not exist. |
+
+---
+
+## `scribetronic doctor [path]`
+
+Health check for an existing installation. Verifies six things:
+
+1. `scribetronic/` directory exists.
+2. `scribetronic/calendar/` exists.
+3. `scribetronic/publish-config.yaml` exists.
+4. The plugin (`scribetronic@scribetronic`) is enabled in `.claude/settings.json`.
+5. The marketplace source resolves to `r-bart/scribetronic-plugin`.
+6. `writing-style/SKILL.md` has been seeded.
+
+Each check renders as `✓` (pass) or `✗` (fail) with a short detail line. Failed checks include a hint at how to fix them.
+
+### Exit codes
+
+| Code | Meaning |
+|---|---|
+| 0 | All six checks passed. |
+| 1 | At least one check failed. |
+
+### Example
+
+```bash
+$ scribetronic doctor
+scribetronic doctor
+/Users/me/blog
+
+  ✓ scribetronic/ directory
+  ✓ scribetronic/calendar/ directory
+  ✓ scribetronic/publish-config.yaml
+  ✓ scribetronic@scribetronic enabled in .claude/settings.json
+  ✓ marketplace source resolves to r-bart/scribetronic-plugin
+  ✗ writing-style/SKILL.md seeded
+     missing — run `scribetronic style`
+
+1/6 check(s) failed
+```
+
+---
+
+## `scribetronic uninstall [path]`
+
+Disables the scribetronic plugin and removes its marketplace entry from `<target>/.claude/settings.json`. **Does not** touch `scribetronic/` content — drafts, calendar, history, and `publish-config.yaml` are yours; we never delete prose.
+
+### Behaviour
+
+1. If the plugin is not registered, prints "nothing to do" and exits 0.
+2. Otherwise, removes `enabledPlugins["scribetronic@scribetronic"]` and `extraKnownMarketplaces.scribetronic`.
+3. Reminds the user they can `rm -rf scribetronic/` manually if they no longer need it.
+
+### Exit codes
+
+| Code | Meaning |
+|---|---|
+| 0 | Success (including no-op). |
+| 1 | Target path does not exist. |

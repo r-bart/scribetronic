@@ -1,6 +1,6 @@
 ---
 name: short-form-x-vs-y
-description: Short-form comparison post. Two things contrasted to reveal a non-obvious preference. Welsh format #1.
+description: Short-form comparison post (X / LinkedIn / Threads). Two things contrasted to reveal a non-obvious preference. Welsh format #1. Use when the user wants to publish an "X vs Y" take — tools, approaches, mindsets, frameworks — and stake a side. Pairs well after a hot-take or how-to long-form piece.
 inherits: ../short-form-voice-adjustments/SKILL.md
 formats: [X single, X thread, LinkedIn]
 ---
