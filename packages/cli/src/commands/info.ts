@@ -2,28 +2,43 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import chalk from 'chalk';
 import { getSkillsRoot, parseFrontmatter } from '../data/skills.js';
+import * as out from '../utils/output.js';
+import { ExitCode } from '../utils/exit.js';
+
+export interface InfoOptions {
+  json?: boolean;
+}
 
 /**
- * Pretty-prints one bundled skill's frontmatter and body.
- * Exits 1 if the skill folder doesn't exist.
+ * Show one skill's frontmatter + body.
+ *
+ * Human mode: pretty-printed on stderr; the body is also stderr (it's
+ * documentation, not data). Stdout stays empty.
+ * JSON mode: one line on stdout with `{name, path, frontmatter, body}`.
+ *
+ * Exit codes: 0 success, 2 if skill is not found.
  */
-export async function infoCommand(skillName: string): Promise<void> {
+export async function infoCommand(skillName: string, options: InfoOptions = {}): Promise<void> {
   const root = getSkillsRoot();
   const skillPath = join(root, skillName, 'SKILL.md');
 
   if (!existsSync(skillPath)) {
-    console.error(chalk.red(`error: skill "${skillName}" not found`));
-    console.error(chalk.dim(`  expected: ${skillPath}`));
-    process.exit(1);
+    out.error(`skill "${skillName}" not found (expected ${skillPath})`, 'SKILL_NOT_FOUND');
+    process.exit(ExitCode.Usage);
   }
 
   const raw = readFileSync(skillPath, 'utf-8');
   const { frontmatter, body } = parseFrontmatter(raw);
 
-  console.log();
-  console.log(chalk.bold.cyan(skillName));
-  console.log(chalk.dim(skillPath));
-  console.log();
+  if (options.json) {
+    out.data({ name: skillName, path: skillPath, frontmatter, body });
+    return;
+  }
+
+  process.stderr.write('\n');
+  process.stderr.write(chalk.bold.cyan(skillName) + '\n');
+  process.stderr.write(chalk.dim(skillPath) + '\n');
+  process.stderr.write('\n');
 
   const fields: Array<[string, string | string[] | undefined]> = [
     ['name', frontmatter.name],
@@ -36,7 +51,7 @@ export async function infoCommand(skillName: string): Promise<void> {
   for (const [label, value] of fields) {
     if (value === undefined) continue;
     const formatted = Array.isArray(value) ? value.join(', ') : value;
-    console.log(`  ${chalk.bold(label.padEnd(14))}${chalk.dim(':')} ${formatted}`);
+    process.stderr.write(`  ${chalk.bold(label.padEnd(14))}${chalk.dim(':')} ${formatted}\n`);
   }
 
   // Surface any other frontmatter keys we don't have a dedicated label for.
@@ -44,12 +59,12 @@ export async function infoCommand(skillName: string): Promise<void> {
   for (const [key, value] of Object.entries(frontmatter)) {
     if (known.has(key) || value === undefined) continue;
     const formatted = Array.isArray(value) ? value.join(', ') : value;
-    console.log(`  ${chalk.bold(key.padEnd(14))}${chalk.dim(':')} ${formatted}`);
+    process.stderr.write(`  ${chalk.bold(key.padEnd(14))}${chalk.dim(':')} ${formatted}\n`);
   }
 
-  console.log();
-  console.log(chalk.bold.underline('Body'));
-  console.log();
-  console.log(body.trimEnd());
-  console.log();
+  process.stderr.write('\n');
+  process.stderr.write(chalk.bold.underline('Body') + '\n');
+  process.stderr.write('\n');
+  process.stderr.write(body.trimEnd() + '\n');
+  process.stderr.write('\n');
 }

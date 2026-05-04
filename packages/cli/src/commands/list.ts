@@ -1,5 +1,6 @@
 import chalk from 'chalk';
-import { loadSkills, groupByCategory, type SkillCategory } from '../data/skills.js';
+import { loadSkills, groupByCategory, type SkillCategory, type Skill } from '../data/skills.js';
+import * as out from '../utils/output.js';
 
 const CATEGORY_ORDER: SkillCategory[] = [
   'Orchestrators',
@@ -8,16 +9,43 @@ const CATEGORY_ORDER: SkillCategory[] = [
   'Shared',
 ];
 
+export interface ListOptions {
+  json?: boolean;
+}
+
+interface SkillJSON {
+  name: string;
+  category: SkillCategory;
+  path: string;
+  description: string | null;
+}
+
 /**
- * Prints a chalk-styled tree of bundled skills, grouped by category.
- * Gracefully degrades to "no skills found" if the templates dir is empty.
+ * List the bundled skills.
+ *
+ * Human mode: chalk-styled tree on stderr (chrome) with the skill names
+ * on stderr too. Stdout stays empty.
+ * JSON mode: one line on stdout with `{ skills: [{name, category, path, description}] }`.
  */
-export async function listCommand(): Promise<void> {
+export async function listCommand(options: ListOptions = {}): Promise<void> {
   const skills = await loadSkills();
 
+  if (options.json) {
+    const payload: { skills: SkillJSON[] } = {
+      skills: skills.map((s: Skill) => ({
+        name: s.name,
+        category: s.category,
+        path: s.path,
+        description: typeof s.frontmatter.description === 'string' ? s.frontmatter.description : null,
+      })),
+    };
+    out.data(payload);
+    return;
+  }
+
   if (skills.length === 0) {
-    console.log(chalk.yellow('No skills found.'));
-    console.log(
+    out.warn('No skills found.');
+    out.note(
       chalk.dim(
         '  (The templates directory is missing or empty — skills are populated by the publish step.)'
       )
@@ -27,22 +55,22 @@ export async function listCommand(): Promise<void> {
 
   const grouped = groupByCategory(skills);
 
-  console.log();
-  console.log(chalk.bold(`scribetronic skills`) + chalk.dim(` (${skills.length})`));
-  console.log();
+  process.stderr.write('\n');
+  process.stderr.write(chalk.bold('scribetronic skills') + chalk.dim(` (${skills.length})`) + '\n');
+  process.stderr.write('\n');
 
   for (const cat of CATEGORY_ORDER) {
     const items = grouped[cat];
     if (items.length === 0) continue;
 
-    console.log(`  ${chalk.bold.underline(cat)}`);
+    process.stderr.write(`  ${chalk.bold.underline(cat)}\n`);
     for (const skill of items) {
       const desc = oneLineDescription(skill.frontmatter.description);
       const namePart = chalk.cyan(skill.name.padEnd(32));
       const descPart = desc.length > 0 ? chalk.dim(desc) : chalk.dim('(no description)');
-      console.log(`    ${chalk.dim('•')} ${namePart} ${descPart}`);
+      process.stderr.write(`    ${chalk.dim('•')} ${namePart} ${descPart}\n`);
     }
-    console.log();
+    process.stderr.write('\n');
   }
 }
 

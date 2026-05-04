@@ -11,9 +11,11 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { initCommand } from '../commands/init.js';
 import { GITHUB_MARKETPLACE_REPO, PLUGIN_KEY } from '../data/plugin.js';
+import { captureStreams, type CapturedStreams } from './helpers/captureStreams.js';
 
 let project: string;
 let fakeTemplatesRoot: string;
+let streams: CapturedStreams;
 
 vi.mock('../data/skills.js', async () => {
   const actual = await vi.importActual<typeof import('../data/skills.js')>(
@@ -43,6 +45,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  streams?.restore();
   rmSync(project, { recursive: true, force: true });
   rmSync(fakeTemplatesRoot, { recursive: true, force: true });
   vi.restoreAllMocks();
@@ -50,6 +53,7 @@ afterEach(() => {
 
 describe('initCommand', () => {
   it('copies project templates and renames .example.yaml', async () => {
+    streams = captureStreams();
     await initCommand({ path: project });
 
     expect(existsSync(join(project, 'scribetronic/calendar/README.md'))).toBe(true);
@@ -58,6 +62,7 @@ describe('initCommand', () => {
   });
 
   it('does NOT copy bundled skills into the project (they live in the marketplace)', async () => {
+    streams = captureStreams();
     await initCommand({ path: project });
 
     expect(existsSync(join(project, '.claude/skills/agenda/SKILL.md'))).toBe(false);
@@ -65,6 +70,7 @@ describe('initCommand', () => {
   });
 
   it('writes .claude/settings.json registering the GitHub marketplace + plugin', async () => {
+    streams = captureStreams();
     await initCommand({ path: project });
 
     const settingsPath = join(project, '.claude/settings.json');
@@ -88,6 +94,7 @@ describe('initCommand', () => {
       })
     );
 
+    streams = captureStreams();
     await initCommand({ path: project });
 
     const settings = JSON.parse(readFileSync(join(project, '.claude/settings.json'), 'utf-8'));
@@ -97,6 +104,7 @@ describe('initCommand', () => {
   });
 
   it('is idempotent — re-running does not overwrite existing files or settings', async () => {
+    streams = captureStreams();
     await initCommand({ path: project });
 
     const target = join(project, 'scribetronic/calendar/README.md');
@@ -109,6 +117,7 @@ describe('initCommand', () => {
     before.enabledPlugins[PLUGIN_KEY] = false;
     writeFileSync(settingsPath, JSON.stringify(before));
 
+    streams = captureStreams();
     await initCommand({ path: project });
 
     expect(readFileSync(target, 'utf-8')).toBe('user-edited');
@@ -121,19 +130,22 @@ describe('initCommand', () => {
     mkdirSync(join(project, 'scribetronic/calendar'), { recursive: true });
     writeFileSync(target, 'user-config: true');
 
+    streams = captureStreams();
     await initCommand({ path: project });
 
     expect(readFileSync(target, 'utf-8')).toBe('user-config: true');
   });
 
-  it('exits 1 when the target path does not exist', async () => {
-    const exitSpy = vi.spyOn(process, 'exit').mockImplementation(((_code?: number) => {
-      throw new Error('process.exit called');
+  it('exits 2 (Usage) when the target path does not exist', async () => {
+    streams = captureStreams();
+    const exitSpy = vi.spyOn(process, 'exit').mockImplementation(((code?: number) => {
+      throw new Error(`process.exit(${code ?? 0})`);
     }) as never);
 
     await expect(initCommand({ path: join(project, 'nope') })).rejects.toThrow(
-      'process.exit called'
+      'process.exit(2)'
     );
+    expect(streams.stderr()).toContain('Directory does not exist');
 
     exitSpy.mockRestore();
   });
@@ -141,6 +153,7 @@ describe('initCommand', () => {
   it('warns and returns gracefully when bundled templates are missing', async () => {
     rmSync(fakeTemplatesRoot, { recursive: true, force: true });
     fakeTemplatesRoot = mkdtempSync(join(tmpdir(), 'scribe-init-tpl-empty-'));
+    streams = captureStreams();
 
     await expect(initCommand({ path: project })).resolves.toBeUndefined();
 
@@ -149,6 +162,7 @@ describe('initCommand', () => {
   });
 
   it('detects an existing scribetronic install and continues idempotently', async () => {
+    streams = captureStreams();
     await initCommand({ path: project });
     expect(existsSync(join(project, 'scribetronic/calendar/README.md'))).toBe(true);
 

@@ -51,12 +51,12 @@ describe('updateCommand', () => {
   });
 
   it('exits 1 when the target path does not exist', async () => {
-    const exitSpy = vi.spyOn(process, 'exit').mockImplementation(((_code?: number) => {
-      throw new Error('process.exit called');
+    const exitSpy = vi.spyOn(process, 'exit').mockImplementation(((code?: number) => {
+      throw new Error(`process.exit(${code ?? 0})`);
     }) as never);
 
     await expect(updateCommand({ path: join(project, 'nope') })).rejects.toThrow(
-      'process.exit called'
+      'process.exit(2)'
     );
     exitSpy.mockRestore();
   });

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import type { Skill } from '../data/skills.js';
+import { captureStreams, type CapturedStreams } from './helpers/captureStreams.js';
 
-// Holder for the per-test skill list. Mock factory closes over it lazily.
 let fakeSkills: Skill[] = [];
 
 vi.mock('../data/skills.js', async () => {
@@ -14,14 +14,16 @@ vi.mock('../data/skills.js', async () => {
   };
 });
 
-// Import AFTER vi.mock is registered.
 const { listCommand } = await import('../commands/list.js');
+
+let streams: CapturedStreams;
 
 beforeEach(() => {
   fakeSkills = [];
 });
 
 afterEach(() => {
+  streams?.restore();
   vi.restoreAllMocks();
 });
 
@@ -33,9 +35,6 @@ function makeSkill(name: string, description?: string | string[]): Skill {
       : ['agenda', 'write', 'write-publish'].includes(name)
         ? 'Orchestrators'
         : 'Shared';
-  // The SkillFrontmatter index signature allows string[] for any key. The
-  // explicit `description?: string` is a hint, not enforced at parse time —
-  // the inline-list parser will store arrays for any key.
   const frontmatter = (
     description === undefined ? { name } : { name, description }
   ) as Skill['frontmatter'];
@@ -48,24 +47,18 @@ function makeSkill(name: string, description?: string | string[]): Skill {
   };
 }
 
-describe('listCommand', () => {
-  it('prints a yellow "no skills found" hint when the registry is empty', async () => {
+describe('listCommand (human mode)', () => {
+  it('warns "no skills found" on stderr when registry is empty', async () => {
     fakeSkills = [];
-
-    const logs: string[] = [];
-    const spy = vi.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
-      logs.push(args.map((a) => String(a)).join(' '));
-    });
+    streams = captureStreams();
 
     await listCommand();
-    const output = logs.join('\n');
 
-    expect(output).toMatch(/no skills found/i);
-
-    spy.mockRestore();
+    expect(streams.stderr()).toMatch(/no skills found/i);
+    expect(streams.stdout()).toBe('');
   });
 
-  it('groups skills by category and lists each one', async () => {
+  it('groups skills by category on stderr; stdout stays empty', async () => {
     fakeSkills = [
       makeSkill('agenda', 'Plan the week.'),
       makeSkill('write', 'Master writer.'),
@@ -73,76 +66,90 @@ describe('listCommand', () => {
       makeSkill('short-form-listicle', 'Numbered list.'),
       makeSkill('writing-style', 'Voice guide.'),
     ];
-
-    const logs: string[] = [];
-    const spy = vi.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
-      logs.push(args.map((a) => String(a)).join(' '));
-    });
+    streams = captureStreams();
 
     await listCommand();
-    const output = logs.join('\n');
+    const stderr = streams.stderr();
 
-    expect(output).toContain('Orchestrators');
-    expect(output).toContain('Long-form');
-    expect(output).toContain('Short-form');
-    expect(output).toContain('Shared');
-    expect(output).toContain('agenda');
-    expect(output).toContain('write');
-    expect(output).toContain('long-form-weekly-newsletter');
-    expect(output).toContain('short-form-listicle');
-    expect(output).toContain('writing-style');
-    expect(output).toContain('5');
-
-    spy.mockRestore();
+    expect(stderr).toContain('Orchestrators');
+    expect(stderr).toContain('Long-form');
+    expect(stderr).toContain('Short-form');
+    expect(stderr).toContain('Shared');
+    expect(stderr).toContain('agenda');
+    expect(stderr).toContain('write');
+    expect(stderr).toContain('long-form-weekly-newsletter');
+    expect(stderr).toContain('short-form-listicle');
+    expect(stderr).toContain('writing-style');
+    expect(stderr).toContain('5');
+    expect(streams.stdout()).toBe('');
   });
 
   it('truncates descriptions longer than 80 chars with ellipsis', async () => {
     const longDesc = 'A'.repeat(120);
     fakeSkills = [makeSkill('agenda', longDesc)];
-
-    const logs: string[] = [];
-    const spy = vi.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
-      logs.push(args.map((a) => String(a)).join(' '));
-    });
+    streams = captureStreams();
 
     await listCommand();
-    const output = logs.join('\n');
+    const stderr = streams.stderr();
 
-    expect(output).toContain('...');
-    expect(output).not.toContain('A'.repeat(120));
-
-    spy.mockRestore();
+    expect(stderr).toContain('...');
+    expect(stderr).not.toContain('A'.repeat(120));
   });
 
   it('renders "(no description)" for skills missing one', async () => {
     fakeSkills = [makeSkill('agenda')];
-
-    const logs: string[] = [];
-    const spy = vi.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
-      logs.push(args.map((a) => String(a)).join(' '));
-    });
+    streams = captureStreams();
 
     await listCommand();
-    const output = logs.join('\n');
 
-    expect(output).toContain('(no description)');
-
-    spy.mockRestore();
+    expect(streams.stderr()).toContain('(no description)');
   });
 
   it('joins array-valued descriptions before truncating', async () => {
     fakeSkills = [makeSkill('agenda', ['part one', 'part two'])];
-
-    const logs: string[] = [];
-    const spy = vi.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
-      logs.push(args.map((a) => String(a)).join(' '));
-    });
+    streams = captureStreams();
 
     await listCommand();
-    const output = logs.join('\n');
 
-    expect(output).toContain('part one part two');
+    expect(streams.stderr()).toContain('part one part two');
+  });
+});
 
-    spy.mockRestore();
+describe('listCommand (--json)', () => {
+  it('emits one JSON line on stdout, nothing on stderr, when registry is empty', async () => {
+    fakeSkills = [];
+    streams = captureStreams({ json: true });
+
+    await listCommand({ json: true });
+
+    const stdout = streams.stdout();
+    const parsed = JSON.parse(stdout);
+    expect(parsed).toEqual({ skills: [] });
+    expect(streams.stderr()).toBe('');
+  });
+
+  it('serializes every skill with name, category, path, description', async () => {
+    fakeSkills = [
+      makeSkill('agenda', 'Plan the week.'),
+      makeSkill('write'),
+      makeSkill('long-form-weekly-newsletter', ['part one', 'part two']),
+    ];
+    streams = captureStreams({ json: true });
+
+    await listCommand({ json: true });
+
+    const parsed = JSON.parse(streams.stdout());
+    expect(parsed.skills).toHaveLength(3);
+    expect(parsed.skills[0]).toEqual({
+      name: 'agenda',
+      category: 'Orchestrators',
+      path: '/fake/agenda/SKILL.md',
+      description: 'Plan the week.',
+    });
+    expect(parsed.skills[1].description).toBeNull();
+    // Array-valued descriptions are not coerced to strings in JSON output —
+    // they stay null per the SkillJSON contract (description: string | null).
+    expect(parsed.skills[2].description).toBeNull();
+    expect(streams.stderr()).toBe('');
   });
 });

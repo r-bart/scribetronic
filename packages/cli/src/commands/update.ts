@@ -9,6 +9,8 @@ import {
   PLUGIN_NAME,
 } from '../data/plugin.js';
 import { isPluginRegistered, registerGitHubPlugin } from '../utils/settings.js';
+import * as out from '../utils/output.js';
+import { ExitCode } from '../utils/exit.js';
 
 export interface UpdateOptions {
   path?: string;
@@ -18,29 +20,38 @@ export interface UpdateOptions {
  * Re-applies the marketplace registration in `.claude/settings.json`. Useful
  * after a fresh `git clone`, after upgrading the CLI, or when settings drift.
  * Does not touch `scribetronic/` content — use `scribetronic init` for that.
+ *
+ * Output discipline: chrome on stderr, stdout empty. Exit codes: 0 success,
+ * 2 if target path doesn't exist.
  */
 export async function updateCommand(options: UpdateOptions): Promise<void> {
   const targetDir = resolve(options.path ?? process.cwd());
 
-  p.intro(chalk.bold('scribetronic update'));
+  if (out.isInteractive()) {
+    p.intro(chalk.bold('scribetronic update'));
+  } else {
+    out.note('scribetronic update');
+  }
 
   if (!existsSync(targetDir)) {
-    p.cancel(`Directory does not exist: ${targetDir}`);
-    process.exit(1);
+    out.error(`Directory does not exist: ${targetDir}`, 'PATH_NOT_FOUND');
+    process.exit(ExitCode.Usage);
   }
 
   const wasRegistered = isPluginRegistered(targetDir, PLUGIN_NAME, MARKETPLACE_NAME);
   registerGitHubPlugin(targetDir, PLUGIN_NAME, MARKETPLACE_NAME, GITHUB_MARKETPLACE_REPO);
 
-  p.log.success(
+  out.success(
     wasRegistered
-      ? chalk.green(`marketplace refreshed: ${PLUGIN_KEY}`)
-      : chalk.green(`marketplace registered: ${PLUGIN_KEY}`)
+      ? `marketplace refreshed: ${PLUGIN_KEY}`
+      : `marketplace registered: ${PLUGIN_KEY}`
   );
 
-  p.outro(
-    chalk.dim(
-      'Restart Claude Code so it pulls the latest version of the plugin from GitHub.'
-    )
-  );
+  if (out.isInteractive()) {
+    p.outro(
+      chalk.dim('Restart Claude Code so it pulls the latest version of the plugin from GitHub.')
+    );
+  } else {
+    out.note('restart Claude Code so it pulls the latest version of the plugin from GitHub.');
+  }
 }

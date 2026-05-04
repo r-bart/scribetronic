@@ -3,8 +3,10 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { infoCommand } from '../commands/info.js';
+import { captureStreams, type CapturedStreams } from './helpers/captureStreams.js';
 
 let fakeTemplatesRoot: string;
+let streams: CapturedStreams;
 
 vi.mock('../data/skills.js', async () => {
   const actual = await vi.importActual<typeof import('../data/skills.js')>(
@@ -22,6 +24,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  streams?.restore();
   rmSync(fakeTemplatesRoot, { recursive: true, force: true });
   vi.restoreAllMocks();
 });
@@ -32,92 +35,100 @@ function writeSkill(name: string, body: string) {
   writeFileSync(join(dir, 'SKILL.md'), body);
 }
 
-describe('infoCommand', () => {
-  it('exits 1 with an error when the skill is not found', async () => {
-    const exitSpy = vi.spyOn(process, 'exit').mockImplementation(((_code?: number) => {
-      throw new Error('process.exit called');
+describe('infoCommand (human mode)', () => {
+  it('exits 2 with a structured error when the skill is not found', async () => {
+    streams = captureStreams();
+    const exitSpy = vi.spyOn(process, 'exit').mockImplementation(((code?: number) => {
+      throw new Error(`process.exit(${code ?? 0})`);
     }) as never);
-    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    await expect(infoCommand('does-not-exist')).rejects.toThrow('process.exit called');
-    expect(errSpy).toHaveBeenCalled();
-    const errorOutput = errSpy.mock.calls.map((c) => String(c[0])).join(' ');
-    expect(errorOutput).toContain('does-not-exist');
+    await expect(infoCommand('does-not-exist')).rejects.toThrow('process.exit(2)');
+    expect(streams.stderr()).toContain('does-not-exist');
+    expect(streams.stdout()).toBe('');
 
     exitSpy.mockRestore();
-    errSpy.mockRestore();
   });
 
-  it('prints frontmatter and body for a found skill', async () => {
+  it('prints frontmatter and body for a found skill on stderr; stdout empty', async () => {
     writeSkill(
       'agenda',
       '---\nname: agenda\ndescription: Plan the week.\ncadence: weekly\n---\nbody text here\n'
     );
-
-    const logs: string[] = [];
-    const spy = vi.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
-      logs.push(args.map((a) => String(a)).join(' '));
-    });
+    streams = captureStreams();
 
     await infoCommand('agenda');
-    const output = logs.join('\n');
+    const stderr = streams.stderr();
 
-    expect(output).toContain('agenda');
-    expect(output).toContain('Plan the week.');
-    expect(output).toContain('weekly');
-    expect(output).toContain('body text here');
-
-    spy.mockRestore();
+    expect(stderr).toContain('agenda');
+    expect(stderr).toContain('Plan the week.');
+    expect(stderr).toContain('weekly');
+    expect(stderr).toContain('body text here');
+    expect(streams.stdout()).toBe('');
   });
 
   it('surfaces unknown frontmatter keys (not just the curated list)', async () => {
-    writeSkill(
-      'custom',
-      '---\nname: custom\ncustom_key: hello\nanother: world\n---\nbody\n'
-    );
-
-    const logs: string[] = [];
-    const spy = vi.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
-      logs.push(args.map((a) => String(a)).join(' '));
-    });
+    writeSkill('custom', '---\nname: custom\ncustom_key: hello\nanother: world\n---\nbody\n');
+    streams = captureStreams();
 
     await infoCommand('custom');
-    const output = logs.join('\n');
+    const stderr = streams.stderr();
 
-    expect(output).toContain('custom_key');
-    expect(output).toContain('hello');
-    expect(output).toContain('another');
-    expect(output).toContain('world');
-
-    spy.mockRestore();
+    expect(stderr).toContain('custom_key');
+    expect(stderr).toContain('hello');
+    expect(stderr).toContain('another');
+    expect(stderr).toContain('world');
   });
 
   it('formats list-valued frontmatter (inherits) as comma-joined', async () => {
-    writeSkill(
-      'derived',
-      '---\nname: derived\ninherits: [a, b, c]\n---\nbody\n'
-    );
-
-    const logs: string[] = [];
-    const spy = vi.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
-      logs.push(args.map((a) => String(a)).join(' '));
-    });
+    writeSkill('derived', '---\nname: derived\ninherits: [a, b, c]\n---\nbody\n');
+    streams = captureStreams();
 
     await infoCommand('derived');
-    const output = logs.join('\n');
 
-    expect(output).toContain('a, b, c');
-
-    spy.mockRestore();
+    expect(streams.stderr()).toContain('a, b, c');
   });
 
   it('omits undefined optional fields without crashing', async () => {
     writeSkill('minimal', '---\nname: minimal\n---\nbody\n');
-
-    const spy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    streams = captureStreams();
 
     await expect(infoCommand('minimal')).resolves.toBeUndefined();
+  });
+});
 
-    spy.mockRestore();
+describe('infoCommand (--json)', () => {
+  it('emits JSON with name, path, frontmatter, body on stdout', async () => {
+    writeSkill(
+      'agenda',
+      '---\nname: agenda\ndescription: Plan the week.\ncadence: weekly\n---\nbody text here\n'
+    );
+    streams = captureStreams({ json: true });
+
+    await infoCommand('agenda', { json: true });
+
+    const parsed = JSON.parse(streams.stdout());
+    expect(parsed.name).toBe('agenda');
+    expect(parsed.path).toContain('agenda/SKILL.md');
+    expect(parsed.frontmatter.name).toBe('agenda');
+    expect(parsed.frontmatter.description).toBe('Plan the week.');
+    expect(parsed.frontmatter.cadence).toBe('weekly');
+    expect(parsed.body.trim()).toBe('body text here');
+    expect(streams.stderr()).toBe('');
+  });
+
+  it('emits a structured error envelope on stdout when skill is not found', async () => {
+    streams = captureStreams({ json: true });
+    const exitSpy = vi.spyOn(process, 'exit').mockImplementation(((code?: number) => {
+      throw new Error(`process.exit(${code ?? 0})`);
+    }) as never);
+
+    await expect(infoCommand('nope', { json: true })).rejects.toThrow('process.exit(2)');
+    const parsed = JSON.parse(streams.stdout());
+    expect(parsed.ok).toBe(false);
+    expect(parsed.error.code).toBe('SKILL_NOT_FOUND');
+    expect(parsed.error.message).toContain('nope');
+    expect(streams.stderr()).toBe('');
+
+    exitSpy.mockRestore();
   });
 });

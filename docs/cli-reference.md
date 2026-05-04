@@ -4,17 +4,17 @@ Scribetronic exposes seven commands plus standard `--version` / `--help` flags.
 
 ```
 scribetronic init [path]
-scribetronic style [--reset]
-scribetronic list
-scribetronic info <skill>
+scribetronic style [--reset] [--yes]
+scribetronic list [--json]
+scribetronic info <skill> [--json]
 scribetronic update [path]
-scribetronic doctor [path]
+scribetronic doctor [path] [--json]
 scribetronic uninstall [path]
 scribetronic --version
 scribetronic --help
 ```
 
-All commands exit with code `0` on success, non-zero on failure. Exit codes documented per command below.
+All commands exit with code `0` on success, non-zero on failure. Exit codes follow a global contract: `1` unexpected, `2` usage error, `3` state error. Per-command details documented below; the full contract and agent-friendly modes are in the [Agent-friendly modes](#agent-friendly-modes) section at the bottom.
 
 ---
 
@@ -119,9 +119,8 @@ plugin: scribetronic@scribetronic (r-bart/scribetronic-plugin)
 | Code | Meaning |
 |---|---|
 | 0 | Success (including no-op idempotent runs). |
-| 1 | Target path does not exist or is not a directory. |
-| 2 | Target path is not writable. |
-| 3 | Internal error (template missing, copy failed). |
+| 1 | Internal error (template missing, copy failed). |
+| 2 | Target path does not exist or is not writable. |
 
 ---
 
@@ -198,9 +197,9 @@ $ scribetronic style < /dev/null
 | Code | Meaning |
 |---|---|
 | 0 | Success (seeded, edited, reset, or no-op). |
-| 1 | `.claude/skills/` parent directory missing — run `scribetronic init` first. |
-| 4 | `--reset` passed in non-interactive mode (would skip the confirmation prompt). |
-| 5 | Editor binary not found on `$PATH`. |
+| 1 | Internal error (bundled seed missing, editor spawn failed). |
+| 2 | `--reset` in non-TTY without `--yes` / `SCRIBETRONIC_YES=1`. |
+| _other_ | When `$EDITOR` exits non-zero, the command propagates that exit code. |
 
 ---
 
@@ -359,7 +358,7 @@ Idempotent. If the marketplace source has changed (e.g. a stale local-directory 
 | Code | Meaning |
 |---|---|
 | 0 | Success. |
-| 1 | Target path does not exist. |
+| 2 | Target path does not exist (Usage error). |
 
 ---
 
@@ -381,7 +380,7 @@ Each check renders as `✓` (pass) or `✗` (fail) with a short detail line. Fai
 | Code | Meaning |
 |---|---|
 | 0 | All six checks passed. |
-| 1 | At least one check failed. |
+| 3 | At least one check failed (State error). |
 
 ### Example
 
@@ -418,4 +417,100 @@ Disables the scribetronic plugin and removes its marketplace entry from `<target
 | Code | Meaning |
 |---|---|
 | 0 | Success (including no-op). |
-| 1 | Target path does not exist. |
+| 2 | Target path does not exist (Usage error). |
+
+---
+
+## Agent-friendly modes
+
+Every read-only command (`list`, `info`, `doctor`) supports `--json` for machine-readable output. Mutation commands (`init`, `update`, `uninstall`, `style`) follow stdout/stderr discipline by default and respect `NO_COLOR`.
+
+### `--json` output
+
+When `--json` is passed:
+
+- The single payload is a newline-terminated JSON line on **stdout**.
+- All chrome (progress, hints, decorations) is suppressed.
+- Errors emit a structured envelope on **stdout** (yes, stdout — gh / kubectl convention) with shape `{"ok": false, "error": {"message": "...", "code": "..."}}`. The exit code is still non-zero.
+
+#### Schemas
+
+`scribetronic list --json`
+```json
+{
+  "skills": [
+    { "name": "agenda", "category": "Orchestrators", "path": "/abs/path/SKILL.md", "description": "..." }
+  ]
+}
+```
+
+`scribetronic info <skill> --json`
+```json
+{
+  "name": "agenda",
+  "path": "/abs/path/SKILL.md",
+  "frontmatter": { "name": "agenda", "description": "...", "...": "..." },
+  "body": "..."
+}
+```
+
+`scribetronic doctor [path] --json`
+```json
+{
+  "ok": true,
+  "target": "/abs/path",
+  "checks": [
+    { "label": "scribetronic/ directory", "ok": true, "detail": "..." }
+  ]
+}
+```
+
+### Exit codes (global contract)
+
+| Code | Meaning | When |
+|---|---|---|
+| 0 | Success | Command completed |
+| 1 | Unexpected error | Uncaught throw, internal bug, FS failure mid-op |
+| 2 | Usage error | Bad argument, missing path, unknown skill, `--reset` without TTY/`--yes` |
+| 3 | State error | Plugin not registered when expected, `doctor` checks failed |
+
+### Environment variables
+
+| Variable | Effect |
+|---|---|
+| `NO_COLOR` | If set to any non-empty value, disables ANSI color and the clack `intro/spinner/note/outro` boxes. Same effect as not having a TTY. |
+| `SCRIBETRONIC_YES` | Set to `1` to bypass `--reset` confirm prompts. Same as passing `--yes`. |
+| `EDITOR` | Editor invoked by `scribetronic style` (existing target, TTY). Falls back to `$VISUAL`, then `vi`. |
+| `VISUAL` | Fallback for `$EDITOR`. |
+
+### stdout vs stderr discipline
+
+| Stream | Contents |
+|---|---|
+| **stdout** | The command's data payload. In JSON mode: one JSON line. In human mode: only the value `style` prints when target exists in non-TTY (the absolute path). Everything else mutation-related goes to stderr. |
+| **stderr** | All chrome: headers, summaries, progress spinners, hints, error messages, success confirmations. |
+
+This means `scribetronic list | jq '.skills[].name' --raw-input` works; `scribetronic init >/dev/null 2>&1` is silent on success; `scribetronic doctor 2> doctor.log` keeps the report even with stdout discarded.
+
+### Examples for agents
+
+```bash
+# Read-only introspection, parseable
+scribetronic list --json | jq '.skills | length'                # → 22
+scribetronic info agenda --json | jq -r '.frontmatter.description'
+
+# Health check with structured output
+scribetronic doctor /repo --json | jq '.checks[] | select(.ok == false)'
+
+# Idempotent setup (silent on success)
+scribetronic update /repo > /dev/null 2>&1
+echo $?                                                          # → 0
+
+# Non-interactive reset
+scribetronic style --reset --yes
+SCRIBETRONIC_YES=1 scribetronic style --reset                    # equivalent
+
+# Capture writing-style path
+path=$(scribetronic style)
+cat "$path"
+```

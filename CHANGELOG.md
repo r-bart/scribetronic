@@ -31,6 +31,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `scripts/normalize-skill-frontmatter.mjs` — extracts non-spec keys from any SKILL.md frontmatter and migrates them to a `## Metadata` body section. Run after editing or adding skills.
 
+### Agent-friendly CLI
+
+Tier-1 fixes from the post-publish CLI audit. Every read-only command (`list`, `info`, `doctor`) now supports `--json` and emits a single newline-terminated JSON line on stdout; chrome (progress, hints, decorations) goes to stderr in human mode and is suppressed entirely in JSON mode. Errors in JSON mode emit `{"ok": false, "error": {"message", "code"}}` on stdout (gh / kubectl convention).
+
+- `--json` flag on `list`, `info`, `doctor` — schema documented in `docs/cli-reference.md`.
+- All commands route decoration/progress to **stderr**; stdout is reserved for data. `scribetronic init >/dev/null` now silently mutates without losing the error output.
+- `NO_COLOR=1` and non-TTY stdout disable color and clack chrome globally.
+- Granular exit codes: `0` success, `1` unexpected, `2` usage error (bad args/path, unknown skill), `3` state error (plugin not registered, doctor checks failed). Documented in `--help` epilog and `docs/cli-reference.md`.
+- `scribetronic style --reset` accepts `--yes` (or `SCRIBETRONIC_YES=1`) to bypass the confirm prompt — required for non-interactive shells (CI, agent invocations).
+- `scribetronic style` (no flags, existing target, non-TTY) prints the writing-style path on **stdout** so an agent can capture it via `path=$(scribetronic style)`.
+- `scribetronic --help` epilog now lists agent-canonical examples + the exit-code table.
+- Test suite grew from 78 to 106 tests across 14 files; coverage 91.26% statements / 78.74% branches / 95.74% functions.
+
 ### Voice override path (BREAKING for `scribetronic style`)
 
 - **`scribetronic style` now writes to `scribetronic/style/writing-style.md` (project root) instead of `.claude/skills/writing-style/SKILL.md`.** The old path was a leftover from before the plugin marketplace and was effectively orphaned: skills loaded `writing-style` from the marketplace cache, never from the project, so user edits had no effect.

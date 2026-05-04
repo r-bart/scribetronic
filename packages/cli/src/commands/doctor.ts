@@ -3,9 +3,12 @@ import { join, resolve } from 'node:path';
 import chalk from 'chalk';
 import { MARKETPLACE_NAME, PLUGIN_KEY, PLUGIN_NAME } from '../data/plugin.js';
 import { isPluginRegistered, readClaudeSettings } from '../utils/settings.js';
+import * as out from '../utils/output.js';
+import { ExitCode } from '../utils/exit.js';
 
 export interface DoctorOptions {
   path?: string;
+  json?: boolean;
 }
 
 interface Check {
@@ -20,7 +23,11 @@ interface Check {
  *
  * Exit codes:
  *   0 — all checks pass
- *   1 — at least one check failed
+ *   3 — at least one check failed (state error)
+ *
+ * Output:
+ *   Human mode: chalk-styled report on stderr; stdout empty.
+ *   JSON mode: one line on stdout: `{ ok, target, checks: [{label, ok, detail}] }`.
  */
 export async function doctorCommand(options: DoctorOptions): Promise<void> {
   const targetDir = resolve(options.path ?? process.cwd());
@@ -82,25 +89,39 @@ export async function doctorCommand(options: DoctorOptions): Promise<void> {
       : 'missing — run `scribetronic style` to seed your voice from the template',
   });
 
-  console.log();
-  console.log(chalk.bold('scribetronic doctor'));
-  console.log(chalk.dim(targetDir));
-  console.log();
+  const failed = checks.filter((c) => !c.ok).length;
 
-  let failed = 0;
-  for (const c of checks) {
-    const mark = c.ok ? chalk.green('✓') : chalk.red('✗');
-    const line = `  ${mark} ${c.label}`;
-    console.log(line);
-    if (c.detail) console.log(`     ${chalk.dim(c.detail)}`);
-    if (!c.ok) failed++;
+  if (options.json) {
+    out.data({
+      ok: failed === 0,
+      target: targetDir,
+      checks: checks.map((c) => ({
+        label: c.label,
+        ok: c.ok,
+        detail: c.detail ?? null,
+      })),
+    });
+    if (failed > 0) process.exit(ExitCode.State);
+    return;
   }
 
-  console.log();
+  // Human mode: report on stderr.
+  process.stderr.write('\n');
+  process.stderr.write(chalk.bold('scribetronic doctor') + '\n');
+  process.stderr.write(chalk.dim(targetDir) + '\n');
+  process.stderr.write('\n');
+
+  for (const c of checks) {
+    const mark = c.ok ? chalk.green('✓') : chalk.red('✗');
+    process.stderr.write(`  ${mark} ${c.label}\n`);
+    if (c.detail) process.stderr.write(`     ${chalk.dim(c.detail)}\n`);
+  }
+
+  process.stderr.write('\n');
   if (failed === 0) {
-    console.log(chalk.green(`all ${checks.length} checks passed`));
+    process.stderr.write(chalk.green(`all ${checks.length} checks passed`) + '\n');
   } else {
-    console.log(chalk.red(`${failed}/${checks.length} check(s) failed`));
-    process.exit(1);
+    process.stderr.write(chalk.red(`${failed}/${checks.length} check(s) failed`) + '\n');
+    process.exit(ExitCode.State);
   }
 }
