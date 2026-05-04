@@ -86,6 +86,37 @@ await templateCopier.copy(project, target)
 - Always `await` — no floating promises
 - Use `node:fs/promises`, never sync FS in hot paths
 
+### SKILL.md frontmatter (CRITICAL)
+
+Bundled `templates/claude-code/.claude/skills/*/SKILL.md` files MUST contain ONLY these YAML frontmatter keys: `name`, `description`, `allowed-tools`, `argument-hint`. Any other key (e.g. `inherits`, `formats`, `cadence`, `length_target`, `applies_to`, `quota`) causes Claude Code to **silently reject the skill at load time** — the file appears in the bundle and the cache, but the slash command never registers. This bug is invisible in unit tests; only `/plugin install` + a Claude Code restart exposes it.
+
+Operational metadata belongs in a `## Metadata` section at the top of the body (rendered as a bullet list), not in YAML.
+
+After editing or adding any SKILL.md, run:
+
+```bash
+node scripts/normalize-skill-frontmatter.mjs
+```
+
+The script is idempotent — it only touches files that have non-spec keys.
+
+### Skill content: format ↔ style decoupling (CRITICAL)
+
+Skills under `templates/claude-code/.claude/skills/` are **format-only**. Never embed:
+
+- Author names (Welsh, Koe, Moretti, Röhl, etc.)
+- References to specific posts, accounts, or third-party content libraries
+- "Roberto"-specifics (MakerOps, MW#N, personal newsletter URLs)
+- "X-style" labels naming a specific person ("Welsh-style closer", "Moretti tag-line")
+
+The single point of personalization is `writing-style/SKILL.md`, which ships as a **template the user fills in**. Every other skill remains universal — usable by any writer in any niche without editing.
+
+When a skill needs to reference voice/tone/examples, it must say:
+
+> "Voice and tone come from `writing-style/SKILL.md`."
+
+Not embed the voice itself.
+
 ---
 
 ## Quality Checks

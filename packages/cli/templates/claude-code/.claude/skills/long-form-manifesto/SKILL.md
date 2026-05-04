@@ -1,16 +1,19 @@
 ---
 name: long-form-manifesto
-description: Vision/strategy piece. ~1500-3000 words. Rare format — once or twice a year. Names what you're building, why, and how. Style: Dan Koe meets Marcus Moretti.
-inherits: ../writing-style/SKILL.md
-length_target: 1500-3000 words
-cadence: rare — quarterly at most, often annually
+description: Vision/strategy piece (~1500-3000 words). Rare format — once or twice a year. Names what you're building, why it matters, and how you'll get there. Use to plant a flag, reset direction, or invite people into a longer-term mission.
 ---
+
+## Metadata
+
+- **inherits**: `../writing-style/SKILL.md`
+- **length target**: 1500-3000 words
+- **cadence**: rare — quarterly at most, often annually
 
 # long-form-manifesto
 
-A piece that names what you're building, why it matters, and how you'll get there. Rare format. Used to plant a flag, reset direction, or invite people into a longer-term mission. References: own MW#1 + MW#3.
+A piece that names what you're building, why it matters, and how you'll get there. Rare format. Used to plant a flag, reset direction, or invite people into a longer-term mission.
 
-The danger: this is the format where Roberto's prose currently degrades the most into abstraction. Defaults must be aggressive on concreteness.
+The danger: this format is the most prone to abstraction drift — vague vision-speak, "transformational" language, no numbers. Defaults must be aggressive on concreteness. Voice and tone are inherited from `writing-style/SKILL.md`.
 
 ## Structure
 

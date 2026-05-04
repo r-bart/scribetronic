@@ -1,9 +1,12 @@
 ---
 name: short-form-present-vs-future
-description: Short-form (X / LinkedIn) comparison of how something is done today vs how it will be done in 1–5 years. Welsh format #8. Strong for tech / AI / tooling takes. Use when the user wants to frame a directional bet, a tooling shift, or an obsolescence call — anything where the punchline is "this is the present; here's the future".
-inherits: ../short-form-voice-adjustments/SKILL.md
-formats: [X single, X thread, LinkedIn]
+description: Short-form (X / LinkedIn) comparison of how something is done today vs how it will be done in 1–5 years. Strong for tech / AI / tooling takes. Use when the user wants to frame a directional bet, a tooling shift, or an obsolescence call — anything where the punchline is "this is the present; here's the future".
 ---
+
+## Metadata
+
+- **inherits**: `../short-form-voice-adjustments/SKILL.md`
+- **formats**: X single, X thread, LinkedIn
 
 # short-form-present-vs-future
 
@@ -40,7 +43,11 @@ Compare how a thing is done today vs how it will be done — soon, or with a new
 - Symmetry trap — listing 5 things old vs 5 things new with no insight. Pick the contrast that matters.
 - "RIP [old thing]" framing. Lazy.
 
-## Examples to model
+## Example shapes
 
-Moretti-style: _"The old way: spend 3 hours in dashboards. The new way: one /pulse command. The dashboards weren't the work — they were the obstacle."_
-Welsh-style: _"Old: 9 tools for content. New: 1 doc + 1 cron. Same output."_
+Two illustrative present-vs-future framings (replace with shifts you're actually experiencing):
+
+- The reframed-obstacle shape: _"The old way: spend 3 hours in dashboards. The new way: one /pulse command. The dashboards weren't the work — they were the obstacle."_
+- The collapsed-toolchain shape: _"Old: 9 tools for content. New: 1 doc + 1 cron. Same output."_
+
+For author-specific references in your voice, see `writing-style/SKILL.md`.

@@ -1,14 +1,17 @@
 ---
 name: short-form-motivational
-description: Short-form motivational post within your niche. Welsh format #4. WARNING — easiest format to slide into AI slop / coach-speak. Use sparingly.
-inherits: ../short-form-voice-adjustments/SKILL.md
-formats: [X single, LinkedIn, Threads]
-quota: max 1-2 per month
+description: Short-form motivational post within your niche (X / LinkedIn / Threads). WARNING — easiest format to slide into AI slop / coach-speak. Use when you have a personal-stakes statement or hard truth tied to a specific moment in your work — never as generic inspiration. Hard quota: 1-2 per month max.
 ---
+
+## Metadata
+
+- **inherits**: `../short-form-voice-adjustments/SKILL.md`
+- **formats**: X single, LinkedIn, Threads
+- **quota**: max 1-2 per month
 
 # short-form-motivational
 
-A motivational post WITHIN your niche. The format Welsh uses regularly, and the format most likely to make you sound like a LinkedIn coach if you're not careful.
+A motivational post WITHIN your niche. The format most likely to make you sound like a LinkedIn coach if you're not careful — and the format most likely to ship pure AI slop if your `writing-style/SKILL.md` doesn't enforce specifics.
 
 **Quota: 1-2 per month maximum.** More than that and your feed turns into noise.
 
@@ -26,16 +29,16 @@ A motivational post WITHIN your niche. The format Welsh uses regularly, and the 
   - The implication for the reader.]
 
 [Closer: a hard, declarative line. NOT "you got this!".
-  Examples:
+  Generic shapes (replace with your own):
   - "Just start."
   - "The right time is now."
-  - "Your future self will thank you." (Welsh signature)]
+  - A specific command tied to your niche.]
 ```
 
 ## Rules
 
 - **Personal specifics are mandatory.** A motivational post without a specific scene from YOUR life is generic motivation — and generic motivation is AI slop.
-- **No "you got this" / "believe in yourself" energy.** Welsh works because he says hard things, not soft things.
+- **No "you got this" / "believe in yourself" energy.** Motivational posts that land say hard things, not soft things.
 - **Land it with a command, not a wish.** "Just start" beats "I hope you take action".
 - **Tie it to your niche.** Motivation about life in general is too broad. Motivation about shipping, building, writing — your turf.
 
@@ -46,12 +49,13 @@ A motivational post WITHIN your niche. The format Welsh uses regularly, and the 
 - Posts that could appear under any name in any industry. The post should only make sense from YOU about YOUR niche.
 - Three-adjective stacks describing future state ("amazing, fulfilling, abundant"). Cut.
 - "Like and follow if you agree" — engagement bait.
-- Closing with "What's stopping you?" — Welsh-tic-overuse.
+- Closing with "What's stopping you?" — overused tic.
 
-## Examples to model (and their constraints)
+## Example patterns (and their constraints)
 
-Welsh: _"The worst thing that happens when we take a chance is that our life stays the same."_ — sharp, specific phrasing, earns the motivational tone.
-Welsh: _"Why not you? Why not today?"_ — Welsh's actual closer. Use ONCE per year, not per post.
+The shape that works: a sharp, specific phrasing that earns the motivational tone via concrete detail — _"The worst thing that happens when we take a chance is that our life stays the same."_ Counter-pattern that almost never earns its place: rhetorical-question closers like _"Why not you? Why not today?"_ — usable once per year, not per post.
+
+For author-specific references in your own voice, see `writing-style/SKILL.md`.
 
 ## Workflow
 

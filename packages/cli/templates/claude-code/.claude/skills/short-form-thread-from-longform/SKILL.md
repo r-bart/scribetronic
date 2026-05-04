@@ -1,16 +1,19 @@
 ---
 name: short-form-thread-from-longform
-description: Derives an X thread (and optionally LinkedIn post + Threads post) from a long-form piece. Repurposing engine — Welsh's "1 newsletter → 6-12 pieces" approach.
-inherits: ../short-form-voice-adjustments/SKILL.md
-input: a long-form piece from .claude/skills/long-form-* output (devlog, hot-take, how-to, launch-retro, manifesto)
-formats: [X thread, LinkedIn post, Threads post]
+description: Derives an X thread (and optionally LinkedIn post + Threads post) from a long-form piece. Repurposing engine — chops one published long-form into 2-4 short-form derivatives so the writing system stays sustainable. Use after a long-form is drafted (and ideally edited) when you want to extract its substance for social channels.
 ---
+
+## Metadata
+
+- **inherits**: `../short-form-voice-adjustments/SKILL.md`
+- **input**: a long-form piece from skills/long-form-* output (devlog, hot-take, how-to, launch-retro, manifesto)
+- **formats**: X thread, LinkedIn post, Threads post
 
 # short-form-thread-from-longform
 
 Takes a finished long-form piece and produces 1-3 short-form derivatives. This is the engine that makes the writing system sustainable — without it, you're writing twice.
 
-Reference: Welsh's content matrix repurposing flow ("chop a newsletter into 6-12 pieces").
+The repurposing principle: one well-structured long-form should yield 6-12 candidate short-form pieces; ship 2-4 of them, spread over 1-2 weeks.
 
 ## Inputs
 
@@ -73,7 +76,7 @@ N+1/ [Soft CTA: "Wrote about this in detail here: [link to long-form]"]
 - **Hook tweet is 80% of the work.** Spend disproportionate time on it. If the hook is weak, the rest is wasted.
 - **No "1/" if you're not numbering.** Either number all or none.
 - **Always link back to the long-form** in the closer if it's published. Drives the long-form's reach.
-- **Quota check:** don't ship the thread + LinkedIn + Threads + observation all on the same day. Stagger. (Welsh: spread across 12 weeks.)
+- **Quota check:** don't ship the thread + LinkedIn + Threads + observation all on the same day. Stagger across the week, or further (1-2 weeks for derivatives of a single long-form).
 
 ## Anti-patterns
 

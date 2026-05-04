@@ -1,6 +1,6 @@
 {
   "name": "scribetronic",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Editorial calendar + writing pipeline for Claude Code (CLI + plugin marketplace)",
   "type": "module",
   "bin": {

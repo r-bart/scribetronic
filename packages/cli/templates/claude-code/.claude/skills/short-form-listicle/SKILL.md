@@ -1,9 +1,12 @@
 ---
 name: short-form-listicle
-description: Short-form numbered list post for X / LinkedIn / Threads. "X things I learned doing Y", "X mistakes that cost me Z", "X principles for Z". Welsh format #2. Use when the user has a small set (3–10) of crisp, parallel points worth shipping as a standalone short-form piece — or when distilling a how-to / launch-retro long-form into a list.
-inherits: ../short-form-voice-adjustments/SKILL.md
-formats: [X thread, LinkedIn, Threads]
+description: Short-form numbered list post for X / LinkedIn / Threads. "X things I learned doing Y", "X mistakes that cost me Z", "X principles for Z". Use when the user has a small set (3–10) of crisp, parallel points worth shipping as a standalone short-form piece — or when distilling a how-to / launch-retro long-form into a list.
 ---
+
+## Metadata
+
+- **inherits**: `../short-form-voice-adjustments/SKILL.md`
+- **formats**: X thread, LinkedIn, Threads
 
 # short-form-listicle
 
@@ -63,7 +66,11 @@ N/ [Closer — meta-lesson + soft CTA to long-form if it's a derivative]
 - Items that overlap (#3 is just #1 reworded). Cut.
 - Inconsistent grammar (mix of imperatives and nouns).
 
-## Examples to model
+## Example shapes
 
-Welsh: _"5 things I do every Sunday to set up the week."_
-Welsh: _"3 LinkedIn habits that grew my account to 500k."_
+The goal is a hook of the form `<number> + <outcome> + <qualifier>`. Two illustrative shapes (replace with examples in your own niche):
+
+- `"5 things I do every Sunday to set up the week."`
+- `"3 habits that grew my [audience metric] to [number]."`
+
+If your `writing-style/SKILL.md` lists author/post references for listicle hooks you admire, those override these defaults.

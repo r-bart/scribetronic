@@ -15,6 +15,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.1] — 2026-05-04
+
+### Fixed
+
+- **All 22 skills now load correctly in Claude Code.** Previously the bundled SKILL.md frontmatter included custom keys (`inherits`, `length_target`, `cadence`, `formats`, `applies_to`, `input`, `format`, `quota`, `status`, `language`, `target_voice`, `sources`, `last_updated`) that the Claude Code skills loader silently rejected — only 4 of 22 skills were actually loading. Frontmatter now contains only the spec-allowed keys (`name`, `description`); the operational metadata moved to a `## Metadata` section at the top of each skill body where it remains visible to humans and to skills that read it.
+
+### Changed
+
+- **Skills decoupled from style.** Every `long-form-*`, `short-form-*`, `editing-pass`, and `ai-slop-check` SKILL.md is now format-only — no embedded references to specific authors, posts, or accounts. The skills describe how a piece is shaped (structure, length, anti-patterns); the voice/tone/reference layer lives entirely in `writing-style/SKILL.md`. This makes every format skill reusable by any user in any niche without editing.
+- **`writing-style/SKILL.md` rewritten as a personalization template.** Ships with a new `## Reference sources` section, `<your-name>` placeholders throughout, "How to fill this file" instructions, and a generalized "native-language interference watch" section (was Spanish-specific). Users either fill it manually (~30-60 min) or run `/scribetronic:style-extract` against their own samples to get a first draft.
+- Bumped CLI to `0.2.1` and plugin lockstep to `0.2.1`.
+
+### Tooling
+
+- `scripts/normalize-skill-frontmatter.mjs` — extracts non-spec keys from any SKILL.md frontmatter and migrates them to a `## Metadata` body section. Run after editing or adding skills.
+
+### Migration
+
+- v0.2.0 was live for hours with no production users, so no migration is required for skill content.
+- If you forked v0.2.0 and personalized `writing-style/SKILL.md`: port your customizations to the new template structure (sections renumbered; section 0 "Reference sources" is new).
+
+---
+
 ## [0.2.0] — 2026-05-04
 
 ### Added

@@ -1,9 +1,12 @@
 ---
 name: short-form-observation
-description: Short-form post (X single / LinkedIn / Threads) stating a single observation. No list, no contrast — just one thing noticed clearly and named. Welsh format #3. Use when the user has a one-line insight, pattern, or quiet contrarian take that doesn't need scaffolding to land.
-inherits: ../short-form-voice-adjustments/SKILL.md
-formats: [X single, LinkedIn, Threads]
+description: Short-form post (X single / LinkedIn / Threads) stating a single observation. No list, no contrast — just one thing noticed clearly and named. Use when the user has a one-line insight, pattern, or quiet contrarian take that doesn't need scaffolding to land.
 ---
+
+## Metadata
+
+- **inherits**: `../short-form-voice-adjustments/SKILL.md`
+- **formats**: X single, LinkedIn, Threads
 
 # short-form-observation
 
@@ -44,8 +47,12 @@ A single noticed thing, stated clearly. The most disposable format AND the most 
 - Vague universals ("Life is hard", "People are weird"). The whole point is specificity.
 - Adding a CTA. Observations don't sell — they earn trust.
 
-## Examples to model
+## Example shapes
 
-Welsh: _"Most people don't have a content problem. They have a thinking problem."_
-Koe: _"People don't follow dictionaries, they follow humans."_
-Röhl-style observation: _"The week I shipped least was the week I learned most. That should bother me more than it does."_
+Three illustrative observation shapes (replace with examples in your own niche / voice):
+
+- The reframed-pattern observation: _"Most people don't have a content problem. They have a thinking problem."_
+- The metaphor-collapse observation: _"People don't follow dictionaries, they follow humans."_
+- The honest-paradox observation: _"The week I shipped least was the week I learned most. That should bother me more than it does."_
+
+For specific author/post references you want to model, store them in `writing-style/SKILL.md`.

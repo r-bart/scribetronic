@@ -1,8 +1,11 @@
 ---
 name: style-refine
 description: Propone deltas concretos a writing-style/SKILL.md a partir del historial real de edición del usuario (draft vs publicado). No reescribe automáticamente — genera un documento de propuestas con evidencia textual obligatoria. Invocar tras 3+ piezas publicadas o cuando el usuario sienta drift de voz.
-inherits: ../writing-style/SKILL.md
 ---
+
+## Metadata
+
+- **inherits**: `../writing-style/SKILL.md`
 
 # style-refine
 

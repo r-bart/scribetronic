@@ -1,9 +1,12 @@
 ---
 name: editing-pass
 description: Read-and-revise pass for any drafted post. Applies writing-style.md checklist, tightens prose, kills filler. Run after drafting and before ai-slop-check.
-inherits: ../writing-style/SKILL.md
-applies_to: [long-form/*, short-form/*]
 ---
+
+## Metadata
+
+- **inherits**: `../writing-style/SKILL.md`
+- **applies to**: long-form/*, short-form/*
 
 # editing-pass
 
@@ -31,7 +34,7 @@ Run through the checklist in `writing-style/SKILL.md` section 8:
 - [ ] First 2 sentences contain the point.
 - [ ] Closer is declarative, not soft.
 - [ ] At most ONE rhetorical question.
-- [ ] At most ONE Welsh-punctuation paragraph.
+- [ ] At most ONE staccato 2-3 word paragraph (_"That's it."_, _"Why?"_).
 - [ ] Zero "not just X, but Y" constructions.
 - [ ] Zero adjective stacks of 3+.
 - [ ] At least one concrete number, name, or date.
